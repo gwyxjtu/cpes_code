@@ -119,10 +119,10 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     m_ghp_q=p_ghp_nominal/c/(12-7)#地源热泵供冷水回路流量,额定产冷量除以(供回水路温差*比热容)
     A_wt=pow(m_wt/ro_wt,2/3)*6#热水罐表面积
     A_ct=pow(m_ct/ro_wt,2/3)*6#热水罐表面积
-    m_io=m_wt#热水罐的换水量，后续要改
+    #m_io=m_wt#热水罐的换水量，后续要改
     m_cio=m_ct#冷水罐的换水量，后续要改
     
-    temperature =[26.32, 25.57, 24.6, 24.4, 23.85, 24.9, 25.68, 26.41, 27.2, 28.36, 30.97, 31.3, 33.65, 35.29, 35.5, 33.7, 32.45,
+    temperature = [26.32, 25.57, 24.6, 24.4, 23.85, 24.9, 25.68, 26.41, 27.2, 28.36, 30.97, 31.3, 33.65, 35.29, 35.5, 33.7, 32.45,
     31.8, 30.87, 29.79, 28.7, 27.7, 26.79, 25.97]   #夏季室外温度
     # temperature = np.array(
     #     [6.32, 5.57, 4.6, 4.4, 3.85, 4.9, 5.68, 6.41, 7.2, 8.36, 0.97, 11.3, 13.65, 15.29, 15.5, 13.7, 12.45,
@@ -136,7 +136,10 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     ce_ce=probV6.addVar(vtype=GRB.CONTINUOUS,name=f"ce_ce")
     cer=probV6.addVar(vtype=GRB.CONTINUOUS,name=f"cer")
     ce_eo=probV6.addVar(vtype=GRB.CONTINUOUS,name=f"ce_eo")
-    
+    #果式debug
+    m_io = probV6.addVar(vtype=GRB.CONTINUOUS,name=f"m_io")
+    #m_cio = probV6.addVar(vtype=GRB.CONTINUOUS,name=f"m_cio")
+
 
     z_g=[probV6.addVar(lb=0,ub=1,vtype=GRB.BINARY,name=f"z_g{i}") for i in range(period)]
     z_u=[probV6.addVar(lb=0,ub=1,vtype=GRB.BINARY,name=f"z_u{i}") for i in range(period)]
@@ -266,7 +269,7 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
         probV6.addConstr(r_ea[i] == 0*z_fca[i] + 1.78*(r_ma[i] - 0*z_fca[i]))
         probV6.addConstr(r_eb[i] == 0.534*z_fcb[i] + 0.94*(r_mb[i] - 0.3*z_fcb[i]))
         probV6.addConstr(r_ec[i] == 0.91*z_fcc[i] + 0.3*(r_mc[i] - 0.7*z_fcc[i]))
-        probV6.addConstr(m_fc[i] == 0.11*(r_ma[i] + r_mb[i] + r_mc[i])*p_fc_nominal)
+        probV6.addConstr(m_fc[i] == 1/yita_fc_e_nominal*(r_ma[i] + r_mb[i] + r_mc[i])*p_fc_nominal)
         probV6.addConstr(p_fc[i] == (r_ea[i] + r_eb[i] + r_ec[i])*p_fc_nominal)
         probV6.addConstr(r_ga[i] >= z_fca[i]*0)
         probV6.addConstr(r_ga[i] <= z_fca[i]*0.21)
@@ -277,11 +280,11 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
         probV6.addConstr(r_ga[i] == 0*z_fca[i] + 0.7*(r_ma[i] - 0*z_fca[i]))
         probV6.addConstr(r_gb[i] == 0.21*z_fcb[i] + 0.9475*(r_mb[i] - 0.3*z_fcb[i]))
         probV6.addConstr(r_gc[i] == 0.619*z_fcc[i] + 1.27*(r_mc[i] - 0.7*z_fcc[i]))
-        probV6.addConstr(g_fc[i] == (r_ga[i] + r_gb[i] + r_gc[i])*p_fc_nominal*2.19)
-        probV6.addConstr((r_ea[i] + r_eb[i] + r_ec[i]) >= yita_fc_e_nominal * 0.11*(r_ma[i] + r_mb[i] + r_mc[i]) - M*(p_fc_nominal-p_fc[i]))#额定功率时产电COP等于额定值
-        probV6.addConstr((r_ea[i] + r_eb[i] + r_ec[i]) <= yita_fc_e_nominal * 0.11*(r_ma[i] + r_mb[i] + r_mc[i]) + M*(p_fc_nominal-p_fc[i]))
-        probV6.addConstr((r_ga[i] + r_gb[i] + r_gc[i])*2.19 >= yita_fc_e_nominal * 0.11*(r_ma[i] + r_mb[i] + r_mc[i]) - M*(p_fc_nominal-p_fc[i]))#额定功率时产热COP等于额定值
-        probV6.addConstr((r_ga[i] + r_gb[i] + r_gc[i])*2.19 <= yita_fc_e_nominal * 0.11*(r_ma[i] + r_mb[i] + r_mc[i]) + M*(p_fc_nominal-p_fc[i]))
+        probV6.addConstr(g_fc[i] == (r_ga[i] + r_gb[i] + r_gc[i])*p_fc_nominal*yita_fc_g_nominal/yita_fc_e_nominal)
+        #probV6.addConstr((r_ea[i] + r_eb[i] + r_ec[i]) >= yita_fc_e_nominal * 0.11*(r_ma[i] + r_mb[i] + r_mc[i]) - M*(p_fc_nominal-p_fc[i]))#额定功率时产电COP等于额定值
+        #probV6.addConstr((r_ea[i] + r_eb[i] + r_ec[i]) <= yita_fc_e_nominal * 0.11*(r_ma[i] + r_mb[i] + r_mc[i]) + M*(p_fc_nominal-p_fc[i]))
+        #probV6.addConstr((r_ga[i] + r_gb[i] + r_gc[i])*2.19 >= yita_fc_e_nominal * 0.11*(r_ma[i] + r_mb[i] + r_mc[i]) - M*(p_fc_nominal-p_fc[i]))#额定功率时产热COP等于额定值
+        #probV6.addConstr((r_ga[i] + r_gb[i] + r_gc[i])*2.19 <= yita_fc_e_nominal * 0.11*(r_ma[i] + r_mb[i] + r_mc[i]) + M*(p_fc_nominal-p_fc[i]))
         probV6.addConstr(t_fc_ex[i] >= t_r[i])#V6.5(16),下同
         probV6.addConstr(c * m_fc_w * (t_fc_ex[i] - t_r[i]) == w_fc[i])#双线性改
         probV6.addConstr(g_fc[i]-M*(1-z_fcth[i]) <= w_fc[i])
@@ -415,9 +418,11 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     #input()
     if probV6.status == GRB.INFEASIBLE or probV6.status == 4:
         print('Model is infeasible111')
-        return 1,1,1,1
         probV6.computeIIS()
-        probV6.write('model.ilp')
+        probV6.write('opmodel.ilp')
+        return 1,1,1,1
+        
+        
         print("Irreducible inconsistent subsystem is written to file 'model.ilp'")
         
     #prob.solve(pulp.GUROBI_CMD(options=[('MIPgap',0.0001)]))
@@ -484,20 +489,20 @@ def operating_problem(dict_load,device_cap,isolate,tem_env,input_json,period):
     #exit(0)
     if flag1 == 1 or flag2 == 1 or flag3 ==1 or flag4 ==1:
         return 0,1
-    opex_sum=(opex_spring+opex_summer+opex_autumn+opex_winter)*12
-    ce_sum=(ce_h_spring+ce_h_summer+ce_h_autumn+ce_h_winter)*12
+    opex_sum=(opex_spring+opex_summer+opex_autumn+opex_winter)*365/28
+    ce_sum=(ce_h_spring+ce_h_summer+ce_h_autumn+ce_h_winter)*365/28
     
     #第三步算结果
     output_json = {
             "operation_cost": format(opex_sum/10000,'.2f'),  # 年化运行成本/万元
             "cost_save_rate": format((opex_ele_only-opex_sum)/opex_ele_only,'.4f'),  #电运行成本节约比例
             "cost_save_rate_gas": format((opex_ele_gas-opex_sum)/opex_ele_gas,'.4f'),  #电气运行成本节约比例
-            "co2":format(ce_sum,'.2f'),  #总碳排/t
+            "co2":format(ce_sum/1000,'.2f'),  #总碳排/t
             "cer_rate":format((co2_ele_only-ce_sum)/co2_ele_only,'.4f'),  #与电系统相比的碳减排率
             "cer_gas":format((co2_ele_gas-ce_sum)/co2_ele_gas,'.4f'), #与电气系统相比的碳减排率
-            "cer_perm2":format((co2_ele_only-ce_sum)/area,'.2f'),  #电系统每平米的碳减排量/t
-            "cer_perm2_gas":format((co2_ele_gas-ce_sum)/area,'.2f'),  #电气系统每平米的碳减排量/t
-            "cer":format(co2_ele_only-ce_sum,'.4f')
+            "cer_perm2":format((co2_ele_only-ce_sum)/area/1000,'.2f'),  #相对于电系统每平米的碳减排量/t
+            "cer_perm2_gas":format((co2_ele_gas-ce_sum)/area/1000,'.2f'),  #相对于电气系统每平米的碳减排量/t
+            "cer":format((co2_ele_only-ce_sum)/1000,'.4f')#碳减排
     }
 
     return output_json,0

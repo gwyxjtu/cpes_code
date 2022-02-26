@@ -190,7 +190,7 @@ def get_load_new(load_dict):
             ele_load = [ele_load[i]*kkk for i in range(period)]
     print(max(g_demand),max(q_demand),max(ele_load))
     print(sum(g_demand),sum(q_demand),sum(ele_load))
-    dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar}
+    dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,'load_sort':load_dict["load_sort"]}
     #exit(0)
     return dict_load
 

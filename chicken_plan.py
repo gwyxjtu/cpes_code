@@ -140,7 +140,7 @@ def planning_problem(dict,isloate,input_json):
     k_fc_g = input_json['device']['fc']['eta_ex_g']
     k_el = input_json['device']['el']['beta_el']
 
-    k_hp_g = input_json['device']['hp']['beta_hpg']
+    k_hp_g = input_json['device']['hp']['beta_hpg']-dict['load_sort']*0.3
     k_hp_q = input_json['device']['hp']['beta_hpq']
     k_hpg_g = input_json['device']['ghp']['beta_ghpg']
     k_hpg_q = input_json['device']['ghp']['beta_ghpq']
@@ -148,6 +148,8 @@ def planning_problem(dict,isloate,input_json):
     k_sc = input_json['device']['sc']['beta_sc']
     theta_ex = input_json['device']['sc']['theta_ex']
     p_gtw = input_json['device']['gtw']['beta_gtw']
+    #if  >= 4:
+    #k_hp_g = input_json['device']['hp']['beta_hpg']
 
     ele_load = dict['ele_load']
     g_demand = dict['g_demand']
@@ -298,7 +300,7 @@ def planning_problem(dict,isloate,input_json):
         #m.addConstr(h_sto[i*24+24] == h_sto[24*i])
     m.addConstr(t_ht[-1] == t_ht[0])
     m.addConstr(t_ct[-1] == t_ct[0])
-    m.addConstr(h_sto[-24] == h_sto[0])
+    m.addConstr(h_sto[-12] == h_sto[0])
 
 
     m.addConstr(num_gtw<=input_json['device']['gtw']['number_max'])
@@ -335,11 +337,11 @@ def planning_problem(dict,isloate,input_json):
     # 储能约束
     for i in range(period - 1):
         # hot water tank and heat supply
-        m.addConstr(c*m_ht*(t_ht[i + 1] - t_ht[i]) + g_demand[i] +g_hpg_gr[i] == 
+        m.addConstr(c*m_ht*(t_ht[i + 1] - 0.99*t_ht[i]) + g_demand[i] +g_hpg_gr[i] == 
             g_fc[i] + g_hp[i] + g_eb[i] + g_hpg[i])
 
         # cold water tank and cold supply
-        m.addConstr(c*m_ct * (t_ct[i] - t_ct[i+1]) + q_demand[i] == q_hp[i] +q_hpg[i])
+        m.addConstr(c*m_ct * (1.01*t_ct[i] - t_ct[i+1]) + q_demand[i] == q_hp[i] +q_hpg[i])
         #if i%24 == 0 and int(i/24)<364:
             #m.addConstr(m_ct * (t_ct[i] - t_ct[i+1]) + q_demand[i]/c == m_hpc[i] * (5) +m_ec[i]*(5)  - eta_loss*m_ct*(t_ct[i] - 16))
             #m.addConstr(h_sto[i+1] - h_sto[i] + h_ssto[int(i/24)+1] - h_ssto[int(i/24)] == h_pur[i] + h_el[i] - h_fc[i])
@@ -348,8 +350,8 @@ def planning_problem(dict,isloate,input_json):
             #m.addConstr(m_ct * (t_ct[i] - t_ct[i+1]) + q_demand[i]/c == m_hpc[i] * (5) +m_ec[i]*(5)  - eta_loss*m_ct*(t_ct[i] - 16))
         m.addConstr(h_sto[i+1] - h_sto[i] == h_pur[i] + h_el[i] - h_fc[i])
         
-    m.addConstr(c*m_ht * (t_ht[0] - t_ht[-1]) + g_demand[-1] +g_hpg_gr[-1] == g_fc[-1]+g_hp[-1]+g_eb[-1]+ g_hpg[-1])
-    m.addConstr(c*m_ct * (t_ct[-1] - t_ct[0]) + q_demand[-1] ==  q_hp[-1] +q_hpg[-1])
+    m.addConstr(c*m_ht * (t_ht[0] - 0.99*t_ht[-1]) + g_demand[-1] +g_hpg_gr[-1] == g_fc[-1]+g_hp[-1]+g_eb[-1]+ g_hpg[-1])
+    m.addConstr(c*m_ct * (1.01*t_ct[-1] - t_ct[0]) + q_demand[-1] ==  q_hp[-1] +q_hpg[-1])
     m.addConstr(h_sto[0] - h_sto[-1] == h_pur[-1] + h_el[-1] - h_fc[-1])
     #m.addConstr(h_sto[0] - h_sto[-1] + h_ssto[0] - h_ssto[-1] == h_pur[-1] + h_el[-1] - h_fc[-1])
     #m.addConstr(t_ht[0] == 60)
@@ -432,7 +434,7 @@ def planning_problem(dict,isloate,input_json):
     m.addConstr(cost_c_cool == sum([q_demand[i]/4*lambda_ele_in[i] for i in range(period)]))#/3.8)
     m.addConstr(cost_c == cost_c_cool+cost_c_heat+cost_c_ele)
     m.setObjective(crf_pv*s_pv*cost_pv +crf_sc*s_sc*cost_sc + crf_hst*hst*cost_hst + crf_water*cost_ht*(m_ht+m_ct) + crf_hp*cost_hp*p_hp_max  + crf_hpg*cost_hpg*p_hpg_max + crf_gtw*cost_gtw*num_gtw
-        + crf_eb*cost_eb*p_eb_max  +crf_fc*capex_fc+crf_el*capex_el+crf_co*p_co_max*cost_co
+        + crf_eb*cost_eb*p_eb_max  + crf_fc*capex_fc + crf_el*capex_el+crf_co*p_co_max*cost_co
         + lambda_h*gp.quicksum(h_pur) + gp.quicksum([p_pur[i]*lambda_ele_in[i] for i in range(period)])-gp.quicksum(p_sol)*lambda_ele_out,GRB.MINIMIZE)
     #-gp.quicksum(p_sol)*lambda_ele_out
     # First optimize() call will fail - need to set NonConvex to 2
@@ -550,12 +552,12 @@ def planning_problem(dict,isloate,input_json):
             "operation_cost": format(op_sum/10000,'.2f'),  # 年化运行成本/万元
             "cost_save_rate": format((opex_ele_only-op_sum)/opex_ele_only,'.4f'),  #电运行成本节约比例
             "cost_save_rate_gas": format((opex_ele_gas-op_sum)/opex_ele_gas,'.4f'),  #电气运行成本节约比例
-            "co2":format(ce_h.X,'.2f'),  #总碳排/t
+            "co2":format(ce_h.X/1000,'.2f'),  #总碳排/t
             "cer_rate":format((co2_ele_only-ce_h.X)/co2_ele_only,'.4f'),  #与电系统相比的碳减排率
             "cer_gas":format((co2_ele_gas-ce_h.X)/co2_ele_gas,'.4f'), #与电气系统相比的碳减排率
-            "cer_perm2":format((co2_ele_only-ce_h.X)/input_json['load']['load_area'],'.2f'),  #电系统每平米的碳减排量/t
-            "cer_perm2_gas":format((co2_ele_gas-ce_h.X)/input_json['load']['load_area'],'.2f'),  #电气系统每平米的碳减排量/t
-            "cer":format(co2_ele_only-ce_h.X,'.4f')
+            "cer_perm2":format((co2_ele_only-ce_h.X)/input_json['load']['load_area']/1000,'.2f'),  #电系统每平米的碳减排量/t
+            "cer_perm2_gas":format((co2_ele_gas-ce_h.X)/input_json['load']['load_area']/1000,'.2f'),  #电气系统每平米的碳减排量/t
+            "cer":format((co2_ele_only-ce_h.X)/1000,'.4f')
     }
     return {'objective':m.objVal,
             'process time':time.time() - t0,

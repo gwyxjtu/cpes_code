@@ -1,24 +1,16 @@
-\ Model mip1_copy
+\ Model OperatingModelV6_copy
 \ LP format - for model browsing. Use MPS format to capture full model detail.
 Minimize
  
 Subject To
- R8801: 2000 s_pv + 2000 s_sc + 3000 num_gtw + 3000 p_hp_max
-   + 4000 p_hpg_max + 500 p_eb_max + 0.5 m_ht + 0.5 m_ct + 10000 p_fc_max
-   + 10000 p_el_max + 3000 hst <= 4e+08
- R202095: p_pur7159 <= 0
- R202101: p_fc7159 - p_fc_max <= 0
- R202113: p_co7159 - 1.399 h_el7159 = 0
- R202118: p_hp7159 + p_hpc7159 + p_hpg7159 + p_hpgc7159 + p_eb7159
-   + p_co7159 - p_pv7159 - p_fc7159 + p_el7159 - p_pur7159 + p_sol7159
-   = -51247.36548606704
- R202119: - 0.05565 s_pv + p_pv7159 = 0
+ R18217: q_hp159 + q_ghp159 - q_inout159 = 1970.330774229672
+ R18224: p_hp159 <= 337.7214229023394
+ R18227: - 4 p_hp159 + q_hp159 = 0
+ R18231: - 4 p_ghp_q159 = 0
+ R18232: - 4 p_ghp_q159 + q_ghp159 = 0
 Bounds
- p_co7159 free
- p_pv7159 free
- p_fc7159 free
- p_fc_max free
- p_pur7159 free
-Generals
- num_gtw
+ p_hp159 free
+ p_ghp_q159 free
+ q_hp159 free
+ q_ghp159 free
 End

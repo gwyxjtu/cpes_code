@@ -1,0 +1,16 @@
+\ Model OperatingModelV6_copy
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Minimize
+ 
+Subject To
+ R18217: q_hp159 + q_ghp159 - q_inout159 = 1970.330774229672
+ R18224: p_hp159 <= 317.2390661833117
+ R18227: - 4 p_hp159 + q_hp159 = 0
+ R18231: - 4 p_ghp_q159 = 0
+ R18232: - 4 p_ghp_q159 + q_ghp159 = 0
+Bounds
+ p_hp159 free
+ p_ghp_q159 free
+ q_hp159 free
+ q_ghp159 free
+End
