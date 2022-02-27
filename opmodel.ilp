@@ -3,14 +3,15 @@
 Minimize
  
 Subject To
- R18217: q_hp159 + q_ghp159 - q_inout159 = 1970.330774229672
- R18224: p_hp159 <= 317.2390661833117
- R18227: - 4 p_hp159 + q_hp159 = 0
- R18231: - 4 p_ghp_q159 = 0
- R18232: - 4 p_ghp_q159 + q_ghp159 = 0
+ R17739: q_hp159 + q_ghp159 - q_inout159 >= 693.1682583041821
+ R17744: p_hp159 <= 106.8565511153121
+ R17747: - 4 p_hp159 + q_hp159 = 0
+ R17751: - 4 p_ghp_q159 + 1.4 t_cr159 - 1.4 t_ghp_q159 = 0
+ R17752: - 4 p_ghp_q159 + q_ghp159 = 0
 Bounds
  p_hp159 free
  p_ghp_q159 free
  q_hp159 free
  q_ghp159 free
+ -infinity <= t_cr159 <= 100
 End

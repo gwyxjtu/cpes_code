@@ -320,6 +320,20 @@ if __name__ == '__main__':
     #买电，卖电，买氢
 
     res1,grid_planning_output_json,grid_operation_output_json_plan,device_cap1 = planning_problem(dict_load, [1,1,1], input_json)
+    # device_cap1 = {'area_pv': 2052.0416969482167,
+    #      'area_sc': 0.0,
+    #      'hst': 29.738068123876026,
+    #      'm_ct': 313651.26633118524,
+    #      'm_ht': 10231.47838154615,
+    #      'num_gtw': 1.0,
+    #      'p_co': 5.20044466316282,
+    #      'p_eb_max': 0.0,
+    #      'p_el_max': 161.6199354558481,
+    #      'p_fc_max': 267.5702413120801,
+    #      'p_hp_max': 106.85655111531212,
+    #      'p_hpg_max': 7.0}
+    pprint.pprint(device_cap1)
+
     grid_operation_output_json,flag = operating_problem(dict_load, device_cap1,[1,1,1],tem_env,input_json,8760)
     if flag == 1:
         print("grid_g")

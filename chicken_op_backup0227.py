@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
-# %load chicken_op.py
 # %load main.py
 import sys
 import numpy as np
@@ -58,7 +51,7 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     theta_ex=0.95#热交换器效率
     yita_fc_e_nominal=15#燃料电池产电COP15kWh/kg
     yita_fc_g_nominal=16.6#燃料电池产热COP16.6kWh/kg
-    yita_hp_g=input_json['device']['hp']['beta_hpg']-dict_load['load_sort']*0.3#空气源热泵制热COP
+    yita_hp_g=3#空气源热泵制热COP
     yita_hp_q=4#空气源热泵制冷COP
     yita_ghp_g=3.54#地源热泵制热COP
     yita_ghp_q=4#地源热泵制冷COP
@@ -86,7 +79,7 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     T_ct_upper=25#℃冷水罐储水温度上限
     T_ct_lower=3#℃冷水罐储水温度下限
     T_g_lower=55#℃供热温度下限
-    #T_q_lower=9#℃供冷温度上限
+    T_q_lower=9#℃供冷温度上限
     
     c = 4.2/3600    #水的比热容，4.2KJ/(kg*K)，已转换成KWH
     ro_wt=1000  #水密度(kg/m3)
@@ -125,9 +118,9 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     m_ghp_g=p_ghp_nominal/c/(55-40)#地源热泵供热水回路流量,额定产冷量除以(供回水路温差*比热容)
     m_ghp_q=p_ghp_nominal/c/(12-7)#地源热泵供冷水回路流量,额定产冷量除以(供回水路温差*比热容)
     A_wt=pow(m_wt/ro_wt,2/3)*6#热水罐表面积
-    #A_ct=pow(m_ct/ro_wt,2/3)*6#热水罐表面积
+    A_ct=pow(m_ct/ro_wt,2/3)*6#热水罐表面积
     #m_io=m_wt#热水罐的换水量，后续要改
-    #m_cio=m_ct#冷水罐的换水量，后续要改
+    m_cio=m_ct#冷水罐的换水量，后续要改
     
     temperature = [26.32, 25.57, 24.6, 24.4, 23.85, 24.9, 25.68, 26.41, 27.2, 28.36, 30.97, 31.3, 33.65, 35.29, 35.5, 33.7, 32.45,
     31.8, 30.87, 29.79, 28.7, 27.7, 26.79, 25.97]   #夏季室外温度
@@ -144,11 +137,8 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     cer=probV6.addVar(vtype=GRB.CONTINUOUS,name=f"cer")
     ce_eo=probV6.addVar(vtype=GRB.CONTINUOUS,name=f"ce_eo")
     #果式debug
-    m_io = probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"m_io")
+    m_io = probV6.addVar(vtype=GRB.CONTINUOUS,name=f"m_io")
     #m_cio = probV6.addVar(vtype=GRB.CONTINUOUS,name=f"m_cio")
-    
-    #cold water tank debug
-    q_io=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"q_io{i}") for i in range(period+1)]
 
 
     z_g=[probV6.addVar(lb=0,ub=1,vtype=GRB.BINARY,name=f"z_g{i}") for i in range(period)]
@@ -166,7 +156,7 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     z_ghp_g=[probV6.addVar(lb=0,ub=1,vtype=GRB.BINARY,name=f"z_ghp_g{i}") for i in range(period)]#地源热泵开热
     z_ghp_q=[probV6.addVar(lb=0,ub=1,vtype=GRB.BINARY,name=f"z_ghp_q{i}") for i in range(period)]#地源热泵开冷
     z_wt=[probV6.addVar(lb=0,ub=1,vtype=GRB.BINARY,name=f"z_wt{i}") for i in range(period)]#热水罐换热开关
-    #z_ct=[probV6.addVar(lb=0,ub=1,vtype=GRB.BINARY,name=f"z_ct{i}") for i in range(period)]#冷水罐换热开关
+    z_ct=[probV6.addVar(lb=0,ub=1,vtype=GRB.BINARY,name=f"z_ct{i}") for i in range(period)]#冷水罐换热开关
     z_el=[probV6.addVar(lb=0,ub=1,vtype=GRB.BINARY,name=f"z_el{i}") for i in range(period)]
 
     g_fc=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"g_fc{i}") for i in range(period)]
@@ -187,7 +177,7 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     m_fc=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"m_fc{i}") for i in range(period)]
     m_out=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"m_out{i}") for i in range(period)]
     m_tube=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"m_tube{i}") for i in range(period)]#管道中水的质量
-    #m_q=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"m_q{i}") for i in range(period)]#冷水罐换冷水
+    m_q=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"m_q{i}") for i in range(period)]#冷水罐换冷水
     p_g=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"p_g{i}") for i in range(period)]
     p_u=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"p_u{i}") for i in range(period)]
     p_fc=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"p_fc{i}") for i in range(period)]
@@ -201,7 +191,7 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     q_hp=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"q_hp{i}") for i in range(period)]#空气源热泵制冷
     q_ghp=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"q_ghp{i}") for i in range(period)]#地源热泵制冷
     q_inout=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"q_inout{i}") for i in range(period)]#冷水罐
-    #q_loss=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"q_loss{i}") for i in range(period)]#冷水罐损耗
+    q_loss=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"q_loss{i}") for i in range(period)]#冷水罐损耗
     r_ma=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"r_ma{i}") for i in range(period)]
     r_mb=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"r_mb{i}") for i in range(period)]
     r_mc=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"r_mc{i}") for i in range(period)]
@@ -232,8 +222,8 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     t_ghp_g=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"t_ghp_g{i}") for i in range(period)]#地源热泵制热水温
     t_ghp_q=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"t_ghp_q{i}") for i in range(period)]#地源热泵制冷水温
     t_tube=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"t_tube{i}") for i in range(period)]#管道温度
-    #t_ct=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"t_ct{i}") for i in range (period+1)]#冷水罐内冷水温度
-    #t_q=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"t_q{i}") for i in range (period)]#冷水罐内换冷温度
+    t_ct=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"t_ct{i}") for i in range (period+1)]#冷水罐内冷水温度
+    t_q=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"t_q{i}") for i in range (period)]#冷水罐内换冷温度
     w_fc=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"w_fc{i}") for i in range(period)]#处理fuel cell双线性约束参量
     w_stc_ex=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"w_stc_ex{i}") for i in range(period)]#处理太阳能集热器双线性约束参量V6.5（19）
     w_ht=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"w_ht{i}") for i in range(period)]#处理热水罐双线性约束参量V6.5（22）
@@ -363,17 +353,16 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
         probV6.addConstr(w_ht_wt[i]*M>=z_wt[i])
         
         #Cold Water Tank
-        #probV6.addConstr(c*m_ct*(t_ct[i]-t_ct[i+1])==q_inout[i]-q_loss[i])#V6.5(41)
-        probV6.addConstr(q_io[i+1]==0.99*q_io[i]+q_inout[i])
-        #probV6.addConstr(q_inout[i]==z_ct[i]*c*m_cio*(t_ct[i]-t_cr[i]))
-        #probV6.addConstr(q_loss[i]==miu_loss*A_ct*(t_env_in[i]-t_ct[i]))#V6.5(42)
-        probV6.addConstr(q_io[i]<=c*m_ct*T_ct_upper)#V6.5(43)
-        probV6.addConstr(q_io[i]>=c*m_ct*T_ct_lower)
-        probV6.addConstr(q_ghp[i]+q_hp[i]-q_inout[i]>=q_demand[i])#V6.5(44)
-        #probV6.addConstr(q_demand[i]<=c*m_q[i]*(t_cr[i]-t_q[i]))
-        #probV6.addConstr(t_q[i]<=T_q_lower)
-        #probV6.addConstr(m_hp_q+m_ghp_q+z_ct[i]*m_cio==m_q[i])#V6.5(45)
-        #probV6.addConstr(m_hp_q*t_hp_q[i]+m_ghp_q*t_ghp_q[i]+z_ct[i]*m_cio*t_ct[i]==m_q[i]*t_q[i])#V6.5(46)
+        probV6.addConstr(c*m_ct*(t_ct[i]-t_ct[i+1])==q_inout[i]-q_loss[i])#V6.5(41)
+        probV6.addConstr(q_inout[i]==z_ct[i]*c*m_cio*(t_ct[i]-t_cr[i]))
+        probV6.addConstr(q_loss[i]==miu_loss*A_ct*(t_env_in[i]-t_ct[i]))#V6.5(42)
+        probV6.addConstr(t_ct[i]<=T_ct_upper)#V6.5(43)
+        probV6.addConstr(t_ct[i]>=T_ct_lower)
+        probV6.addConstr(q_ghp[i]+q_hp[i]-q_inout[i]==q_demand[i])#V6.5(44)
+        probV6.addConstr(q_demand[i]<=c*m_q[i]*(t_cr[i]-t_q[i]))
+        probV6.addConstr(t_q[i]<=T_q_lower)
+        probV6.addConstr(m_hp_q+m_ghp_q+z_ct[i]*m_cio==m_q[i])#V6.5(45)
+        probV6.addConstr(m_hp_q*t_hp_q[i]+m_ghp_q*t_ghp_q[i]+z_ct[i]*m_cio*t_ct[i]==m_q[i]*t_q[i])#V6.5(46)
         
         
         #Electric boiler
@@ -487,10 +476,10 @@ def operating_problem(dict_load,device_cap,isolate,tem_env,input_json,period):
     co2_ele_gas=sum(dict_load['ele_load'])*input_json['carbon']['alpha_e']+sum(gas_sum_ele_gas)*1.535
 
     #分别算四个季节的运行程序，得到碳排放和运行成本，算一个一年的运行成本和碳排放。
-    dict_spring={'ele_load':dict_load['ele_load'][3288:3288+7*24],'g_demand':dict_load['g_demand'][3288:3288+7*24],'q_demand':dict_load['q_demand'][3288:3288+7*24],'r_solar':dict_load['r_solar'][3288:3288+7*24],'load_sort':dict_load['load_sort']}
-    dict_summer={'ele_load':dict_load['ele_load'][6192:6192+7*24],'g_demand':dict_load['g_demand'][6192:6192+7*24],'q_demand':dict_load['q_demand'][6192:6192+7*24],'r_solar':dict_load['r_solar'][6192:6192+7*24],'load_sort':dict_load['load_sort']}
-    dict_autumn={'ele_load':dict_load['ele_load'][7656:7656+7*24],'g_demand':dict_load['g_demand'][7656:7656+7*24],'q_demand':dict_load['q_demand'][7656:7656+7*24],'r_solar':dict_load['r_solar'][7656:7656+7*24],'load_sort':dict_load['load_sort']}
-    dict_winter={'ele_load':dict_load['ele_load'][360:360+7*24],'g_demand':dict_load['g_demand'][360:360+7*24],'q_demand':dict_load['q_demand'][360:360+7*24],'r_solar':dict_load['r_solar'][360:360+7*24],'load_sort':dict_load['load_sort']}
+    dict_spring={'ele_load':dict_load['ele_load'][3288:3288+7*24],'g_demand':dict_load['g_demand'][3288:3288+7*24],'q_demand':dict_load['q_demand'][3288:3288+7*24],'r_solar':dict_load['r_solar'][3288:3288+7*24]}
+    dict_summer={'ele_load':dict_load['ele_load'][6192:6192+7*24],'g_demand':dict_load['g_demand'][6192:6192+7*24],'q_demand':dict_load['q_demand'][6192:6192+7*24],'r_solar':dict_load['r_solar'][6192:6192+7*24]}
+    dict_autumn={'ele_load':dict_load['ele_load'][7656:7656+7*24],'g_demand':dict_load['g_demand'][7656:7656+7*24],'q_demand':dict_load['q_demand'][7656:7656+7*24],'r_solar':dict_load['r_solar'][7656:7656+7*24]}
+    dict_winter={'ele_load':dict_load['ele_load'][360:360+7*24],'g_demand':dict_load['g_demand'][360:360+7*24],'q_demand':dict_load['q_demand'][360:360+7*24],'r_solar':dict_load['r_solar'][360:360+7*24]}
 
     ce_h_spring,opex_spring,res_spring,flag1 = season_operating_problem(dict_spring,device_cap,isolate,tem_env,input_json,7*24)
     ce_h_summer,opex_summer,res_summer,flag2 = season_operating_problem(dict_summer,device_cap,isolate,tem_env,input_json,7*24)
@@ -514,7 +503,6 @@ def operating_problem(dict_load,device_cap,isolate,tem_env,input_json,period):
             "cer_perm2":format((co2_ele_only-ce_sum)/area/1000,'.2f'),  #相对于电系统每平米的碳减排量/t
             "cer_perm2_gas":format((co2_ele_gas-ce_sum)/area/1000,'.2f'),  #相对于电气系统每平米的碳减排量/t
             "cer":format((co2_ele_only-ce_sum)/1000,'.4f')#碳减排
-     }
+    }
 
     return output_json,0
-

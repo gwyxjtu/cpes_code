@@ -27,7 +27,7 @@
         "cold_price":16,
 
         "hydrogen_price":30,
-        "capex_max":[20000000,2000000000]
+        "capex_max":[10000000,2000000000]
     },
 
     "device":{
