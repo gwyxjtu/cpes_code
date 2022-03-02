@@ -32,8 +32,8 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     # lambda_ele_in = [0.3748,0.3748,0.3748,0.3748,0.3748,0.3748,0.3748,0.8745,0.8745,0.8745,1.4002,1.4002,1.4002,1.4002,
     #                  1.4002,0.8745,0.8745,0.8745,1.4002,1.4002,1.4002,0.8745,0.8745,0.3748]*7
     # power price in summer
-    lambda_ele_in = [0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.7704, 1.1313, 1.1313, 1.1313, 1.1313,
-                     0.7704, 0.7704, 0.7704, 0.7704, 0.7704, 0.7704, 1.1313, 1.1313, 1.1313, 1.1313, 1.1313, 0.4096] * 7
+    # lambda_ele_in = [0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.7704, 1.1313, 1.1313, 1.1313, 1.1313,
+    #                  0.7704, 0.7704, 0.7704, 0.7704, 0.7704, 0.7704, 1.1313, 1.1313, 1.1313, 1.1313, 1.1313, 0.4096] * 7
     lambda_ele_in = input_json['price']['TOU_power']*7
     lambda_ele_out = input_json['price']['power_sale']
     lambda_h = input_json['price']['hydrogen_price']
@@ -409,7 +409,7 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
         probV6.addConstr(e_ce[i]==ele_load[i])
         probV6.addConstr(v_gas[i]==(g_demand[i]+q_demand[i]/1.35)/7.5)
 
-    probV6.addConstr(ce_h==gp.quicksum(m_b)*alpha_H2+gp.quicksum(p_g)*alpha_e)#V6.5(47)
+    probV6.addConstr(ce_h==gp.quicksum(p_g)*alpha_e)#V6.5(47)
     probV6.addConstr(ce_ce==gp.quicksum(e_ce)*alpha_e+gp.quicksum(v_gas)*alpha_gas)#V6.5(48)
     probV6.addConstr(cer==ce_ce-ce_h)#V6.5(49)
     probV6.addConstr(ce_eo==gp.quicksum(p_u)*alpha_eo)#V6.5(50)

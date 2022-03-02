@@ -1,33 +1,38 @@
 {
     "load":{
         "building_area":{
-            "apartment":1.5,
+            "apartment":1,
             "hotel":0,
-            "office":11,
-            "restaurant":0.5
+            "office":0,
+            "restaurant":0
         },
-        "load_area":130000,
-        "heat_mounth":[1,2,12],
-        "cold_mounth":[6,7,8,9],
-        "power_peak":0,
-        "yearly_power":2000000,
+        "load_area":9936,
+        "heat_mounth":[1,2,3,11,12],
+        "cold_mounth":[],
+        "power_peak":{
+            "flag":1,
+            "ele":400,
+            "g":800,
+            "q":0
+        },
+        "yearly_power":0,
         "ele_type":0,
-        "location":[110,31]
+        "location":[92,31]
     },
     "renewable_energy":{
         "pv_existst":0,
         "sc_existst":0,
-        "pv_sc_max":20000
+        "pv_sc_max":20000000
     },
     "price":{
-        "TOU_power":[0.3123,0.3123,0.3123,0.3123,0.3123,0.3123,0.3123,0.6507,0.6507,0.9695,0.9695,0.9695,0.9695,0.9695,0.9695,0.6507,0.6507,0.6507,0.6507,0.6507,1.1713,1.1713,0.6507,0.3123],
-        "power_sale":0.3,
+        "TOU_power":[0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49],
+        "power_sale":0.25,
         "gas_price":4.085,
         "heat_price":10,
         "cold_price":16,
 
         "hydrogen_price":30,
-        "capex_max":[10000000,2000000000]
+        "capex_max":[100000000,2000000000]
     },
 
     "device":{
@@ -54,7 +59,7 @@
             },
         "ht":
             {
-                "water_max":18000000,
+                "water_max":80000,
                 "water_min":0,
                 "cost":0.5,
                 "crf":20,
@@ -67,7 +72,7 @@
 
         "eb":
             {
-                "power_max":1000000,
+                "power_max":0,
                 "power_min":0,
                 "cost":500,
                 "crf":10,
@@ -76,7 +81,7 @@
             },
         "hp":
             {
-                "power_max":1000000,
+                "power_max":0,
                 "power_min":0,
                 "cost":3000,
                 "crf":15,
@@ -87,7 +92,7 @@
 
         "ghp":
             {
-                "power_max":1000000,
+                "power_max":0,
                 "power_min":0,
                 "cost":4000,
                 "crf":15,
@@ -145,7 +150,7 @@
             {
                 "area_max":1000000,
                 "area_min":0,
-                "cost":2000,
+                "cost":1000,
                 "crf":20,
 
                 "beta_sc":0.72,

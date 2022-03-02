@@ -338,7 +338,7 @@ def planning_problem(dict,isloate,input_json):
     for i in range(period - 1):
         # hot water tank and heat supply
         m.addConstr(c*m_ht*(t_ht[i + 1] - 0.99*t_ht[i]) + g_demand[i] +g_hpg_gr[i] == 
-            g_fc[i] + g_hp[i] + g_eb[i] + g_hpg[i])
+            g_fc[i] + g_hp[i] + g_eb[i] + g_hpg[i] + g_sc[i])
 
         # cold water tank and cold supply
         m.addConstr(c*m_ct * (1.01*t_ct[i] - t_ct[i+1]) + q_demand[i] == q_hp[i] +q_hpg[i])
@@ -350,7 +350,7 @@ def planning_problem(dict,isloate,input_json):
             #m.addConstr(m_ct * (t_ct[i] - t_ct[i+1]) + q_demand[i]/c == m_hpc[i] * (5) +m_ec[i]*(5)  - eta_loss*m_ct*(t_ct[i] - 16))
         m.addConstr(h_sto[i+1] - h_sto[i] == h_pur[i] + h_el[i] - h_fc[i])
         
-    m.addConstr(c*m_ht * (t_ht[0] - 0.99*t_ht[-1]) + g_demand[-1] +g_hpg_gr[-1] == g_fc[-1]+g_hp[-1]+g_eb[-1]+ g_hpg[-1])
+    m.addConstr(c*m_ht * (t_ht[0] - 0.99*t_ht[-1]) + g_demand[-1] +g_hpg_gr[-1] == g_fc[-1]+g_hp[-1]+g_eb[-1]+ g_hpg[-1]+g_sc[-1])
     m.addConstr(c*m_ct * (1.01*t_ct[-1] - t_ct[0]) + q_demand[-1] ==  q_hp[-1] +q_hpg[-1])
     m.addConstr(h_sto[0] - h_sto[-1] == h_pur[-1] + h_el[-1] - h_fc[-1])
     #m.addConstr(h_sto[0] - h_sto[-1] + h_ssto[0] - h_ssto[-1] == h_pur[-1] + h_el[-1] - h_fc[-1])
@@ -428,7 +428,7 @@ def planning_problem(dict,isloate,input_json):
     # m.setObjective( crf_pv * cost_pv*area_pv+ crf_el*cost_el*el_max
     #     +crf_hst * hst*cost_hst +crf_water* cost_water_hot*m_ht + crf_fc *cost_fc * fc_max + lambda_h*gp.quicksum(h_pur)*365+ 
     #     365*gp.quicksum([p_pur[i]*lambda_ele_in[i] for i in range(24)])-365*gp.quicksum(p_sol)*lambda_ele_out , GRB.MINIMIZE)
-    m.addConstr(gp.quicksum(p_pur)<=cer*(sum(ele_load)+sum(g_demand)+sum(q_demand)))
+    #m.addConstr(gp.quicksum(p_pur)<=cer*(sum(ele_load)+sum(g_demand)+sum(q_demand)))
     m.addConstr(cost_c_ele == sum([ele_load[i]*lambda_ele_in[i] for i in range(period)]))
     m.addConstr(cost_c_heat == sum([g_demand[i]/0.95*lambda_ele_in[i] for i in range(period)]))#/(3.41))
     m.addConstr(cost_c_cool == sum([q_demand[i]/4*lambda_ele_in[i] for i in range(period)]))#/3.8)
@@ -442,7 +442,7 @@ def planning_problem(dict,isloate,input_json):
     m.params.MIPGap = 0.01
     # m.optimize()
     #print(m.status)
-    m.addConstr(ce_h==gp.quicksum(h_pur)*alpha_H2+gp.quicksum(p_pur)*alpha_e)
+    m.addConstr(ce_h==gp.quicksum(p_pur)*alpha_e)
     try:
         m.optimize()
     except gp.GurobiError:
@@ -637,6 +637,7 @@ def planning_problem(dict,isloate,input_json):
             #'w_solar_ex':[pulp.value(w_solar_ex[i]) for i in range(period)],
             'p_eb':[p_eb[i].X for i in range(period)],
             'g_eb':[g_eb[i].X for i in range(period)],
+            'g_sc':[g_sc[i].X for i in range(period)],
             #'m_eb':[m_eb[i].X for i in range(period)],
             'g_hpg_gr':[g_hpg_gr[i].X for i in range(period)],
             #'m_fc':[m_fc[i].X for i in range(period)],

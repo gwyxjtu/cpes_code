@@ -188,12 +188,19 @@ def get_load_new(load_dict):
             kkk = (load_dict["yearly_power"]-sum(q_demand)/4-sum(g_demand)/0.95) /sum(ele_load)
 
             ele_load = [ele_load[i]*kkk for i in range(period)]
-    if load_dict["power_peak"] !=0:
-        tmp_sum = max(ele_load)+max(q_demand)/4+max(g_demand)/0.95
-        kkk = load_dict["power_peak"] / tmp_sum
+    if load_dict["power_peak"]['flag'] == 1:
+        tmp_sum = max(g_demand)+0.001
+        kkk = load_dict["power_peak"]['g'] / tmp_sum
         g_demand = [g_demand[i]*kkk for i in range(period)]
-        q_demand = [q_demand[i]*kkk for i in range(period)]
+
+        tmp_sum = max(ele_load)+0.001
+        kkk = load_dict["power_peak"]['ele'] / tmp_sum
         ele_load = [ele_load[i]*kkk for i in range(period)]
+
+        tmp_sum = max(q_demand) +0.001
+        kkk = load_dict["power_peak"]['q'] / tmp_sum
+        q_demand = [q_demand[i]*kkk for i in range(period)]
+        
     print(max(g_demand),max(q_demand),max(ele_load))
     print(sum(g_demand),sum(q_demand),sum(ele_load))
     dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,'load_sort':load_dict["load_sort"]}
@@ -341,6 +348,7 @@ if __name__ == '__main__':
     pprint.pprint(device_cap1)
 
     grid_operation_output_json,flag = operating_problem(dict_load, device_cap1,[1,1,1],tem_env,input_json,8760)
+    #flag = 1
     if flag == 1:
         print("grid_g")
         grid_operation_output_json = grid_operation_output_json_plan
@@ -349,6 +357,7 @@ if __name__ == '__main__':
     res2,itgrid_planning_output_json,isloate_operation_output_json_plan,device_cap2 = planning_problem(dict_load, [0,1,1], input_json)
     pprint.pprint(device_cap2)
     itgrid_operation_output_json,flag = operating_problem(dict_load, device_cap2,[0,1,1],tem_env,input_json,8760)
+    #flag = 1
     if flag == 1:
         print("isloate_g")
         itgrid_operation_output_json = isloate_operation_output_json_plan
@@ -375,3 +384,4 @@ if __name__ == '__main__':
     to_csv(res1,'test1' + '.xls')
     to_csv(res2,'test2' + '.xls')
 
+#[0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49]
