@@ -188,6 +188,12 @@ def get_load_new(load_dict):
             kkk = (load_dict["yearly_power"]-sum(q_demand)/4-sum(g_demand)/0.95) /sum(ele_load)
 
             ele_load = [ele_load[i]*kkk for i in range(period)]
+    if load_dict["power_peak"] !=0:
+        tmp_sum = max(ele_load)+max(q_demand)/4+max(g_demand)/0.95
+        kkk = load_dict["power_peak"] / tmp_sum
+        g_demand = [g_demand[i]*kkk for i in range(period)]
+        q_demand = [q_demand[i]*kkk for i in range(period)]
+        ele_load = [ele_load[i]*kkk for i in range(period)]
     print(max(g_demand),max(q_demand),max(ele_load))
     print(sum(g_demand),sum(q_demand),sum(ele_load))
     dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,'load_sort':load_dict["load_sort"]}
