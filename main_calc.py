@@ -80,6 +80,9 @@ def read_load_file(filename,gb,load_sort,heat_mounth,cool_mounth):
     print(sum(g_demand),sum(q_demand),sum(ele_load))
     return ele_load,g_demand,q_demand
 
+
+
+
 def get_load_new(load_dict):
     jing = float(load_dict["location"][0])
     wei = float(load_dict["location"][1])
@@ -176,6 +179,8 @@ def get_load_new(load_dict):
     
             i+=1
     r_solar = r_solar[-8:]+r_solar[:-8]
+    print("ori")
+    print(max(g_demand),max(q_demand),max(ele_load))
     if load_dict["yearly_power"] !=0:
         #print(1)
         if load_dict["ele_type"] == 0:
@@ -191,18 +196,20 @@ def get_load_new(load_dict):
     if load_dict["power_peak"]['flag'] == 1:
         tmp_sum = max(g_demand)+0.001
         kkk = load_dict["power_peak"]['g'] / tmp_sum
-        g_demand = [g_demand[i]*kkk for i in range(period)]
+        g_demand = [g_demand[i]*max(kkk-load_dict["power_peak"]['flag_shear']*(tmp_sum-g_demand[i])/(g_demand[i]/load_dict["power_peak"]['shear']+0.01),1) for i in range(period)]
 
         tmp_sum = max(ele_load)+0.001
         kkk = load_dict["power_peak"]['ele'] / tmp_sum
-        ele_load = [ele_load[i]*kkk for i in range(period)]
+        ele_load = [ele_load[i]*max(kkk-(tmp_sum-ele_load[i])/(ele_load[i]+0.01),1)  for i in range(period)]
 
         tmp_sum = max(q_demand) +0.001
         kkk = load_dict["power_peak"]['q'] / tmp_sum
-        q_demand = [q_demand[i]*kkk for i in range(period)]
-        
+        q_demand = [q_demand[i]*max(kkk-load_dict["power_peak"]['flag_shear']*(tmp_sum-q_demand[i])/(q_demand[i]/load_dict["power_peak"]['shear']+0.01),1) for i in range(period)]
+    
+    print("new")
     print(max(g_demand),max(q_demand),max(ele_load))
     print(sum(g_demand),sum(q_demand),sum(ele_load))
+    #exit(0)
     dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,'load_sort':load_dict["load_sort"]}
     #exit(0)
     return dict_load
@@ -332,7 +339,7 @@ if __name__ == '__main__':
 
     #买电，卖电，买氢
 
-    res1,grid_planning_output_json,grid_operation_output_json_plan,device_cap1 = planning_problem(dict_load, [1,1,1], input_json)
+    res1,grid_planning_output_json,grid_operation_output_json_plan,device_cap1 = planning_problem(dict_load, [1,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['grid']], input_json)
     # device_cap1 = {'area_pv': 2052.0416969482167,
     #      'area_sc': 0.0,
     #      'hst': 29.738068123876026,
@@ -346,18 +353,18 @@ if __name__ == '__main__':
     #      'p_hp_max': 106.85655111531212,
     #      'p_hpg_max': 7.0}
     pprint.pprint(device_cap1)
-
-    grid_operation_output_json,flag = operating_problem(dict_load, device_cap1,[1,1,1],tem_env,input_json,8760)
-    #flag = 1
+    print(grid_planning_output_json['equipment_cost'],grid_planning_output_json['receive_year'])
+    #grid_operation_output_json,flag = operating_problem(dict_load, device_cap1,[1,1,1],tem_env,input_json,8760)
+    flag = 1
     if flag == 1:
         print("grid_g")
         grid_operation_output_json = grid_operation_output_json_plan
 
 
-    res2,itgrid_planning_output_json,isloate_operation_output_json_plan,device_cap2 = planning_problem(dict_load, [0,1,1], input_json)
+    res2,itgrid_planning_output_json,isloate_operation_output_json_plan,device_cap2 = planning_problem(dict_load, [0,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['isloate']], input_json)
     pprint.pprint(device_cap2)
-    itgrid_operation_output_json,flag = operating_problem(dict_load, device_cap2,[0,1,1],tem_env,input_json,8760)
-    #flag = 1
+    #itgrid_operation_output_json,flag = operating_problem(dict_load, device_cap2,[0,1,1],tem_env,input_json,8760)
+    flag = 1
     if flag == 1:
         print("isloate_g")
         itgrid_operation_output_json = isloate_operation_output_json_plan

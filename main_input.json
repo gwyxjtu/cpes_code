@@ -7,13 +7,23 @@
             "restaurant":0
         },
         "load_area":9936,
-        "heat_mounth":[1,2,3,11,12],
+        "heat_mounth":[1,2,3,4,11,12],
         "cold_mounth":[],
+        "hydrogen_state":{
+            "grid":0,
+            "isloate":0
+        },
+        "power_sale_state":{
+            "grid":1,
+            "isloate":0
+        },
         "power_peak":{
             "flag":1,
             "ele":400,
             "g":800,
-            "q":0
+            "q":0,
+            "flag_shear":1,
+            "shear":1
         },
         "yearly_power":0,
         "ele_type":0,
@@ -28,10 +38,10 @@
         "TOU_power":[0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49],
         "power_sale":0.25,
         "gas_price":4.085,
-        "heat_price":10,
+        "heat_price":4.46,
         "cold_price":16,
 
-        "hydrogen_price":30,
+        "hydrogen_price":200,
         "capex_max":[100000000,2000000000]
     },
 
@@ -49,7 +59,7 @@
             {
                 "power_max":1000000,
                 "power_min":0,
-                "cost":10000,
+                "cost":8000,
                 "crf":10,
 
                 "eta_fc_p":15,
@@ -59,7 +69,7 @@
             },
         "ht":
             {
-                "water_max":80000,
+                "water_max":800000,
                 "water_min":0,
                 "cost":0.5,
                 "crf":20,
@@ -137,7 +147,7 @@
             {
                 "power_max":500000,
                 "power_min":0,
-                "cost":10000,
+                "cost":8000,
                 "crf":7,
 
                 "beta_el":0.023,
@@ -150,7 +160,7 @@
             {
                 "area_max":1000000,
                 "area_min":0,
-                "cost":1000,
+                "cost":800,
                 "crf":20,
 
                 "beta_sc":0.72,
@@ -163,7 +173,7 @@
             {
                 "area_max":300000,
                 "area_min":0,
-                "cost":2000,
+                "cost":1500,
                 "crf":20,
 
                 "beta_pv":0.21

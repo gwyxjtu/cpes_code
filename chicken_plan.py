@@ -358,8 +358,10 @@ def planning_problem(dict,isloate,input_json):
     #m.addConstr(h_ssto[-1] == h_ssto[0])
     m.addConstr(gp.quicksum(q_hpg)-gp.quicksum(p_hpgc)+gp.quicksum(g_hpg_gr) == gp.quicksum(g_hpg)-gp.quicksum(p_hpg))
     #piecewise price
-    m = model_linear_cost(m,300,600000,10,310,439000,p_el_max,capex_el)
-    m = model_linear_cost(m,300,600000,10,310,490000,p_fc_max,capex_fc)
+    # m = model_linear_cost(m,300,600000,10,310,439000,p_el_max,capex_el)
+    # m = model_linear_cost(m,300,600000,10,310,490000,p_fc_max,capex_fc)
+    m.addConstr(capex_fc == cost_fc*p_fc_max)
+    m.addConstr(capex_el == cost_el*p_el_max)
     #m.addConstr(s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_hp*p_hp_max+cost_fc*p_fc_max+cost_el*p_el_max + 10*gp.quicksum([p_pur[i]*lambda_ele_in[i] for i in range(period)])-10*gp.quicksum(p_sol)*lambda_ele_out+10*lambda_h*gp.quicksum(h_pur)+954>=0 ) 
     m.addConstr(s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_hp*p_hp_max+cost_fc*p_fc_max+cost_el*p_el_max <= input_json['price']['capex_max'][1-isloate[0]])
     for i in range(period):
@@ -410,12 +412,12 @@ def planning_problem(dict,isloate,input_json):
         m.addConstr(h_sto[i]<=hst)
 
         # balance
-        m.addConstr(p_el[i] + p_sol[i] + p_hp[i] +p_hpc[i] + p_hpg[i] + p_hpgc[i] + p_eb[i] + p_co[i]+ ele_load[i] == p_pur[i] + p_fc[i] + p_pv[i])
+        m.addConstr(p_el[i] + p_sol[i] + p_hp[i] +p_hpc[i] + p_hpg[i] + p_hpgc[i] + p_eb[i] + p_co[i]+ ele_load[i] <= p_pur[i] + p_fc[i] + p_pv[i])
 
         # pv
         m.addConstr(p_pv[i] == eta_pv*s_pv*r_solar[i])
         # sc
-        m.addConstr(g_sc[i] == k_sc*theta_ex*s_sc*r_solar[i])
+        m.addConstr(g_sc[i] <= k_sc*theta_ex*s_sc*r_solar[i])
 
         #psol
         m.addConstr(p_sol[i] <= p_fc[i]+p_pv[i])
@@ -458,6 +460,8 @@ def planning_problem(dict,isloate,input_json):
     cap_sum = s_pv.X*cost_pv +s_sc.X*cost_sc +p_hpg_max.X*cost_hpg +cost_gtw*num_gtw.X +cost_ht*m_ht.X+cost_ht*m_ct.X+cost_hst*hst.X+cost_eb*p_eb_max.X+cost_hp*p_hp_max.X+capex_fc.X+capex_el.X+p_co_max.X*cost_co
     op_sum = sum([p_pur[i].X*lambda_ele_in[i] for i in range(period)])-sum([p_sol[i].X for i in range(period)])*lambda_ele_out+lambda_h*sum([h_pur[i].X for i in range(period)])
     revenue = sum([ele_load[i]*lambda_ele_in[i] for i in range(period)]) + input_json['load']['load_area']*(input_json['price']['heat_price']*len(input_json['load']['heat_mounth'])+input_json['price']['cold_price']*len(input_json['load']['cold_mounth']))
+    print(revenue)
+    #exit(0)
     #s_heat_sto = [q_hp[i].X - g_hp[i].X for i in range(period)]
     # for i in range(period-1):
     #     s_heat_sto[i+1]+=s_heat_sto[i]

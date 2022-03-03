@@ -25,22 +25,32 @@
 
 ### 负荷部分
 
-输入,`building_area`为各个类型房屋的比例；`heat_mounth,cold_mounth`为供热和供冷的月份，`power_peak`为峰值电负荷，缺省为0;`yearly_power`为年用电总量;`load_area`为总用能面积，非常关键;`ele_type`如果为1，代表冷热负荷与总电量无关，只与面积有关，如果为0代表冷热负荷与总电量有关。  `location`为坐标经纬度，第一个为经度，第二个为纬度。用于获取当地光照水平以及供暖条件；。
+输入,`building_area`为各个类型房屋的比例；`heat_mounth,cold_mounth`为供热和供冷的月份，`power_peak`为峰值电负荷，缺省为0;`yearly_power`为年用电总量;`load_area`为总用能面积，非常关键;`ele_type`如果为1，代表冷热负荷与总电量无关，只与面积有关，如果为0代表冷热负荷与总电量有关。  `location`为坐标经纬度，第一个为经度，第二个为纬度。用于获取当地光照水平以及供暖条件；`power_peak`是负荷峰值，flag1表示启用，0表示不启用；`shear`表示负荷削减程度越大说明总负荷越低。`hydrogen_state`表示是否允许买氢，0表示不允许，1表示允许。
 ```
     "load":{
         "building_area":{
-            "apartment":0,
+            "apartment":1,
             "hotel":0,
-            "office":1,
+            "office":0,
             "restaurant":0
         },
-        "heat_mounth":[1,2,3,10,11,12],
-        "cold_mounth":[6,7,8,9],
-        "power_peak":0,
+        "load_area":9936,
+        "heat_mounth":[1,2,3,4,11,12],
+        "cold_mounth":[],
+        "hydrogen_state":{
+            "grid":0,
+            "isloate":0
+        },
+        "power_peak":{
+            "flag":1,
+            "ele":400,
+            "g":800,
+            "q":0,
+            "shear":4
+        },
         "yearly_power":0,
-        "ele_type":1,
-        "load_area":12000,
-        "location":[110,41],
+        "ele_type":0,
+        "location":[92,31]
     },
 ```
 
