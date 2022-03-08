@@ -177,7 +177,7 @@ def planning_problem(dict,isloate,input_json):
     #z_ele_in = [m.addVar(lb=-0.0001, ub=1.01, vtype=GRB.BINARY, name=f"z_ele_in{t}") for t in range(period)]
 
     #z_ele_out = [m.addVar(lb=-0.0001, ub=1.01, vtype=GRB.BINARY, name=f"z_ele_out{t}") for t in range(period)]
-    
+    op_sum = m.addVar(vtype=GRB.CONTINUOUS, lb=0,  name=f"op_sum")
     s_pv = m.addVar(vtype=GRB.CONTINUOUS, lb=0,  name=f"s_pv")#ub=13340,
     s_sc = m.addVar(vtype=GRB.CONTINUOUS, lb=0,  name=f"s_sc")
 
@@ -313,6 +313,8 @@ def planning_problem(dict,isloate,input_json):
     m.addConstr(p_eb_max<=input_json['device']['eb']['power_max'])
     m.addConstr(p_eb_max>=input_json['device']['eb']['power_min'])
     m.addConstr(p_el_max<=input_json['device']['el']['power_max'])
+    m.addConstr(p_el_max<=50*input_json['device']['el']['nm3_min']/11.2)
+    m.addConstr(p_el_max>=50*input_json['device']['el']['nm3_min']/11.2)
     m.addConstr(p_el_max>=input_json['device']['el']['power_min'])
     m.addConstr(hst<=input_json['device']['hst']['sto_max'])
     m.addConstr(hst>=input_json['device']['hst']['sto_min'])
@@ -363,7 +365,7 @@ def planning_problem(dict,isloate,input_json):
     m.addConstr(capex_fc == cost_fc*p_fc_max)
     m.addConstr(capex_el == cost_el*p_el_max)
     #m.addConstr(s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_hp*p_hp_max+cost_fc*p_fc_max+cost_el*p_el_max + 10*gp.quicksum([p_pur[i]*lambda_ele_in[i] for i in range(period)])-10*gp.quicksum(p_sol)*lambda_ele_out+10*lambda_h*gp.quicksum(h_pur)+954>=0 ) 
-    m.addConstr(s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_hp*p_hp_max+cost_fc*p_fc_max+cost_el*p_el_max <= input_json['price']['capex_max'][1-isloate[0]])
+    m.addConstr(s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_hp*p_hp_max+cost_fc*p_fc_max+cost_el*p_el_max <= input_json['price']['capex_max'][1-isloate[1]])
     for i in range(period):
         #电网
         m.addConstr(p_pur[i] <= 1000000000*(isloate[0]))
@@ -424,9 +426,9 @@ def planning_problem(dict,isloate,input_json):
 
     # area
     m.addConstr(s_pv+s_sc<=s_sum)
-    m.addConstr(num_gtw*p_gtw>=p_hpg_max)
-
-
+    m.addConstr(num_gtw*p_gtw==p_hpg_max)
+    m.addConstr(op_sum == gp.quicksum([p_pur[i]*lambda_ele_in[i] for i in range(period)])-gp.quicksum([p_sol[i] for i in range(period)])*lambda_ele_out+lambda_h*gp.quicksum([h_pur[i] for i in range(period)]))
+    m.addConstr(op_sum<=input_json['price']['op_max'][1-isloate[1]])
     # m.setObjective( crf_pv * cost_pv*area_pv+ crf_el*cost_el*el_max
     #     +crf_hst * hst*cost_hst +crf_water* cost_water_hot*m_ht + crf_fc *cost_fc * fc_max + lambda_h*gp.quicksum(h_pur)*365+ 
     #     365*gp.quicksum([p_pur[i]*lambda_ele_in[i] for i in range(24)])-365*gp.quicksum(p_sol)*lambda_ele_out , GRB.MINIMIZE)
@@ -493,29 +495,30 @@ def planning_problem(dict,isloate,input_json):
 
     #规划输出
     output_json = {
-            'ele_load_sum': format(sum(ele_load),'.2f'),  # 电负荷总量/kwh
-            'g_demand_sum': format(sum(g_demand),'.2f'),  # 热负荷总量/kwh
-            'q_demand_sum': format(sum(q_demand),'.2f'),  # 冷负荷总量/kwh
-            'ele_load_max': format(max(ele_load),'.2f'),  # 电负荷峰值/kwh
-            'g_demand_max': format(max(g_demand),'.2f'),  # 热负荷峰值/kwh
-            'q_demand_max': format(max(q_demand),'.2f'),  # 冷负荷峰值/kwh
+            'ele_load_sum': format(sum(ele_load),'.1f'),  # 电负荷总量/kwh
+            'g_demand_sum': format(sum(g_demand),'.1f'),  # 热负荷总量/kwh
+            'q_demand_sum': format(sum(q_demand),'.1f'),  # 冷负荷总量/kwh
+            'ele_load_max': format(max(ele_load),'.1f'),  # 电负荷峰值/kwh
+            'g_demand_max': format(max(g_demand),'.1f'),  # 热负荷峰值/kwh
+            'q_demand_max': format(max(q_demand),'.1f'),  # 冷负荷峰值/kwh
             'ele_load': ele_load,  # 电负荷8760h的分时数据/kwh
             'g_demand': g_demand,  # 热负荷8760h的分时数据/kwh
             'q_demand': q_demand,  # 冷负荷8760h的分时数据/kwh
             'r_solar': r_solar,  # 光照强度8760h的分时数据/kwh
 
             'num_gtw': num_gtw.X,  # 地热井数目/个
-            'p_fc_max': format(p_fc_max.X,'.2f'),  # 燃料电池容量/kw
-            'p_hpg_max': format(p_hpg_max.X,'.2f'),  # 地源热泵功率/kw
-            'p_hp_max': format(p_hp_max.X,'.2f'),  # 空气源热泵功率/kw
-            'p_eb_max': format(p_eb_max.X,'.2f'),  # 电热锅炉功率/kw
-            'p_el_max': format(p_el_max.X,'.2f'),  # 电解槽功率/kw
-            'hst': format(hst.X,'.2f'),  # 储氢罐容量/kg
-            'm_ht': format(m_ht.X,'.2f'),  # 储热罐/kg
-            'm_ct': format(m_ct.X,'.2f'),  # 冷水罐/kg
-            'area_pv': format(s_pv.X,'.2f'),  # 光伏面积/m2
-            'area_sc': format(s_sc.X,'.2f'),  # 集热器面积/m2
-            'p_co': format(p_co_max.X,'.2f'),  #氢压机功率/kw
+            'p_fc_max': format(p_fc_max.X,'.1f'),  # 燃料电池容量/kw
+            'p_hpg_max': format(p_hpg_max.X,'.1f'),  # 地源热泵功率/kw
+            'p_hp_max': format(p_hp_max.X,'.1f'),  # 空气源热泵功率/kw
+            'p_eb_max': format(p_eb_max.X,'.1f'),  # 电热锅炉功率/kw
+            'p_el_max': format(p_el_max.X,'.1f'),  # 电解槽功率/kw
+            'nm3_el_max': format(p_el_max.X,'.1f'),  # 电解槽功率/kw
+            'hst': format(hst.X,'.1f'),  # 储氢罐容量/kg
+            'm_ht': format(m_ht.X,'.1f'),  # 储热罐/kg
+            'm_ct': format(m_ct.X,'.1f'),  # 冷水罐/kg
+            'area_pv': format(s_pv.X,'.1f'),  # 光伏面积/m2
+            'area_sc': format(s_sc.X,'.1f'),  # 集热器面积/m2
+            'p_co': format(p_co_max.X,'.1f'),  #氢压机功率/kw
 
             "equipment_cost": format(cap_sum/10000,'.2f'),  #设备总投资/万元
             "receive_year": format(cap_sum/(revenue-op_sum),'.2f'),  # 投资回报年限/年
@@ -554,6 +557,7 @@ def planning_problem(dict,isloate,input_json):
 
     operation_output_json = {
             "operation_cost": format(op_sum/10000,'.2f'),  # 年化运行成本/万元
+            "revenue": format(revenue/10000,'.2f'),  # 年化运行成本/万元
             "cost_save_rate": format((opex_ele_only-op_sum)/opex_ele_only,'.4f'),  #电运行成本节约比例
             "cost_save_rate_gas": format((opex_ele_gas-op_sum)/opex_ele_gas,'.4f'),  #电气运行成本节约比例
             "co2":format(ce_h.X/1000,'.2f'),  #总碳排/t

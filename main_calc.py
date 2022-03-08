@@ -57,7 +57,9 @@ def read_load_file(filename,gb,load_sort,heat_mounth,cool_mounth):
     r_solar =  [1 for i in range(8760+24)]
     for h in heat_mounth:
         #print(m_date[h-1],m_date[h])
-        g_demand[m_date[h-1]:m_date[h]] = [1 for _ in range(m_date[h]-m_date[h-1])]
+        g_demand[m_date[h-1]+15*24:min(m_date[h]+15*24,8760)] = [1 for _ in range(m_date[h]-m_date[h-1])]
+    if 12 in heat_mounth:
+        g_demand[:15*24] = [1 for _ in range(15*24)]
     for cc in cool_mounth:
         q_demand[m_date[cc-1]:m_date[cc]] = [1 for _ in range(m_date[cc]-m_date[cc-1])]
     with open("load/"+filename) as officecsv:
@@ -78,6 +80,9 @@ def read_load_file(filename,gb,load_sort,heat_mounth,cool_mounth):
     q_demand = [q_demand[i]*kkk for i in range(8760)]
     ele_load = [ele_load[i]*kkk for i in range(8760)]
     print(sum(g_demand),sum(q_demand),sum(ele_load))
+    print(m_date)
+    #print(g_demand[2870:2890])
+    #exit(0)
     return ele_load,g_demand,q_demand
 
 
@@ -194,18 +199,21 @@ def get_load_new(load_dict):
 
             ele_load = [ele_load[i]*kkk for i in range(period)]
     if load_dict["power_peak"]['flag'] == 1:
-        tmp_sum = max(g_demand)+0.001
+        tmp_sum = max(g_demand)+0.000001
         kkk = load_dict["power_peak"]['g'] / tmp_sum
-        g_demand = [g_demand[i]*max(kkk-load_dict["power_peak"]['flag_shear']*(tmp_sum-g_demand[i])/(g_demand[i]/load_dict["power_peak"]['shear']+0.01),1) for i in range(period)]
+        g_demand = [g_demand[i]*max(kkk-load_dict["power_peak"]['flag_shear_g']*(tmp_sum-g_demand[i])/(g_demand[i]/load_dict["power_peak"]['shear']+0.01),1) for i in range(period)]
+        #g_demand = [g_demand[i]*kkk for i in range(period)]
+        
 
-        tmp_sum = max(ele_load)+0.001
+        tmp_sum = max(ele_load)+0.000001
         kkk = load_dict["power_peak"]['ele'] / tmp_sum
-        ele_load = [ele_load[i]*max(kkk-(tmp_sum-ele_load[i])/(ele_load[i]+0.01),1)  for i in range(period)]
+        ele_load = [ele_load[i]*max(kkk-load_dict["power_peak"]['flag_shear_e']*(tmp_sum-ele_load[i])/(ele_load[i]/load_dict["power_peak"]['shear']+0.01),1)  for i in range(period)]
+        #ele_load = [ele_load[i]*kkk for i in range(period)]
 
-        tmp_sum = max(q_demand) +0.001
+        tmp_sum = max(q_demand) +0.000001
         kkk = load_dict["power_peak"]['q'] / tmp_sum
-        q_demand = [q_demand[i]*max(kkk-load_dict["power_peak"]['flag_shear']*(tmp_sum-q_demand[i])/(q_demand[i]/load_dict["power_peak"]['shear']+0.01),1) for i in range(period)]
-    
+        q_demand = [q_demand[i]*max(kkk-load_dict["power_peak"]['flag_shear_q']*(tmp_sum-q_demand[i])/(q_demand[i]/load_dict["power_peak"]['shear']+0.01),1) for i in range(period)]
+        #q_demand = [q_demand[i]*kkk for i in range(period)]
     print("new")
     print(max(g_demand),max(q_demand),max(ele_load))
     print(sum(g_demand),sum(q_demand),sum(ele_load))
@@ -214,15 +222,42 @@ def get_load_new(load_dict):
     #exit(0)
     return dict_load
 
-def get_load():
+def get_load(load_dict):
+    min_err = 10000
+    files=os.listdir(r'solar')
     period = 8760
 
     #book_spr = xlrd.open_workbook('cspringdata.xlsx')
     #book_sum = xlrd.open_workbook('csummerdata.xlsx')
     #book_aut = xlrd.open_workbook('cautumndata.xlsx')
     #book_win = xlrd.open_workbook('cwinterdata.xlsx')
+    for file in files:
+        #for i in range(len(df)):
+        lon=file.split('_')[2]
+        lat=file.split('_')[3]
+        # print(((float(lat)-float(df.iloc[:,2][i]))**2+(float(lon)-float(df.iloc[:,3][i]))**2))
+        #print(load_dict["location"])
+        err = (float(lat)-float(load_dict["location"][0]))**2+(float(lon)-float(load_dict["location"][1]))**2
+        if err<min_err:
+            min_err = err
+            final_file = file
+        #print(float(lat),float(lon))
+        #print(err,min_err)
+    #print(final_file,min_err)
+    r_solar =  [0 for i in range(8760+24)]
+    with open("solar/"+final_file) as renewcsv:
+        renewcsv.readline()
+        renewcsv.readline()
+        renewcsv.readline()
+        renew = csv.DictReader(renewcsv)
+        
+        i=0
+        for row in renew:
 
+            r_solar[i] += float(row['electricity'])
     
+            i+=1
+    r_solar = r_solar[-8:]+r_solar[:-8]
 
     #print(len(r_solar),len(t_env_indoor),len(t_env_outdoor))
     #print(max(r_solar))
@@ -245,61 +280,35 @@ def get_load():
     #     g_demand.append(float(data.cell(l,2).value))
     #     m_demand.append(float(data.cell(l,3).value)/(30*c))
     #     ele_load.append(float(data.cell(l,4).value))
-    ele_load = [0 for i in range(8760)]
-    g_demand = [0 for i in range(8760)]
+    ele_load = [10 for i in range(8760)]
+    # tmp_mon = [959.8661111,920.8792593,819.3777778,701.4557407,641.8785185,547.9914815,530.1938889,531.7501852,650.3240741,737.0631481,839.3162963,961.3816667]
+    # tmp = []
+    # tmp+=[[0]*16 + [tmp_mon[0]/2, tmp_mon[0]/2]+[tmp_mon[0]*0.025  ]*4+[0]*2 for _ in range(31)]
+    # tmp+=[[0]*16 + [tmp_mon[1]/2, tmp_mon[1]/2]+[tmp_mon[1]*0.025  ]*4+[0]*2 for _ in range(28)]
+    # tmp+=[[0]*16 + [tmp_mon[2]/2, tmp_mon[2]/2]+[tmp_mon[2]*0.025  ]*4+[0]*2 for _ in range(31)]
+    # tmp+=[[0]*16 + [tmp_mon[3]/2, tmp_mon[3]/2]+[tmp_mon[3]*0.025  ]*4+[0]*2 for _ in range(30)]
+    # tmp+=[[0]*16 + [tmp_mon[4]/2, tmp_mon[4]/2]+[tmp_mon[4]*0.025  ]*4+[0]*2 for _ in range(31)]
+    # tmp+=[[0]*16 + [tmp_mon[5]/2, tmp_mon[5]/2]+[tmp_mon[5]*0.025  ]*4+[0]*2 for _ in range(30)]
+    # tmp+=[[0]*16 + [tmp_mon[6]/2, tmp_mon[6]/2]+[tmp_mon[6]*0.025  ]*4+[0]*2 for _ in range(31)]
+    # tmp+=[[0]*16 + [tmp_mon[7]/2, tmp_mon[7]/2]+[tmp_mon[7]*0.025  ]*4+[0]*2 for _ in range(31)]
+    # tmp+=[[0]*16 + [tmp_mon[8]/2, tmp_mon[8]/2]+[tmp_mon[8]*0.025  ]*4+[0]*2 for _ in range(30)]
+    # tmp+=[[0]*16 + [tmp_mon[9]/2, tmp_mon[9]/2]+[tmp_mon[9]*0.025  ]*4+[0]*2 for _ in range(31)]
+    # tmp+=[[0]*16 + [tmp_mon[10]/2,tmp_mon[10]/2]+[tmp_mon[10]*0.025]*4+[0]*2 for _ in range(30)]
+    # tmp+=[[0]*16 + [tmp_mon[11]/2,tmp_mon[11]/2]+[tmp_mon[10]*0.025]*4+[0]*2 for _ in range(31)]
+    
+    #g_demand = [j for i in tmp for j in i]
+    g_demand = [[0]*16 + [375/2, 375/2]+[375*0.05  ]*4+[0]*2 for _ in range(365)]
+    g_demand = [j for i in g_demand for j in i]
+    #print(g_demand)
     q_demand = [0 for i in range(8760)]
-    r_solar =  [0 for i in range(8760+24)]
-    with open('load.csv') as officecsv:
+    #r_solar =  [0 for i in range(8760+24)]
 
-        office = csv.DictReader(officecsv)
-        i=0
-        for row in office:
-            ele_load[i] += float(row['Electricity Load [J]'])
-            q_demand[i] += float(row['Cooling Load [J]'])
-            g_demand[i] += float(row['Heating Load [J]'])
-            
-            i+=1
-    print(sum(g_demand),sum(q_demand),sum(ele_load))
-    #book = xlrd.open_workbook('renewable.csv')
-    with open('renewable1.csv') as renewcsv:
-        renewcsv.readline()
-        renewcsv.readline()
-        renewcsv.readline()
-        renew = csv.DictReader(renewcsv)
-        
-        i=0
-        for row in renew:
-
-            r_solar[i] += float(row['radiation_surface'])
-            i+=1
-    #print(r_solar)
-    q_demand[:92*24] = [0 for i in range(92*24)]
-    q_demand[-61*24:] = [0 for i in range(61*24)]
-    g_demand[92*24:92*24+212*24] = [0 for i in range(212*24)]
-    r_solar = r_solar[-8:]+r_solar[:-8]
-    r_solar = [r_solar[i]/1000 for i in range(period)]
-
-    kkk = 12000
-    tmp_sum = sum(ele_load)+sum(q_demand)/4+sum(g_demand)/0.95
-    kkk2 = 10000000/tmp_sum
-    g_demand = [g_demand[i]*kkk for i in range(period)]
-    q_demand = [q_demand[i]*kkk for i in range(period)]
-    ele_load = [ele_load[i]*kkk for i in range(period)]
-    #print(max(g_demand),max(q_demand),max(ele_load))
-    #print(sum(g_demand),sum(q_demand),sum(ele_load))
-    #exit(0)
-    #s_e = sum(ele_load)
-    #s_s = sum(r_solar)
-    #ele_load = [ele_load[i]*4971355/s_e for i in range(period)]
-    #g_demand = [g_demand[i] for i in range(period)]
-    #q_demand = [q_demand[i] for i in range(period)]
-    #r_solar = [r_solar[i]*1362/s_s for i in range(period)]
-    print(max(g_demand),max(q_demand),max(ele_load))
+    print(len(g_demand),len(q_demand),len(ele_load))
     print(sum(g_demand),sum(q_demand),sum(ele_load))
     # print(len(r_solar))
     # exit(0)
 
-    dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar}
+    dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,'load_sort':load_dict["load_sort"]}
     return dict_load
 
 def to_csv(res,filename):
@@ -336,7 +345,9 @@ if __name__ == '__main__':
 
     #dict_load = get_load()
     dict_load = get_load_new(input_json["load"])
+    #dict_load = get_load(input_json["load"])
 
+    #exit(0)
     #买电，卖电，买氢
 
     res1,grid_planning_output_json,grid_operation_output_json_plan,device_cap1 = planning_problem(dict_load, [1,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['grid']], input_json)
@@ -361,22 +372,24 @@ if __name__ == '__main__':
         grid_operation_output_json = grid_operation_output_json_plan
 
 
-    res2,itgrid_planning_output_json,isloate_operation_output_json_plan,device_cap2 = planning_problem(dict_load, [0,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['isloate']], input_json)
-    pprint.pprint(device_cap2)
+    #res2,itgrid_planning_output_json,isloate_operation_output_json_plan,device_cap2 = planning_problem(dict_load, [0,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['isloate']], input_json)
+    #pprint.pprint(device_cap2)
+    #
     #itgrid_operation_output_json,flag = operating_problem(dict_load, device_cap2,[0,1,1],tem_env,input_json,8760)
-    flag = 1
-    if flag == 1:
-        print("isloate_g")
-        itgrid_operation_output_json = isloate_operation_output_json_plan
+    # flag = 1
+    # if flag == 1:
+    #     print("isloate_g")
+    #     itgrid_operation_output_json = isloate_operation_output_json_plan
     #print(111)
     print(grid_planning_output_json['equipment_cost'],grid_planning_output_json['receive_year'])
-    print(itgrid_planning_output_json['equipment_cost'],itgrid_planning_output_json['receive_year'])
+    #print(itgrid_planning_output_json['equipment_cost'],itgrid_planning_output_json['receive_year'])
     pprint.pprint(device_cap1)
-    pprint.pprint(device_cap2)
+    #pprint.pprint(device_cap2)
     pprint.pprint(grid_operation_output_json)
     pprint.pprint(grid_operation_output_json_plan)
-    pprint.pprint(itgrid_operation_output_json)
-    pprint.pprint(isloate_operation_output_json_plan)
+    #pprint.pprint(itgrid_operation_output_json)
+    #pprint.pprint(isloate_operation_output_json_plan)
+
     #output_json = operating_problem(dict_load, device_cap, 1, tmp_env, input_json)
 
     #output_json = operating_problem(dict_load, device_cap, 0, tmp_env, input_json)
@@ -386,9 +399,9 @@ if __name__ == '__main__':
 
     save_json(grid_planning_output_json,"grid_planning_output_json")
     save_json(grid_operation_output_json,"grid_operation_output_json")
-    save_json(itgrid_planning_output_json,"itgrid_planning_output_json")
-    save_json(itgrid_operation_output_json,"itgrid_operation_output_json")
+    #save_json(itgrid_planning_output_json,"itgrid_planning_output_json")
+    #save_json(itgrid_operation_output_json,"itgrid_operation_output_json")
     to_csv(res1,'test1' + '.xls')
-    to_csv(res2,'test2' + '.xls')
+    #to_csv(res2,'test2' + '.xls')
 
 #[0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49]
