@@ -14,7 +14,7 @@
             "isloate":0
         },
         "power_sale_state":{
-            "grid":1,
+            "grid":0,
             "isloate":0
         },
         "power_peak":{
@@ -22,8 +22,10 @@
             "ele":300,
             "g":600,
             "q":0,
-            "flag_shear":0,
-            "shear":2
+            "flag_shear_g":0,
+            "flag_shear_e":1,
+            "flag_shear_q":0,
+            "shear":6
         },
         "yearly_power":0,
         "ele_type":0,
@@ -42,7 +44,8 @@
         "cold_price":16,
 
         "hydrogen_price":200,
-        "capex_max":[9650000,2000000000]
+        "capex_max":[9650000,2000000000],
+        "op_max":[11180000,2000000000]
     },
 
     "device":{
@@ -146,8 +149,10 @@
         "el":
             {
                 "power_max":500000,
+                "nm3_max":10000000,
+                "nm3_min":10,
                 "power_min":0,
-                "cost":8000,
+                "cost":3360,
                 "crf":7,
 
                 "beta_el":0.023,

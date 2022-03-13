@@ -7,7 +7,7 @@ import xlrd
 import random
 import time
 import csv
-from chicken_plan import *
+from chicken_plan_zxxc2 import *
 from chicken_op import *
 import json
 import os
@@ -60,6 +60,7 @@ def read_load_file(filename,gb,load_sort,heat_mounth,cool_mounth):
         g_demand[m_date[h-1]+15*24:min(m_date[h]+15*24,8760)] = [1 for _ in range(m_date[h]-m_date[h-1])]
     if 12 in heat_mounth:
         g_demand[:15*24] = [1 for _ in range(15*24)]
+        g_demand = g_demand[:8760]
     for cc in cool_mounth:
         q_demand[m_date[cc-1]:m_date[cc]] = [1 for _ in range(m_date[cc]-m_date[cc-1])]
     with open("load/"+filename) as officecsv:
@@ -74,12 +75,15 @@ def read_load_file(filename,gb,load_sort,heat_mounth,cool_mounth):
             i+=1
 
     s = gb[load_sort]
-    tmp_sum = sum(ele_load)+sum(q_demand)/4+sum(g_demand)/0.95
+    tmp_sum = sum(ele_load)
     kkk = s/tmp_sum
-    g_demand = [g_demand[i]*kkk for i in range(8760)]
-    q_demand = [q_demand[i]*kkk for i in range(8760)]
-    ele_load = [ele_load[i]*kkk for i in range(8760)]
+    #GB
+
+    # g_demand = [g_demand[i]*kkk for i in range(8760)]
+    # q_demand = [q_demand[i]*kkk for i in range(8760)]
+    # ele_load = [ele_load[i]*kkk for i in range(8760)]
     print(sum(g_demand),sum(q_demand),sum(ele_load))
+    print(len(g_demand),len(q_demand),len(ele_load))
     print(m_date)
     #print(g_demand[2870:2890])
     #exit(0)
@@ -147,12 +151,18 @@ def get_load_new(load_dict):
     rate2 = load_dict["load_area"]*load_dict["building_area"]["hotel"]/sum_rate
     rate3 = load_dict["load_area"]*load_dict["building_area"]["office"]/sum_rate
     rate4 = load_dict["load_area"]*load_dict["building_area"]["restaurant"]/sum_rate
-    ele_load =  [e1[i]*rate1+e2[i]*rate2+e3[i]*rate3+e4[i]*rate4 for i in range(len(e1))]
-    g_demand = [g1[i]*rate1+g2[i]*rate2+g3[i]*rate3+g4[i]*rate4 for i in range(len(e1))]
-    q_demand = [q1[i]*rate1+q2[i]*rate2+q3[i]*rate3+q4[i]*rate4 for i in range(len(e1))]
+    ele_load =  [e1[i]*rate1 +e2[i]*rate2 +e3[i]*rate3 +e4[i]*rate4 for i in range(len(e1))]
+    g_demand =  [g1[i]*rate1 +g2[i]*rate2 +g3[i]*rate3 +g4[i]*rate4 for i in range(len(g1))]
+    q_demand =  [q1[i]*rate1 +q2[i]*rate2 +q3[i]*rate3 +q4[i]*rate4 for i in range(len(q1))]
     #q_demand[:92*24] = [0 for i in range(92*24)]
     #q_demand[-61*24:] = [0 for i in range(61*24)]
     #g_demand[92*24:92*24+212*24] = [0 for i in range(212*24)]
+    print("-----")
+    #print(rate1)
+    print(len(g1),len(q1),len(e1))
+    print(sum(g1),sum(q1),sum(e1))
+    print(sum(g_demand),sum(q_demand),sum(ele_load))
+    print("-----")
     period = len(e1)
     min_err = 10000
     files=os.listdir(r'solar')
@@ -185,6 +195,7 @@ def get_load_new(load_dict):
             i+=1
     r_solar = r_solar[-8:]+r_solar[:-8]
     print("ori")
+    print(sum(g_demand),sum(q_demand),sum(ele_load))
     print(max(g_demand),max(q_demand),max(ele_load))
     if load_dict["yearly_power"] !=0:
         #print(1)
@@ -220,6 +231,7 @@ def get_load_new(load_dict):
     #exit(0)
     dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,'load_sort':load_dict["load_sort"]}
     #exit(0)
+    to_csv(dict_load,"test_load.csv")
     return dict_load
 
 def get_load(load_dict):
@@ -309,6 +321,7 @@ def get_load(load_dict):
     # exit(0)
 
     dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,'load_sort':load_dict["load_sort"]}
+
     return dict_load
 
 def to_csv(res,filename):
@@ -340,7 +353,7 @@ def save_json(j,name):
 if __name__ == '__main__':
     tem_env = 0#环境温度，后续补上
     #print(m_date)
-    with open("main_input.json",encoding = "utf-8") as load_file:
+    with open("main_input_zxxc1.json",encoding = "utf-8") as load_file:
         input_json = json.load(load_file)
 
     #dict_load = get_load()
