@@ -7,7 +7,8 @@ import xlrd
 import random
 import time
 import csv
-from chicken_plan_zxxc2 import *
+from chicken_plan_zxxc_plan_h2devices import *
+#chicken_plan_zxxc_plan_h2devices
 from chicken_op import *
 import json
 import os
@@ -352,8 +353,8 @@ def save_json(j,name):
     return 0
 if __name__ == '__main__':
     tem_env = 0#环境温度，后续补上
-    #print(m_date)
-    with open("main_input_zxxc1.json",encoding = "utf-8") as load_file:
+    #print(m_date)#main_input_zxxc_plan_h2devices
+    with open("main_input_zxxc_plan_h2devices.json",encoding = "utf-8") as load_file:
         input_json = json.load(load_file)
 
     #dict_load = get_load()

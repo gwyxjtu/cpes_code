@@ -391,9 +391,9 @@ def planning_problem(dict,isloate,input_json):
 
         # 电解槽
         m.addConstr(p_el[i] <= p_el_max)
-        m.addConstr(h_el[i] <= k_el * p_el[i])
+        m.addConstr(h_el[i] == k_el * p_el[i])
         m.addConstr(h_el[i] <= hst)
-        #m.addConstr(p_el[i] == p_pur[i])
+        m.addConstr(p_el[i] == p_pur[i])
         m.addConstr(p_pur[i]<= water[i])
         m.addConstr(p_sol[i]<= eta_pv*s_pv)
         #m.addConstr(p_sol[i]<= )
@@ -434,7 +434,7 @@ def planning_problem(dict,isloate,input_json):
         m.addConstr(g_sc[i] <= k_sc*theta_ex*s_sc*r_solar[i])
 
         #psol
-        m.addConstr(p_sol[i] <= p_fc[i]+p_pv[i])
+        #m.addConstr(p_sol[i] <= p_fc[i]+p_pv[i])
 
     # area
     #m.addConstr(s_pv+s_sc<=s_sum)

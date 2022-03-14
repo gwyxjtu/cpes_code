@@ -31,6 +31,13 @@
         "ele_type":0,
         "location":[126.535800,45.802160]
     },
+    "calc_mode":{
+        "obj":{
+            "capex":1,
+            "total_cap":0,
+            "opex":1
+        }
+    },
     "renewable_energy":{
         "pv_existst":0,
         "sc_existst":0,
@@ -177,7 +184,7 @@
         "pv":
             {
                 "area_max":50000,
-                "area_min":50000,
+                "area_min":100,
                 "cost":1000,
                 "crf":20,
 

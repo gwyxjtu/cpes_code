@@ -14,7 +14,7 @@
             "isloate":0
         },
         "power_sale_state":{
-            "grid":0,
+            "grid":1,
             "isloate":0
         },
         "power_peak":{
@@ -38,14 +38,14 @@
     },
     "price":{
         "TOU_power":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        "power_sale":0.0,
+        "power_sale":0.38,
         "gas_price":4.085,
         "heat_price":4.46,
         "cold_price":16,
 
         "hydrogen_price":200,
-        "capex_max":[9650000,2000000000],
-        "op_max":[11180000,2000000000]
+        "capex_max":[96500000000000,200000000000000],
+        "op_max":[11180000000,2000000000000]
     },
 
     "device":{

@@ -176,8 +176,8 @@
 
         "pv":
             {
-                "area_max":50000,
-                "area_min":50000,
+                "area_max":1000,
+                "area_min":1000,
                 "cost":1000,
                 "crf":20,
 

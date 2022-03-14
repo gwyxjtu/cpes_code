@@ -195,7 +195,7 @@ def planning_problem(dict,isloate,input_json):
     num_gtw = m.addVar(vtype=GRB.INTEGER,lb=0,name='num_gtw')
     # Create variables
 
-    ce_h = m.addVar(vtype=GRB.CONTINUOUS, lb=0, name="ce_h")
+    ce_h = m.addVar(vtype=GRB.CONTINUOUS, lb=-100000, name="ce_h")
 
     #m_ht = m.addVar(vtype=GRB.CONTINUOUS, lb=10, name="m_ht") # capacity of hot water tank
 
@@ -373,7 +373,7 @@ def planning_problem(dict,isloate,input_json):
     m.addConstr(capex_fc == cost_fc*p_fc_max)
     m.addConstr(capex_el == cost_el*p_el_max)
     #m.addConstr(s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_hp*p_hp_max+cost_fc*p_fc_max+cost_el*p_el_max + 10*gp.quicksum([p_pur[i]*lambda_ele_in[i] for i in range(period)])-10*gp.quicksum(p_sol)*lambda_ele_out+10*lambda_h*gp.quicksum(h_pur)+954>=0 ) 
-    m.addConstr(s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_hp*p_hp_max+cost_fc*p_fc_max+cost_el*p_el_max <= input_json['price']['capex_max'][1-isloate[1]])
+    #m.addConstr(s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_hp*p_hp_max+cost_fc*p_fc_max+cost_el*p_el_max <= input_json['price']['capex_max'][1-isloate[1]])
     for i in range(period):
         #电网
         m.addConstr(p_pur[i] <= 1000000000*(isloate[0]))
@@ -434,7 +434,7 @@ def planning_problem(dict,isloate,input_json):
         m.addConstr(g_sc[i] <= k_sc*theta_ex*s_sc*r_solar[i])
 
         #psol
-        m.addConstr(p_sol[i] <= p_fc[i]+p_pv[i])
+        #m.addConstr(p_sol[i] <= p_fc[i]+p_pv[i])
 
     # area
     #m.addConstr(s_pv+s_sc<=s_sum)
@@ -449,11 +449,11 @@ def planning_problem(dict,isloate,input_json):
     m.addConstr(cost_c_heat == sum([g_demand[i]/0.95*lambda_ele_in[i] for i in range(period)]))#/(3.41))
     m.addConstr(cost_c_cool == sum([q_demand[i]/4*lambda_ele_in[i] for i in range(period)]))#/3.8)
     m.addConstr(cost_c == cost_c_cool+cost_c_heat+cost_c_ele)
-    #m.setObjective(crf_pv*s_pv*cost_pv +crf_sc*s_sc*cost_sc + crf_hst*hst*cost_hst + crf_water*cost_ht*(m_ht+m_ct) + crf_hp*cost_hp*p_hp_max  + crf_hpg*cost_hpg*p_hpg_max + crf_gtw*cost_gtw*num_gtw
-    #    + crf_eb*cost_eb*p_eb_max  + crf_fc*capex_fc + crf_el*capex_el+crf_co*p_co_max*cost_co
-    #    + lambda_h*gp.quicksum(h_pur) + gp.quicksum([p_pur[i]*lambda_ele_in[i] for i in range(period)])-gp.quicksum(p_sol)*lambda_ele_out,GRB.MINIMIZE)
+    m.setObjective(crf_pv*s_pv*cost_pv +crf_sc*s_sc*cost_sc + crf_hst*hst*cost_hst + crf_water*cost_ht*(m_ht+m_ct) + crf_hp*cost_hp*p_hp_max  + crf_hpg*cost_hpg*p_hpg_max + crf_gtw*cost_gtw*num_gtw
+       + crf_eb*cost_eb*p_eb_max  + crf_fc*capex_fc + crf_el*capex_el+crf_co*p_co_max*cost_co
+       + lambda_h*gp.quicksum(h_pur) + gp.quicksum([p_pur[i]*lambda_ele_in[i] for i in range(period)])-gp.quicksum(p_sol)*lambda_ele_out,GRB.MINIMIZE)
     #m.setObjective(5*gp.quicksum(h_el)-gp.quicksum(p_sol)*lambda_ele_out,GRB.MINIMIZE)
-    m.setObjective(capex,GRB.MINIMIZE)
+    #m.setObjective(capex,GRB.MINIMIZE)
     #-gp.quicksum(p_sol)*lambda_ele_out
     # First optimize() call will fail - need to set NonConvex to 2
     m.params.NonConvex = 2
