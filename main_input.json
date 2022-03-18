@@ -6,9 +6,9 @@
             "office":0,
             "restaurant":0
         },
-        "load_area":100000,
-        "heat_mounth":[1,2,3,11,12],
-        "cold_mounth":[6,7,8],
+        "load_area":9932,
+        "heat_mounth":[0],
+        "cold_mounth":[],
         "hydrogen_state":{
             "grid":0,
             "isloate":0
@@ -19,9 +19,9 @@
         },
         "power_peak":{
             "flag":1,
-            "ele":1000,
-            "g":3000,
-            "q":2000,
+            "ele":300,
+            "g":0,
+            "q":0,
             "flag_shear_g":0,
             "flag_shear_e":0,
             "flag_shear_q":0,
@@ -29,13 +29,14 @@
         },
         "yearly_power":0,
         "ele_type":0,
-        "location":[126.535800,45.802160]
+        "location":[92,31]
     },
     "calc_mode":{
+        "whether_isloate":0,
         "obj":{
-            "capex":1,
-            "total_cap":0,
-            "opex":1
+            "capex_sum":1,
+            "capex_crf":0,
+            "opex":0
         }
     },
     "renewable_energy":{
@@ -44,11 +45,13 @@
         "pv_sc_max":20000000000000
     },
     "price":{
-        "TOU_power":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        "power_sale":0.38,
+        "TOU_power":[0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49],
+
+        "power_sale":0.0,
         "gas_price":4.085,
         "heat_price":4.46,
         "cold_price":16,
+        "carbon_price": 0.06,
 
         "hydrogen_price":200,
         "capex_max":[9650000000,2000000000],
@@ -56,10 +59,13 @@
     },
 
     "device":{
+        "grid": {
+          "transformer": 100000
+        },
         "co":
             {
-                "power_max":89.3,
-                "power_min":89.3,
+                "power_max":1000000,
+                "power_min":0,
                 "cost":1000,
                 "crf":10,
 
@@ -67,24 +73,28 @@
             },
         "fc":
             {
-                "power_max":1112.5,
-                "power_min":1112.5,
+                "power_max":100000,
+                "power_min":0,
                 "cost":8000,
                 "crf":10,
+                "nominal_lower": 0,
 
                 "eta_fc_p":15,
                 "eta_ex_g":16.6,
-                "theta_ex":0.95
+                "theta_ex":0.95,
 
+                "V_c": 10,
+                "t_fc": 85
             },
         "ht":
             {
-                "water_max":707047,
-                "water_min":707047,
+                "water_max":80000000,
+                "water_min":0,
                 "cost":0.5,
                 "crf":20,
 
-                "t_max":82,
+
+                "t_max":90,
                 "t_min":4,
                 "t_supply":55,
                 "miu_loss":0.02
@@ -112,8 +122,8 @@
 
         "ghp":
             {
-                "power_max":294,
-                "power_min":294,
+                "power_max":1000000,
+                "power_min":0,
                 "cost":4000,
                 "crf":15,
 
@@ -123,7 +133,7 @@
 
         "gtw":
             {
-                "number_max":42,
+                "number_max":100000,
                 "cost":30000,
                 "crf":30,
 
@@ -131,22 +141,26 @@
             },
         "ct":
             {
-                "water_max":1248422,
-                "water_min":1248422,
+                "water_max":180000000,
+                "water_min":0,
                 "cost":0.5,
                 "crf":15,
 
-                "t_max":21,
+                "t_max":13,
                 "t_min":4,
                 "t_supply":7,
                 "miu_loss":0.9
             },
         "hst":
             {
-                "sto_max":121.8,
+                "sto_max":5000000,
                 "sto_min":0,
                 "cost":3000,
                 "crf":15,
+
+                "pressure_upper": 35,
+                "pressure_lower": 0.5,
+
 
                 "inout_max":5000,
                 "U_max":350,
@@ -155,22 +169,34 @@
 
         "el":
             {
-                "power_max":3506.3,
+                "power_max":5000000,
                 "nm3_max":10000000,
                 "nm3_min":0,
-                "power_min":3506.3,
+                "power_min":0,
                 "cost":3360,
                 "crf":7,
-
+                "pressure_upper": 3,
+                "pressure_lower": 0.1,
                 "beta_el":0.0182,
 
                 "500RtV":0,
                 "U_max":200,
                 "U_min":20
             },
+        "hyd":
+            {
+                "flag":0,
+                "supply":0,
+                "power_cost":0,
+
+                "peak":-1,
+
+                "cost":0,
+                "crf":20
+            },
         "sc":
             {
-                "area_max":0,
+                "area_max":10000,
                 "area_min":0,
                 "cost":800,
                 "crf":20,
@@ -178,13 +204,16 @@
                 "beta_sc":0.72,
                 "theta_ex":0.9,
                 "a_stc":100,
-                "miu_loss":0.0064
+                "miu_loss":0.0064,
+
+                "V_stc": 50,
+                "V_stc_ex": 5
             },
 
         "pv":
             {
-                "area_max":50000,
-                "area_min":100,
+                "area_max":10000,
+                "area_min":0,
                 "cost":1000,
                 "crf":20,
 

@@ -4,7 +4,7 @@ import xlrd
 import random
 import time
 import csv
-from chicken_plan_zxxc_plan_h2devices import *
+#from chicken_plan_zxxc_plan_h2devices import *
 #chicken_plan_zxxc_plan_h2devices
 from chicken_op import *
 import json
@@ -334,6 +334,7 @@ def to_csv(res,filename):
                 # sum += (res[items[i]])[j]
             # total.write(1,i,sum)
         else:
+            print(items[i])
             total.write(1,i,res[items[i]])
 
     #filename = 'res/chicken_plan_2_load_1' + '.xls'

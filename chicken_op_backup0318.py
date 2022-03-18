@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[3]:
+# In[ ]:
 
 
 # %load chicken_op.py
@@ -26,48 +26,48 @@ def verify_dimension(dict):
             print('[WARNING] The dimension of ' + value +' is not correct')
             sys.exit()
 
-def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,period,season):
+def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,period):
     t0=time.time()
     # power price in winter, autumn and spring
     # lambda_ele_in = [0.3748,0.3748,0.3748,0.3748,0.3748,0.3748,0.3748,0.8745,0.8745,0.8745,1.4002,1.4002,1.4002,1.4002,
     #                  1.4002,0.8745,0.8745,0.8745,1.4002,1.4002,1.4002,0.8745,0.8745,0.3748]*7
     # power price in summer
-    lambda_ele_in = [0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.7704, 1.1313, 1.1313, 1.1313, 1.1313,
-                     0.7704, 0.7704, 0.7704, 0.7704, 0.7704, 0.7704, 1.1313, 1.1313, 1.1313, 1.1313, 1.1313, 0.4096] * 7
+    # lambda_ele_in = [0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.7704, 1.1313, 1.1313, 1.1313, 1.1313,
+    #                  0.7704, 0.7704, 0.7704, 0.7704, 0.7704, 0.7704, 1.1313, 1.1313, 1.1313, 1.1313, 1.1313, 0.4096] * 7
     lambda_ele_in = input_json['price']['TOU_power']*7
     lambda_ele_out = input_json['price']['power_sale']
     lambda_h = input_json['price']['hydrogen_price']
-    lambda_carbon = input_json['price']['carbon_price']
+    lambda_carbon = 0.06
 
-    p_transformer = input_json['device']['grid']['transformer']
+    p_transformer = 100000
 
-    alpha_e = input_json['carbon']['alpha_e']#0.5839#电网排放因子kg/kWh
-    alpha_gas = input_json['carbon']['alpha_gas']#1.535#天然气排放因子kg/Nm3
+    alpha_e = 0.5839#电网排放因子kg/kWh
+    alpha_gas = 1.535#天然气排放因子kg/Nm3
     #alpha_heat = 0.351
-    alpha_H2=input_json['carbon']['alpha_h2']#1.74#氢排放因子
-    alpha_eo=input_json['carbon']['alpha_EO']#0.8922#减排项目基准排放因子
+    alpha_H2=1.74#氢排放因子
+    alpha_eo=0.8922#减排项目基准排放因子
     #k_co_b = 0.05
     #k_co_el = 1.02
-    k_pv=input_json['device']['pv']['beta_pv']#0.21#光伏效率
-    k_co=input_json['device']['co']['beta_co']#1.399#压缩机COP1.399kWh/kg
-    k_el = input_json['device']['el']['beta_el']#0.022
+    k_pv=0.21#光伏效率
+    k_co=1.399#压缩机COP1.399kWh/kg
+    k_el = 0.022
     k_stc=input_json['device']['sc']['beta_sc']#集热器效率
-    k_eb=input_json['device']['eb']['beta_eb']#0.95#电锅炉效率COP
-    miu_stc_loss=input_json['device']['sc']['miu_loss']#0.035#集热器损耗系数
-    miu_loss=input_json['device']['ht']['miu_loss']#0.02#W(m2*K)热水罐损耗系数
-    theta_ex=input_json['device']['sc']['theta_ex']#0.95#热交换器效率
-    yita_fc_e_nominal=input_json['device']['fc']['eta_fc_p']#15#燃料电池产电COP15kWh/kg
-    yita_fc_g_nominal=input_json['device']['fc']['eta_ex_g']#16.6#燃料电池产热COP16.6kWh/kg
-    yita_hp_g=input_json['device']['hp']['beta_hpg']#3#空气源热泵制热COP
-    yita_hp_q=input_json['device']['hp']['beta_hpq']#4#空气源热泵制冷COP
-    yita_ghp_g=input_json['device']['ghp']['beta_ghpg']#3.54#地源热泵制热COP
-    yita_ghp_q=input_json['device']['ghp']['beta_ghpq']#4#地源热泵制冷COP
+    k_eb=0.95#电锅炉效率COP
+    miu_stc_loss=0.035#集热器损耗系数
+    miu_loss=0.02#W(m2*K)热水罐损耗系数
+    theta_ex=0.95#热交换器效率
+    yita_fc_e_nominal=15#燃料电池产电COP15kWh/kg
+    yita_fc_g_nominal=16.6#燃料电池产热COP16.6kWh/kg
+    yita_hp_g=input_json['device']['hp']['beta_hpg']-dict_load['load_sort']*0.3#空气源热泵制热COP
+    yita_hp_q=4#空气源热泵制冷COP
+    yita_ghp_g=3.54#地源热泵制热COP
+    yita_ghp_q=4#地源热泵制冷COP
     
 
     # g_loss = 200
     # q_loss = 100
-    #g_storage = 1000
-    #q_storage = 1000
+    g_storage = 1000
+    q_storage = 1000
 
     ele_load = dict_load['ele_load']
     g_demand = dict_load['g_demand']
@@ -75,17 +75,17 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     r_solar = dict_load['r_solar']
 
     
-    #g_ac_nominal = 200#额定
-    p_fc_nominal_lower=input_json['device']['fc']['nominal_lower']#0#p_fc下界
-    u_el_upper=input_json['device']['el']['pressure_upper']#3#输出压强上限3MPa
-    u_el_lower=input_json['device']['el']['pressure_lower']#0.1#输出压强下限0.1MPa
-    u_ht_upper=input_json['device']['hst']['pressure_upper']#35#储氢罐压强上限35MPa
-    u_ht_lower=input_json['device']['hst']['pressure_lower']#0.5#储氢罐压强下限0.5MPa
-    T_wt_upper=input_json['device']['ht']['t_max']#82#℃热水罐储水温度上限
-    T_wt_lower=input_json['device']['ht']['t_min']#4#℃热水罐储水温度下限
-    T_ct_upper=input_json['device']['ct']['t_max']#25#℃冷水罐储水温度上限
-    T_ct_lower=input_json['device']['ht']['t_min']#3#℃冷水罐储水温度下限
-    T_g_lower=input_json['device']['ht']['t_supply']#55#℃供热温度下限
+    g_ac_nominal = 200#额定
+    p_fc_nominal_lower=0#p_fc下界
+    u_el_upper=3#输出压强上限3MPa
+    u_el_lower=0.1#输出压强下限0.1MPa
+    u_ht_upper=35#储氢罐压强上限35MPa
+    u_ht_lower=0.5#储氢罐压强下限0.5MPa
+    T_wt_upper=82#℃热水罐储水温度上限
+    T_wt_lower=4#℃热水罐储水温度下限
+    T_ct_upper=25#℃冷水罐储水温度上限
+    T_ct_lower=3#℃冷水罐储水温度下限
+    T_g_lower=55#℃供热温度下限
     #T_q_lower=9#℃供冷温度上限
     
     c = 4.2/3600    #水的比热容，4.2KJ/(kg*K)，已转换成KWH
@@ -93,31 +93,15 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     epsilon=0.0000001
     M = 1000000000
     
-    V_c=input_json['device']['fc']['V_c']#10  #m3燃料电池回路体积
-    V_stc=input_json['device']['sc']['V_stc']#50#太阳能集热器内部体积
-    V_stc_ex=input_json['device']['sc']['V_stc_ex']#5#m3太阳能集热器回路
+    V_c=10  #m3燃料电池回路体积
+    V_stc=50#太阳能集热器内部体积
+    V_stc_ex=5#m3太阳能集热器回路
     
     
-    t_fc=input_json['device']['fc']['t_fc']#85#燃料电池冷却液流入换热器的温度
-    
-    ##A_stc=100#输入的参数，防冻液管与外界接触的表面积
-    #S_stc=100#输入的参数，太阳能集热板吸收太阳能的面积
-    #S_pv=200#输入的参数，光伏表面积
-    #m_wt=20000#输入的参数，热水罐质量容量
-    #m_ct=20000#输入的参数，冷水罐质量容量
-    #m_inout_upper = 20#输入的参数，储氢罐质量容量
-    #p_el_nominal = 150#输入的参数，电解槽额定功率
-    #p_fc_nominal = 120#输入的参数，燃料电池额定功率
-    #p_eb_nominal=40000000#输入的参数，电锅炉额定功率
-    #p_hp_nominal=40000000#输入的参数，空气源热泵额定功率
-    #p_ghp_nominal=40000000#输入的参数，地源热泵额定功率
-    #p_co_nominal=40000000#输入的参数，压缩机额定功率
-    #g_sts_lower=[0,0,0,0]#输入的参数，地源热泵给埋热管最大从土壤拿的热（春夏秋冬分别）
-    #g_ghp_upper=[20000,20000,20000,20000]#输入的参数，地源热泵制热量上限
-    #q_ghp_upper=[20000,20000,20000,20000]#输入的参数，地源热泵制热量上限
+    t_fc=85#燃料电池冷却液流入换热器的温度
     
     
-    #A_stc=100#输入的参数，防冻液管与外界接触的表面积
+    A_stc=100#输入的参数，防冻液管与外界接触的表面积
     S_stc=device_cap["area_sc"]#输入的参数，太阳能集热板吸收太阳能的面积
     S_pv=device_cap["area_pv"] #输入的参数，光伏表面积
     m_wt=device_cap["m_ht"] #输入的参数，热水罐质量容量
@@ -128,12 +112,8 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     p_eb_nominal= device_cap["p_eb_max"] #输入的参数，电锅炉额定功率
     p_hp_nominal= device_cap["p_hp_max"]#输入的参数，空气源热泵额定功率
     p_ghp_nominal=device_cap["p_hpg_max"]#输入的参数，地源热泵额定功率
-    p_co_nominal=device_cap["p_co"]#输入的参数，压缩机额定功率
-    g_sts_lower=device_cap['g_hpg_gr']
-    g_ghp_upper=device_cap['g_hpg']
-    q_ghp_upper=device_cap['q_hpg']
-    #print(g_ghp_upper=['g_hpg'])
-    #print("**")
+    p_co_nominal=device_cap["p_co"]#输入的参数，地源热泵额定功率
+    
     coeff_el_h2u=u_el_upper/k_el/p_el_nominal if p_el_nominal!=0 else 100000 #输出氢气质量换算成压强的系数
     coeff_ht_h2u=u_ht_upper/m_inout_upper if m_inout_upper!=0 else 100000#储氢罐氢气换算成压强系数
     m_fc_w=ro_wt*V_c#燃料电池回路水的质量
@@ -206,7 +186,7 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     m_el=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"m_el{i}") for i in range(period)]
     m_fc=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"m_fc{i}") for i in range(period)]
     m_out=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"m_out{i}") for i in range(period)]
-    #m_tube=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"m_tube{i}") for i in range(period)]#管道中水的质量
+    m_tube=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"m_tube{i}") for i in range(period)]#管道中水的质量
     #m_q=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"m_q{i}") for i in range(period)]#冷水罐换冷水
     p_g=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"p_g{i}") for i in range(period)]
     p_u=[probV6.addVar(lb=0,vtype=GRB.CONTINUOUS,name=f"p_u{i}") for i in range(period)]
@@ -258,14 +238,8 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
     w_stc_ex=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"w_stc_ex{i}") for i in range(period)]#处理太阳能集热器双线性约束参量V6.5（19）
     w_ht=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"w_ht{i}") for i in range(period)]#处理热水罐双线性约束参量V6.5（22）
     w_ht_stc_ex=[probV6.addVar(lb=0,ub=90,vtype=GRB.CONTINUOUS,name=f"w_ht_stc_ex{i}") for i in range(period)]#处理热水罐t_stc_ex双线性约束参量V6.5（28）
-    w_ht_fc_ex=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"w_ht_fc_ex{i}") for i in range(period)]#处理热水罐t_fc_ex双线性约束参量V6.5（28）
-    w_ht_wt=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"w_ht_wt{i}") for i in range(period)]#处理热水罐t_wt双线性约束参量V6.5（28）
-    w_ht_stc_tube_r=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"w_ht_stc_tube_r{i}") for i in range(period)]
-    w_ht_fc_th_r=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"w_ht_fc_th_r{i}") for i in range(period)]
-    w_ht_wt_io_r=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"w_ht_wt_io_r{i}") for i in range(period)]
-    w_ht_stc_tube=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"w_ht_stc_tube{i}") for i in range(period)]
-    w_ht_fc_th=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"w_ht_fc_th{i}") for i in range(period)]
-    w_ht_wt_io=[probV6.addVar(lb=0,ub=100,vtype=GRB.CONTINUOUS,name=f"w_ht_wt_io{i}") for i in range(period)]
+    w_ht_fc_ex=[probV6.addVar(lb=0,ub=90,vtype=GRB.CONTINUOUS,name=f"w_ht_fc_ex{i}") for i in range(period)]#处理热水罐t_fc_ex双线性约束参量V6.5（28）
+    w_ht_wt=[probV6.addVar(lb=0,ub=90,vtype=GRB.CONTINUOUS,name=f"w_ht_wt{i}") for i in range(period)]#处理热水罐t_wt双线性约束参量V6.5（28）
     e_ce=[probV6.addVar(vtype=GRB.CONTINUOUS,name=f"e_ce{i}") for i in range(period)]
     v_gas=[probV6.addVar(vtype=GRB.CONTINUOUS,name=f"v_gas{i}") for i in range(period)]
     
@@ -326,16 +300,16 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
         probV6.addConstr(g_fc[i]-M*(1-z_fcth[i]) <= w_fc[i])
         probV6.addConstr(g_fc[i]+M*(1-z_fcth[i]) >= w_fc[i])
         probV6.addConstr(w_fc[i] <= M*z_fcth[i])
-        #probV6.addConstr(M*w_fc[i] >= z_fcth[i])
+        probV6.addConstr(M*w_fc[i] >= z_fcth[i])
         probV6.addConstr(z_fcth[i] * epsilon - M * (1 - z_fcth[i]) <= t_fc - t_fc_ex[i])
         probV6.addConstr(t_fc - t_fc_ex[i] <= M * z_fcth[i] - epsilon * (1-z_fcth[i]))
         
         #solar thermal collector
-        probV6.addConstr(c * m_stc * (t_stc[i+1]-t_stc[i]) + miu_stc_loss * S_stc *(t_stc[i]-t_env[i]) + c*m_stc_ex*w_stc_ex[i]/theta_ex == k_stc * S_stc * r_solar[i])#V6.5(19)
+        probV6.addConstr(c * m_stc * (t_stc[i+1]-t_stc[i]) + miu_stc_loss * A_stc *(t_stc[i]-t_env[i]) + c*m_stc_ex*w_stc_ex[i]/theta_ex == k_stc * S_stc * r_solar[i])#V6.5(19)
         probV6.addConstr(w_stc_ex[i] >= t_stc_ex[i]-t_r[i]-M*(1-z_stc_ex[i]))#双线性处理
         probV6.addConstr(w_stc_ex[i] <= t_stc_ex[i]-t_r[i]+M*(1-z_stc_ex[i]))
         probV6.addConstr(w_stc_ex[i] <= M*z_stc_ex[i])
-        #probV6.addConstr(z_stc_ex[i] <= M*w_stc_ex[i])
+        probV6.addConstr(z_stc_ex[i] <= M*w_stc_ex[i])
         probV6.addConstr(t_stc_ex[i] >= t_r[i])#V6.5(20)
         probV6.addConstr(c * m_stc_ex * (t_stc_ex[i]-t_r[i]) == g_stc[i])
         probV6.addConstr(t_stc[i]-t_stc_ex[i] <= M*z_stc_ex[i]-epsilon*(1-z_stc_ex[i]))#V6.5(21)
@@ -366,54 +340,36 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
         probV6.addConstr(w_ht[i]<=t_r[i]-t_wt[i]+M*(1-z_wt[i]))
         probV6.addConstr(w_ht[i]>=t_r[i]-t_wt[i]-M*(1-z_wt[i]))
         probV6.addConstr(w_ht[i]<=M*z_wt[i])
-        #probV6.addConstr(w_ht[i]*M>=z_wt[i])
+        probV6.addConstr(w_ht[i]*M>=z_wt[i])
         probV6.addConstr(g_loss[i]==miu_loss*A_wt*(t_wt[i]-t_env_in[i]))#V6.5(23)
         probV6.addConstr(t_wt[i]>=T_wt_lower)#V6.5(24)
         probV6.addConstr(t_wt[i]<=T_wt_upper)
-        probV6.addConstr(g_stc[i]+w_fc[i]+g_eb[i]+g_hp[i]-g_inout[i]==g_tube[i]+g_sts_in[i])#V6.5(25)
-        probV6.addConstr(g_tube[i]+g_sts_in[i]==c*((m_eb+m_hp_g)*(t_tube[i]-t_r[i])+m_stc_ex*w_ht_stc_tube_r[i]+m_fc_w*w_ht_fc_th_r[i]+m_io*w_ht_wt_io_r[i]))#V6.5(26)
+        probV6.addConstr(g_stc[i]+g_fc[i]+g_eb[i]+g_hp[i]-g_inout[i]==g_tube[i]+g_sts_in[i])#V6.5(25)
+        probV6.addConstr(g_tube[i]+g_sts_in[i]==c*m_tube[i]*(t_tube[i]-t_r[i]))#V6.5(26)
         probV6.addConstr(t_tube[i]>=T_g_lower)
-        probV6.addConstr(w_ht_stc_tube_r[i]<=t_tube[i]-t_r[i]+M*(1-z_stc_ex[i]))#w_ht_stc_tube_r
-        probV6.addConstr(w_ht_stc_tube_r[i]>=t_tube[i]-t_r[i]-M*(1-z_stc_ex[i]))
-        probV6.addConstr(w_ht_stc_tube_r[i]<=M*z_stc_ex[i])
-        probV6.addConstr(w_ht_fc_th_r[i]<=t_tube[i]-t_r[i]+M*(1-z_fcth[i]))#w_ht_fc_th_r
-        probV6.addConstr(w_ht_fc_th_r[i]>=t_tube[i]-t_r[i]-M*(1-z_fcth[i]))
-        probV6.addConstr(w_ht_fc_th_r[i]<=M*z_fcth[i])
-        probV6.addConstr(w_ht_wt_io_r[i]<=t_tube[i]-t_r[i]+M*(1-z_wt[i]))#w_ht_wt_io_r
-        probV6.addConstr(w_ht_wt_io_r[i]>=t_tube[i]-t_r[i]-M*(1-z_wt[i]))
-        probV6.addConstr(w_ht_wt_io_r[i]<=M*z_wt[i])
-        #probV6.addConstr(z_stc_ex[i]*m_stc_ex+z_fcth[i]*m_fc_w+m_eb+m_hp_g+z_wt[i]*m_io==m_tube[i])#V6.5(27)
-        probV6.addConstr(m_stc_ex*w_ht_stc_ex[i]+m_fc_w*w_ht_fc_ex[i]+m_eb*t_eb[i]+m_hp_g*t_hp_g[i]+m_io*w_ht_wt[i]==(m_eb+m_hp_g)*t_tube[i]+m_stc_ex*w_ht_stc_tube[i]+m_fc_w*w_ht_fc_th[i]+m_io*w_ht_wt_io[i])#V6.5(28)
-        probV6.addConstr(w_ht_stc_tube[i]<=t_tube[i]+M*(1-z_stc_ex[i]))#w_ht_stc_tube
-        probV6.addConstr(w_ht_stc_tube[i]>=t_tube[i]-M*(1-z_stc_ex[i]))
-        probV6.addConstr(w_ht_stc_tube[i]<=M*z_stc_ex[i])
-        probV6.addConstr(w_ht_fc_th[i]<=t_tube[i]+M*(1-z_fcth[i]))#w_ht_fc_th
-        probV6.addConstr(w_ht_fc_th[i]>=t_tube[i]-M*(1-z_fcth[i]))
-        probV6.addConstr(w_ht_fc_th[i]<=M*z_fcth[i])
-        probV6.addConstr(w_ht_wt_io[i]<=t_tube[i]+M*(1-z_wt[i]))#w_ht_wt_io
-        probV6.addConstr(w_ht_wt_io[i]>=t_tube[i]-M*(1-z_wt[i]))
-        probV6.addConstr(w_ht_wt_io[i]<=M*z_wt[i])        
+        probV6.addConstr(z_stc_ex[i]*m_stc_ex+z_fcth[i]*m_fc_w+m_eb+m_hp_g+z_wt[i]*m_io==m_tube[i])#V6.5(27)
+        probV6.addConstr(m_stc_ex*w_ht_stc_ex[i]+m_fc_w*w_ht_fc_ex[i]+m_eb*t_eb[i]+m_hp_g*t_hp_g[i]+m_io*w_ht_wt[i]==m_tube[i]*t_tube[i])#V6.5(28)
         probV6.addConstr(w_ht_stc_ex[i]<=t_stc_ex[i]+M*(1-z_stc_ex[i]))#w_ht_stc_ex
         probV6.addConstr(w_ht_stc_ex[i]>=t_stc_ex[i]-M*(1-z_stc_ex[i]))
         probV6.addConstr(w_ht_stc_ex[i]<=M*z_stc_ex[i])
-        #probV6.addConstr(w_ht_stc_ex[i]*M>=z_stc_ex[i])
+        probV6.addConstr(w_ht_stc_ex[i]*M>=z_stc_ex[i])
         probV6.addConstr(w_ht_fc_ex[i]<=t_fc_ex[i]+M*(1-z_fcth[i]))#w_ht_fc_ex
         probV6.addConstr(w_ht_fc_ex[i]>=t_fc_ex[i]-M*(1-z_fcth[i]))
         probV6.addConstr(w_ht_fc_ex[i]<=M*z_fcth[i])
-        #probV6.addConstr(w_ht_fc_ex[i]*M>=z_fcth[i])
+        probV6.addConstr(w_ht_fc_ex[i]*M>=z_fcth[i])
         probV6.addConstr(w_ht_wt[i]<=t_wt[i]+M*(1-z_wt[i]))#w_ht_wt
         probV6.addConstr(w_ht_wt[i]>=t_wt[i]-M*(1-z_wt[i]))
         probV6.addConstr(w_ht_wt[i]<=M*z_wt[i])
-        #probV6.addConstr(w_ht_wt[i]*M>=z_wt[i])
+        probV6.addConstr(w_ht_wt[i]*M>=z_wt[i])
         
         #Cold Water Tank
         #probV6.addConstr(c*m_ct*(t_ct[i]-t_ct[i+1])==q_inout[i]-q_loss[i])#V6.5(41)
         probV6.addConstr(q_io[i+1]==0.99*q_io[i]+q_inout[i])
         #probV6.addConstr(q_inout[i]==z_ct[i]*c*m_cio*(t_ct[i]-t_cr[i]))
         #probV6.addConstr(q_loss[i]==miu_loss*A_ct*(t_env_in[i]-t_ct[i]))#V6.5(42)
-        #probV6.addConstr(q_io[i]<=c*m_ct*T_ct_upper)#V6.5(43)
-        #probV6.addConstr(q_io[i]>=c*m_ct*T_ct_lower)
-        probV6.addConstr(q_ghp[i]+q_hp[i]-q_inout[i]==q_demand[i])#V6.5(44)
+        probV6.addConstr(q_io[i]<=c*m_ct*T_ct_upper)#V6.5(43)
+        probV6.addConstr(q_io[i]>=c*m_ct*T_ct_lower)
+        probV6.addConstr(q_ghp[i]+q_hp[i]-q_inout[i]>=q_demand[i])#V6.5(44)
         #probV6.addConstr(q_demand[i]<=c*m_q[i]*(t_cr[i]-t_q[i]))
         #probV6.addConstr(t_q[i]<=T_q_lower)
         #probV6.addConstr(m_hp_q+m_ghp_q+z_ct[i]*m_cio==m_q[i])#V6.5(45)
@@ -443,7 +399,6 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
         probV6.addConstr(z_ghp_g[i]+z_ghp_q[i]<=1)
         probV6.addConstr(g_sts_ghp[i]==g_ghp[i]*(1-1/yita_ghp_g))#V6.5(35)
         probV6.addConstr(g_ghp_sts[i]==q_ghp[i]*(1+1/yita_ghp_q))#V6.5(36)
-
         
         #埋热管
         probV6.addConstr(g_sts[i+1]-g_sts[i]==g_ghp_sts[i]-g_sts_ghp[i]+g_sts_in[i])#V6.5(39)
@@ -453,11 +408,8 @@ def season_operating_problem(dict_load,device_cap,isolate,tem_env,input_json,per
         
         probV6.addConstr(e_ce[i]==ele_load[i])
         probV6.addConstr(v_gas[i]==(g_demand[i]+q_demand[i]/1.35)/7.5)
-    print(g_ghp_upper[season])
-    probV6.addConstr(gp.quicksum(g_sts_ghp)>= g_sts_lower[season])#地源热泵从土壤取的热量要大于规划给的值
-    probV6.addConstr(gp.quicksum(g_ghp)<=g_ghp_upper[season])
-    probV6.addConstr(gp.quicksum(q_ghp)<=q_ghp_upper[season])
-    probV6.addConstr(ce_h==gp.quicksum(m_b)*alpha_H2+gp.quicksum(p_g)*alpha_e)#V6.5(47)
+
+    probV6.addConstr(ce_h==gp.quicksum(p_g)*alpha_e)#V6.5(47)
     probV6.addConstr(ce_ce==gp.quicksum(e_ce)*alpha_e+gp.quicksum(v_gas)*alpha_gas)#V6.5(48)
     probV6.addConstr(cer==ce_ce-ce_h)#V6.5(49)
     probV6.addConstr(ce_eo==gp.quicksum(p_u)*alpha_eo)#V6.5(50)
@@ -535,15 +487,15 @@ def operating_problem(dict_load,device_cap,isolate,tem_env,input_json,period):
     co2_ele_gas=sum(dict_load['ele_load'])*input_json['carbon']['alpha_e']+sum(gas_sum_ele_gas)*1.535
 
     #分别算四个季节的运行程序，得到碳排放和运行成本，算一个一年的运行成本和碳排放。
-    dict_spring={'ele_load':dict_load['ele_load'][3288:3288+7*24],'g_demand':dict_load['g_demand'][3288:3288+7*24],'q_demand':dict_load['q_demand'][3288:3288+7*24],'r_solar':dict_load['r_solar'][3288:3288+7*24]}
-    dict_summer={'ele_load':dict_load['ele_load'][5448:5448+7*24],'g_demand':dict_load['g_demand'][5448:5448+7*24],'q_demand':dict_load['q_demand'][5448:5448+7*24],'r_solar':dict_load['r_solar'][5448:5448+7*24]}
-    dict_autumn={'ele_load':dict_load['ele_load'][7656:7656+7*24],'g_demand':dict_load['g_demand'][7656:7656+7*24],'q_demand':dict_load['q_demand'][7656:7656+7*24],'r_solar':dict_load['r_solar'][7656:7656+7*24]}
-    dict_winter={'ele_load':dict_load['ele_load'][360:360+7*24]  ,'g_demand':dict_load['g_demand'][360:360+7*24]  ,'q_demand':dict_load['q_demand'][360:360+7*24]  ,'r_solar':dict_load['r_solar'][360:360+7*24]  }
+    dict_spring={'ele_load':dict_load['ele_load'][3288:3288+7*24],'g_demand':dict_load['g_demand'][3288:3288+7*24],'q_demand':dict_load['q_demand'][3288:3288+7*24],'r_solar':dict_load['r_solar'][3288:3288+7*24],'load_sort':dict_load['load_sort']}
+    dict_summer={'ele_load':dict_load['ele_load'][6192:6192+7*24],'g_demand':dict_load['g_demand'][6192:6192+7*24],'q_demand':dict_load['q_demand'][6192:6192+7*24],'r_solar':dict_load['r_solar'][6192:6192+7*24],'load_sort':dict_load['load_sort']}
+    dict_autumn={'ele_load':dict_load['ele_load'][7656:7656+7*24],'g_demand':dict_load['g_demand'][7656:7656+7*24],'q_demand':dict_load['q_demand'][7656:7656+7*24],'r_solar':dict_load['r_solar'][7656:7656+7*24],'load_sort':dict_load['load_sort']}
+    dict_winter={'ele_load':dict_load['ele_load'][360:360+7*24],'g_demand':dict_load['g_demand'][360:360+7*24],'q_demand':dict_load['q_demand'][360:360+7*24],'r_solar':dict_load['r_solar'][360:360+7*24],'load_sort':dict_load['load_sort']}
 
-    ce_h_spring,opex_spring,res_spring,flag1 = season_operating_problem(dict_spring,device_cap,isolate,tem_env,input_json,7*24,0)
-    ce_h_summer,opex_summer,res_summer,flag2 = season_operating_problem(dict_summer,device_cap,isolate,tem_env,input_json,7*24,1)
-    ce_h_autumn,opex_autumn,res_autumn,flag3 = season_operating_problem(dict_autumn,device_cap,isolate,tem_env,input_json,7*24,2)
-    ce_h_winter,opex_winter,res_winter,flag4 = season_operating_problem(dict_winter,device_cap,isolate,tem_env,input_json,7*24,3)
+    ce_h_spring,opex_spring,res_spring,flag1 = season_operating_problem(dict_spring,device_cap,isolate,tem_env,input_json,7*24)
+    ce_h_summer,opex_summer,res_summer,flag2 = season_operating_problem(dict_summer,device_cap,isolate,tem_env,input_json,7*24)
+    ce_h_autumn,opex_autumn,res_autumn,flag3 = season_operating_problem(dict_autumn,device_cap,isolate,tem_env,input_json,7*24)
+    ce_h_winter,opex_winter,res_winter,flag4 = season_operating_problem(dict_winter,device_cap,isolate,tem_env,input_json,7*24)
     print(flag1,flag2,flag3,flag4)
     #exit(0)
     if flag1 == 1 or flag2 == 1 or flag3 ==1 or flag4 ==1:
@@ -565,68 +517,4 @@ def operating_problem(dict_load,device_cap,isolate,tem_env,input_json,period):
      }
 
     return output_json,0
-
-#if __name__ == '__main__':
-#    period = 168
-#
-#    #book = xlrd.open_workbook('E:\自动化85\课程\大四上\毕设\CASE2020code\datawinter.xlsx')
-#    wb = xlwt.Workbook()
-#    total = wb.add_sheet('WHEC')
-#    items = ['objective','process time','ce_h','c_cer','ele_load','g_demand','q_demand','r_solar','lambda_ele_in',
-#             'z_g','z_u','z_in','z_out','g_fc','m_b','m_in',
-#             'm_el','m_fc','m_out','p_g','p_u','p_fc','p_el','p_co',
-#             'm_ht']
-#    ## for k in range(len(items)):
-#    ##     total.write(0,k+1,items[k])
-#    #data = book.sheet_by_index(0)
-#    #ele_load = []
-#    #g_demand = []
-#    #q_demand = []
-#    #r_solar = []
-#    #for l in range(168):
-#    #    ele_load.append(data.cell(l,0).value)#我猜是每一列（好像复杂了一点啦啦啦
-#    #    g_demand.append(data.cell(l,1).value)
-#    #    q_demand.append(data.cell(l, 2).value)
-#    #    r_solar.append(data.cell(l,3).value)
-#    
-#    
-#    f = csv.reader(open('E:\\自动化85\\课程\\大四上\\毕设\\半自动出方案报告\\1.24讨论内容\\升级版code\\load.csv','r'))
-#    ele_load = []
-#    g_demand = []
-#    q_demand = []
-#    r_solar = []
-#    for l in islice(f,1,None):
-#        ele_load.append(float(l[1]))
-#        g_demand.append(float(l[2]))
-#        q_demand.append(float(l[3]))
-#        r_solar.append(float(l[4]))
-#    
-#
-#    device_cap=[]
-#    isolate=[1,1,1]# isloate 0表示并网，1表示离网
-#    tem_env=[]
-#    with open("E:\\自动化85\\课程\\大四上\\毕设\\半自动出方案报告\\代码终\\20220318\\cpes_code-master\\main_input.json",encoding = "utf-8") as load_file:
-#        input_json = json.load(load_file)
-#
-#    dict_load = {'ele_load': ele_load, 'g_demand': g_demand,  'q_demand': q_demand, 'r_solar': r_solar}
-#    output_json = operating_problem(dict_load, device_cap,isolate,tem_env,input_json,period)
-#    print(output_json)
-#
-#    #items = list(res.keys())
-##
-#    #for i in range(len(items)):
-#    #    total.write(0,i,items[i])
-#    #    if type(res[items[i]]) == list:
-#    #        sum = 0
-#    #        for j in range(period):
-#    #            total.write(j+2,i,(res[items[i]])[j])
-#    #            sum += (res[items[i]])[j]
-#    #        total.write(1,i,sum)
-#    #    else:
-#    #        total.write(1,i,res[items[i]])
-##
-#    ##filename = 'asummer氢价=24' + '.xls'
-#    #wb.save('E:\\自动化85\\课程\\大四上\\毕设\\半自动出方案报告\\1.24讨论内容\\8760_byGurobi.xls')
-#    
-#    print("It has reached the end.")
 

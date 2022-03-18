@@ -343,10 +343,6 @@ def to_csv(res,filename):
 
     #filename = 'res/chicken_plan_2_load_1' + '.xls'
     wb.save(res_dict+filename)
-
-
-def save_json(j,name):
-    jj = json.dumps(j)
     f = open(res_dict+name+".json",'w')
     f.write(jj)
     f.close()
@@ -364,7 +360,8 @@ if __name__ == '__main__':
     #exit(0)
     #买电，卖电，买氢
 
-    res1,grid_planning_output_json,grid_operation_output_json_plan,device_cap1 = planning_problem(dict_load, [1,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['grid']], input_json)
+    res1,grid_planning_output_json,grid_operation_output_json_plan,device_cap1 = planning_problem(dict_load, [0,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['grid']], input_json)
+    grid_planning_output_json['falg_isloate'] = 0
     # device_cap1 = {'area_pv': 2052.0416969482167,
     #      'area_sc': 0.0,
     #      'hst': 29.738068123876026,
