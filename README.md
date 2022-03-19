@@ -53,6 +53,19 @@
         "location":[92,31]
     },
 ```
+### 计算模式部分
+`whether_isloate`为1表示计算离网模式，0表示不计算离网模式，`obj`为目标函数选项，`capex_sum`表示总投资成本，`capex_crf`代表年化投资 `opex`代表运行成本，如果为1代表这一项在目标函数中。
+```
+    "calc_mode":{
+        "whether_isloate":0,
+        "obj":{
+            "capex_sum":1,
+            "capex_crf":0,
+            "opex":0
+        }
+    },
+```
+
 
 ### 可再生能源部分
 
@@ -87,7 +100,7 @@
 设备包括氢能系统设备和水循环供热系统设备。
 
 el代表电解槽设备，`power_max`代表最大规划容量，`power_min`代表最小规划容量，`cost`代表设备单价，元/kwh，`crf`代表设备寿命。
-运行参数中`beta_el`代表电解槽制氢效率，`500RtV`代表输出氢气质量压强换算系数，`U_max,U_min`代表输出压强上下限。
+运行参数中`beta_el`代表电解槽制氢效率，`500RtV`代表输出氢气质量压强换算系数，`U_max,U_min`代表输出压强上下限。`nm3_max`   `nm3_min`分别是电解槽规划容量的上限和下限，单位是标方每小时。
 ```
 	"el"://电解槽
 	    {
@@ -95,11 +108,17 @@ el代表电解槽设备，`power_max`代表最大规划容量，`power_min`代�
 	        //最大规划容量
 	        "power_min":0,
 	        //最小规划容量
+            "nm3_max":10000000,
+            //最大标方
+            "nm3_min":0,
+            //最小标方数目
+
 	        "cost":12000,
 	        //设备单价
 	        "crf":7,
 	        //设备寿命
-
+            "pressure_upper": 3,
+            "pressure_lower": 0.1,
 	        //运行参数
 	        "beta_el":0.03,
 	        //制氢效率
@@ -137,6 +156,11 @@ hst代表储氢罐`sto_max`代表最大规划容量,`inout_max`代表单位时�
 	        "crf":10,
 	        //设备寿命
 
+            "pressure_upper": 35,
+            //最大压强
+            "pressure_lower": 0.5,
+            //最小储氢压强
+            
 	        //运行参数
 	        "inout_max":500,
 	        //最大进出量
@@ -144,31 +168,27 @@ hst代表储氢罐`sto_max`代表最大规划容量,`inout_max`代表单位时�
 	        "U_min":5,
 	        //储氢罐压强上下限
 	    },
+ 
 ```
 
 fc代表燃料电池设备，`power_max`代表最大规划容量，`power_min`代表最小规划容量，`cost`代表设备单价，元/kwh，`crf`代表设备寿命。
 运行参数中`eta_fc_p`代表产电效率，`eta_ex_g`代表制热效率，`theta_ex`代表换热效率。
 ```
-	"fc"://燃料电池热电联产unit
-	    {
-	        "power_max":10000,
-	        //最大规划容量
-	        "power_min":0,
-	        //最小规划容量
-	        "cost":12000,
-	        //设备单价
-	        "crf":7,
-	        //设备寿命
+    "fc":
+        {
+            "power_max":100000,
+            "power_min":0,
+            "cost":8000,
+            "crf":10,
+            "nominal_lower": 0,
 
-	        //运行参数
-	        "eta_fc_p":15,
-	        //产电效率kwh/kg
-	        "eta_ex_g":16.6,
-	        //制热效率kwg/kg
-	        "theta_ex":0.95,
-	        //换热效率
+            "eta_fc_p":15,
+            "eta_ex_g":16.6,
+            "theta_ex":0.95,
 
-	    },
+            "V_c": 10,
+            "t_fc": 85
+        },
 ```
 
 sc代表太阳能集热器，`cost`代表设备单价，元/kwh，`crf`代表设备寿命。运行参数中`beta_sc`代表效率，`miu_loss`代表损失率，`theta_ex`代表换热效率。
@@ -304,8 +324,19 @@ ghp代表地源热泵设备，`power_max`代表最大规划容量，`power_min`�
             //制冷效率
         },
 ```
+```
+        "hyd":
+            {
+                "flag":0,
+                "supply":0,
+                "power_cost":0,
 
+                "peak":-1,
 
+                "cost":0,
+                "crf":20
+            },
+```
 
 ### 碳排放参数
 

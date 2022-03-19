@@ -26,13 +26,30 @@ def replace_text(filename,old,new):
     doc.save('test.docx')
     return
 def replace_word():
-    replace_text('./输出文档 - 对接1.docx','（园区名称）',park.loc['园区名称'][1])
+    if park.loc['是否用氢'][1]=='是':
+        #不离网
+        if str(grid_planning_output_json["flag_isloate"])=="0.00":
+            if park.loc['园区规范'][1]=='无':
+                replace_text('./输出文档-无离网docx', '园区规范','')
+            else:
+                replace_text('./输出文档-无离网docx', '园区规范','（3）'+park.loc['园区名称'][1]+'管委会提供的基础资料：'+park.loc['园区规范'][1])
+        else:
+            if park.loc['园区规范'][1]=='无':
+                replace_text('./输出文档.docx', '园区规范','')
+            else:
+                replace_text('./输出文档.docx', '园区规范','（3）'+park.loc['园区名称'][1]+'管委会提供的基础资料：'+park.loc['园区规范'][1])
+    else:
+        if park.loc['园区规范'][1]=='无':
+            replace_text('./输出文档-无氢.docx', '园区规范','')
+        else:
+            replace_text('./输出文档-无氢.docx', '园区规范','（3）'+park.loc['园区名称'][1]+'管委会提供的基础资料：'+park.loc['园区规范'][1])
+
+    replace_text('test.docx','（园区名称）',park.loc['园区名称'][1])
 
     replace_text('test.docx','description',park.loc['园区描述'][1])
 
     replace_text('test.docx','城市描述',city.loc['城市描述'][1])
 
-    replace_text('test.docx','园区规范',park.loc['园区规范'][1])
 
     replace_text('test.docx','土地使用情况',park.loc['土地使用情况'][1])
 
@@ -50,17 +67,19 @@ def replace_word():
 
     replace_text('test.docx','气候分区',city.loc['气候分区'][1])
 
-    replace_text('test.docx','光伏情况',city.loc['光伏情况'][1])
+    # replace_text('test.docx','光伏情况',city.loc['光伏情况'][1])
 
     replace_text('test.docx','采暖供冷描述',city.loc['采暖供冷期描述'][1])
 
     replace_text('test.docx','电价描述',park.loc['电价描述'][1])
 
     replace_text('test.docx','用能政策',park.loc['用能政策'][1])
+    if park.loc['地热资源评价'][1]=='无':
+        replace_text('test.docx', '地热资源评价','')
+    else:
+        replace_text('test.docx','地热资源评价','地热资源属新能源，价廉、方便且无污染，可广泛应用于化工、纺织工业、居民区供热及温室栽培。高温热水中的氟、硅酸、碘、硼酸等含量均达到或超过医疗矿水含量，对多种疾病具有良好的理疗效果，有较高医疗价值。根据中国建科院《中国地源热泵应用适宜性评价》结果显示：寒冷气候区为适宜区，表明各项指标均适宜；夏热冬冷气候区为一般适宜区，表明吸排热量不平衡率偏高、且与当地常规系统相比经济性较差。'+park.loc['地热资源评价'][1])
 
-    replace_text('test.docx','地热资源评价',park.loc['地热资源评价'][1])
-
-    replace_text('test.docx','卖电许可',park.loc['卖电许可'][1])
+    replace_text('test.docx','permits',park.loc['卖电许可'][1])
 
     replace_text('test.docx','氢价',str(park.loc['氢价'][1]))
 
@@ -77,17 +96,17 @@ def replace_word():
 
     replace_text('test.docx','制氢潜力',park.loc['制氢潜力'][1])
 
-    replace_text('test.docx','（电负荷峰值数据）',str(grid_planning_output_json['ele_load_max']))
-
-    replace_text('test.docx','（热负荷峰值数据）',str(grid_planning_output_json['g_demand_max']))
-
-    replace_text('test.docx','（冷负荷峰值数据）',str(grid_planning_output_json['q_demand_max']))
-
-    replace_text('test.docx','（电负荷总量数据）',str(grid_planning_output_json['ele_load_sum']))
-
-    replace_text('test.docx','（热负荷总量数据）',str(grid_planning_output_json['g_demand_sum']))
-
-    replace_text('test.docx','（冷负荷总量数据）',str(grid_planning_output_json['q_demand_sum']))
+    # replace_text('test.docx','（电负荷峰值数据）',str(grid_planning_output_json['ele_load_max']))
+    #
+    # replace_text('test.docx','（热负荷峰值数据）',str(grid_planning_output_json['g_demand_max']))
+    #
+    # replace_text('test.docx','（冷负荷峰值数据）',str(grid_planning_output_json['q_demand_max']))
+    #
+    # replace_text('test.docx','（电负荷总量数据）',str(grid_planning_output_json['ele_load_sum']))
+    #
+    # replace_text('test.docx','（热负荷总量数据）',str(grid_planning_output_json['g_demand_sum']))
+    #
+    # replace_text('test.docx','（冷负荷总量数据）',str(grid_planning_output_json['q_demand_sum']))
 
     replace_text('test.docx',"aaa",grid_planning_output_json['equipment_cost'])
     replace_text('test.docx','bbb',grid_operation_output_json['cer'])
@@ -122,6 +141,7 @@ def change_table_air_para(doc):
 
 def change_table_equip_para(doc):
     tables = doc.tables[1]
+
     for i in range(1, len(tables.rows)):
         if str(list(equip['参数值'])[i - 1]) != 'nan':
             # 在第该表格i行2列的单元格内输入对应内容”
@@ -129,30 +149,21 @@ def change_table_equip_para(doc):
             # 设置字体
             run.font.name = 'Times New Roman'
             # 字体大小
-            run.font.size = Pt(10.5)
+            run.font.size = Pt(12)
             r = run._element
             # 中文宋体
             r.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
             # 居中
             tables.cell(i, 2).paragraphs[0].alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
-        # 在第该表格i行6列的单元格内输入对应内容”
-        if str(list(equip['参数值'])[i + len(tables.rows) - 2]) != 'nan':
-            run = tables.cell(i, 6).paragraphs[0].add_run(str(list(equip['参数值'])[i + len(tables.rows) - 2]))
-            # 设置字体
-            run.font.name = 'Times New Roman'
-            # 字体大小
-            run.font.size = Pt(10.5)
-            r = run._element
-            # 中文宋体
-            r.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
-            # 居中
-            tables.cell(i, 6).paragraphs[0].alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    #删除空白行
+    for row in tables.rows:
+        if not row.cells[2].text:
+            row._element.getparent().remove(row._element)
 
 
 def change_table_equip_allocation(tables, json):
-    keys = ["num_gtw",
-            "p_fc_max",
+    keys = ["p_fc_max",
+            "num_gtw",
             "p_hpg_max",
             "p_hp_max",
             "p_eb_max",
@@ -163,7 +174,26 @@ def change_table_equip_allocation(tables, json):
             "area_pv",
             "area_sc",
             "p_co"]
-    replace = itemgetter(*keys)(json)
+    replace = list(itemgetter(*keys)(json))
+
+    #储热罐、储冷罐kg改成t
+    if float(replace[7])>1000:
+        replace[7]=float(replace[7])//1000
+        p = tables.cell(8, 3).paragraphs[0]
+        inline = p.runs
+        # Loop added to work with runs (strings with same style)
+        for i in range(len(inline)):
+            text = inline[i].text.replace('kg', 't')
+            inline[i].text = text
+    if float(replace[8])>1000:
+        replace[8]=float(replace[8])//1000
+        p = tables.cell(9, 3).paragraphs[0]
+        inline = p.runs
+        # Loop added to work with runs (strings with same style)
+        for i in range(len(inline)):
+            text = inline[i].text.replace('kg', 't')
+            inline[i].text = text
+
     for i in range(1,len(tables.rows)):
         if replace[i-1] !=0 and replace[i-1] != '0.00':
             # 在第该表格i行列的单元格内输入对应内容”
@@ -180,7 +210,7 @@ def change_table_equip_allocation(tables, json):
 
 def change_table_eco_analyse(tables, planing_json,opertion_json):
     replace = [planing_json['equipment_cost'],
-               opertion_json['operation_cost'],
+               abs(float(opertion_json['operation_cost'])),
                opertion_json['cost_save_rate'],
                planing_json['receive_year'],
                opertion_json['co2'],
@@ -196,6 +226,16 @@ def change_table_eco_analyse(tables, planing_json,opertion_json):
         r.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
         # 居中
         tables.cell(i, 1).paragraphs[0].alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+    #收益/成本
+    if float(opertion_json['operation_cost'])<0:
+        p=tables.cell(2,0).paragraphs[0]
+        inline = p.runs
+        # Loop added to work with runs (strings with same style)
+        for i in range(len(inline)):
+                text = inline[i].text.replace('年化运行成本', '年化运行收益')
+                inline[i].text = text
+
 def zip_docx(startdir, file_news):
     z = zipfile.ZipFile(file_news, 'w', zipfile.ZIP_DEFLATED)
     for dirpath, dirnames, filenames in os.walk(startdir):
@@ -245,27 +285,65 @@ if __name__=='__main__':
 
     table2=doc.tables[2]
     table3 = doc.tables[3]
-    table4 = doc.tables[4]
-    table5 = doc.tables[5]
+    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0.00":
+        table4 = doc.tables[4]
+        table5 = doc.tables[5]
 
     change_table_equip_allocation(table2,grid_planning_output_json)
-    change_table_equip_allocation(table4, itgrid_planning_output_json)
+    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0.00":
+        change_table_equip_allocation(table4, itgrid_planning_output_json)
     change_table_eco_analyse(table3, grid_planning_output_json, grid_operation_output_json)
-    change_table_eco_analyse(table5, itgrid_planning_output_json, itgrid_operation_output_json)
+    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0.00":
+        change_table_eco_analyse(table5, itgrid_planning_output_json, itgrid_operation_output_json)
     dynamicTable(table2)
-    dynamicTable(table4)
+    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0.00":
+        dynamicTable(table4)
     doc.save('test.docx')
 
     #更改对应设备文字
     replace_equip_text(table2,'grid-equipment')
-    replace_equip_text(table4, 'off-equipment')
+    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0.00":
+        replace_equip_text(table4, 'off-equipment')
 
 
-    ###更改图片
+    ###更改图片,判断电热冷
+
+    ##只有电热
+    if sum(grid_planning_output_json['q_demand']) == 0:
+        replace_text('test.docx', 'load condition',
+                     '全年的电-热需求呈规律性变化趋势，其中：电负荷峰值为{:.0f}kWh，热负荷峰值为{:.0f}kWh。全年电负荷共{:.0f}kWh，热负荷共{:.0f}kWh。'.format(
+                         grid_planning_output_json['ele_load_max'], grid_planning_output_json['g_demand_max'],
+                          grid_planning_output_json['ele_load_sum'],
+                         grid_planning_output_json['g_demand_sum']))
+    ##只有电冷
+    if sum(grid_planning_output_json['g_demand']) == 0:
+        replace_text('test.docx', 'load condition',
+                     '全年的电-冷需求呈规律性变化趋势，其中：电负荷峰值为{:.0f}kWh，冷负荷峰值为{:.0f}kWh。全年电负荷共{:.0f}kWh，冷负荷共{:.0f}kWh。'.format(
+                         grid_planning_output_json['ele_load_max'], grid_planning_output_json['q_demand_max'],
+                          grid_planning_output_json['ele_load_sum'],
+                         grid_planning_output_json['q_demand_sum']))
+    ##电热冷都有
+    else:
+        replace_text('test.docx','load condition',
+                     '全年的电-热-冷需求呈规律性变化趋势，其中：电负荷峰值为{:.0f}kWh，热负荷峰值为{:.0f}kWh，冷负荷峰值为{:.0f}kWh。全年电负荷共{:.0f}kWh，热负荷共{:.0f}kWh，冷负荷共{:.0f}kWh。'.format(
+                         grid_planning_output_json['ele_load_max'],grid_planning_output_json['g_demand_max'],
+                         grid_planning_output_json['q_demand_max'],grid_planning_output_json['ele_load_sum'],
+                         grid_planning_output_json['g_demand_sum'],grid_planning_output_json['q_demand_sum']))
+
+
     with zipfile.ZipFile('./test.docx') as z:
         z.extractall('./docx/')  # 解压docx文件
     light_image()
     load_image()
+    load_image_1_01()
+    load_image_7_15()
+    # ##只有电冷
+    # if sum(grid_planning_output_json['g_demand']) == 0:
+    #     os.remove('.\docx\word\media\image4.png')
+    # ##只有电热
+    # if sum(grid_planning_output_json['q_demand']) == 0:
+    #     os.remove('.\docx\word\media\image5.png')
+
     zip_docx('./docx/', 'out.docx')
 
     ###删除过程文件

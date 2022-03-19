@@ -19,7 +19,6 @@ import time
 import csv
 
 
-
 def crf(year):
     i = 0.08
     crf=((1+i)**year)*i/((1+i)**year-1);
@@ -44,6 +43,10 @@ def model_linear_cost(m,x1,x2,y1,y2,y3,power,capex):
 
 
 def planning_problem(dict,isloate,input_json):
+    m_date = [31,28,31,30,31,30,31,31,30,31,30,31]
+    m_date = [sum(m_date[:i])*24 for i in range(12)]
+    m_date.append(8760)
+
     if input_json["device"]['hyd']['flag'] == 1:
         water = []
         book = xlrd.open_workbook('load/water.xls')
@@ -166,6 +169,18 @@ def planning_problem(dict,isloate,input_json):
     g_demand = dict['g_demand']
     q_demand = dict['q_demand']
     r_solar  = dict['r_solar']
+    z_g_demand = [0 for i in range(8760)]
+    z_q_demand = [0 for i in range(8760)]
+    heat_mounth = input_json['load']['heat_mounth']
+    cool_mounth = input_json['load']['cold_mounth']
+    for h in heat_mounth:
+        #print(m_date[h-1],m_date[h])
+        z_g_demand[m_date[h-1]+15*24:min(m_date[h]+15*24,8760)] = [1 for _ in range(m_date[h]-m_date[h-1])]
+    if 12 in heat_mounth:
+        z_g_demand[:15*24] = [1 for _ in range(15*24)]
+        z_g_demand = z_g_demand[:8760]
+    for cc in cool_mounth:
+        z_q_demand[m_date[cc-1]:m_date[cc]] = [1 for _ in range(m_date[cc]-m_date[cc-1])]
 
     #--------------
 
@@ -392,11 +407,13 @@ def planning_problem(dict,isloate,input_json):
         m.addConstr(p_sol[i] <= 1000000000*(isloate[1]))
         m.addConstr(h_pur[i] <= 1000000000*(isloate[2]))
 
-        m.addConstr(z_hpgq[i] <= q_demand[i])
-        m.addConstr(z_hpgg[i] <= g_demand[i])
+        #m.addConstr(z_hpgq[i] <= q_demand[i])
+        #m.addConstr(z_hpgg[i] <= g_demand[i])
+        #这里得假设热负荷时连续的月份
 
-        m.addConstr(p_hpgc[i]<= z_hpgq[i] * 1000000000)
-        m.addConstr(p_hpg[i]<=  z_hpgg[i] * 1000000000)
+
+        m.addConstr(p_hpgc[i]<= z_q_demand[i] * 1000000000)
+        m.addConstr(p_hpg[i]<=  z_g_demand[i] * 1000000000)
         # 燃料电池
         m.addConstr(g_fc[i] <= eta_ex*k_fc_g*h_fc[i])#氢燃烧产电
         m.addConstr(10000*z_fc[i]>=g_fc[i])
@@ -536,12 +553,12 @@ def planning_problem(dict,isloate,input_json):
     m_date.append(8760)
     #规划输出
     output_json = {
-            'ele_load_sum': format(sum(ele_load),'.1f'),  # 电负荷总量/kwh
-            'g_demand_sum': format(sum(g_demand),'.1f'),  # 热负荷总量/kwh
-            'q_demand_sum': format(sum(q_demand),'.1f'),  # 冷负荷总量/kwh
-            'ele_load_max': format(max(ele_load),'.1f'),  # 电负荷峰值/kwh
-            'g_demand_max': format(max(g_demand),'.1f'),  # 热负荷峰值/kwh
-            'q_demand_max': format(max(q_demand),'.1f'),  # 冷负荷峰值/kwh
+            'ele_load_sum': int(sum(ele_load)),  # 电负荷总量/kwh
+            'g_demand_sum': int(sum(g_demand)),  # 热负荷总量/kwh
+            'q_demand_sum': int(sum(q_demand)),  # 冷负荷总量/kwh
+            'ele_load_max': int(max(ele_load)),  # 电负荷峰值/kwh
+            'g_demand_max': int(max(g_demand)),  # 热负荷峰值/kwh
+            'q_demand_max': int(max(q_demand)),  # 冷负荷峰值/kwh
             'ele_load': ele_load,  # 电负荷8760h的分时数据/kwh
             'g_demand': g_demand,  # 热负荷8760h的分时数据/kwh
             'q_demand': q_demand,  # 冷负荷8760h的分时数据/kwh

@@ -185,7 +185,7 @@
             },
         "hyd":
             {
-                "flag":0,
+                "flag":1,
                 "supply":0,
                 "power_cost":0,
 

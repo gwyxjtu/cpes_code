@@ -28,15 +28,62 @@ def load_image():
     plt.xticks(fontproperties='Times New Roman', size=10)
     plt.yticks(fontproperties='Times New Roman', size=10)
     plt.plot(grid_planning_output_json['ele_load'], color='blue', alpha=1,label=u'电负荷',linewidth=2)
-    plt.plot(grid_planning_output_json['g_demand'], color='orange', alpha=1,label=u'热负荷',linewidth=2)
-    plt.plot(grid_planning_output_json['q_demand'], color='gray', alpha=1,label=u'冷',linewidth=2)
-    plt.xlim(0, len(grid_planning_output_json['ele_load']) + 1)
+    if sum(grid_planning_output_json['g_demand'])!=0:
+        plt.plot(grid_planning_output_json['g_demand'], color='orange', alpha=1,label=u'热负荷',linewidth=2)
+    if sum(grid_planning_output_json['q_demand'])!=0:
+        plt.plot(grid_planning_output_json['q_demand'], color='gray', alpha=1,label=u'冷负荷',linewidth=2)
+    plt.xlim(0, 8760)
     plt.ylim(0,)
     # 设置刻度间隔
-    x_major_locator = MultipleLocator(24 * 30)
+    x_major_locator = MultipleLocator(730)
     ax = plt.gca()
     ax.xaxis.set_major_locator(x_major_locator)
     plt.grid(linewidth=0.7,axis='y')
     plt.title(u"全年电热冷负荷图", fontsize=14)
     plt.legend()
     plt.savefig('.\docx\word\media\image3.png')
+
+def load_image_1_01():
+    plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
+    plt.rcParams['axes.unicode_minus'] = False
+    plt.figure(figsize=(7.13, 4.43), dpi=100)
+    plt.ylabel(u'负荷(kW·h)', fontsize=10)
+    plt.xticks(fontproperties='Times New Roman', size=10)
+    plt.yticks(fontproperties='Times New Roman', size=10)
+    plt.plot(grid_planning_output_json['ele_load'][0:24], color='blue', alpha=1, label=u'电负荷', linewidth=2)
+    if sum(grid_planning_output_json['g_demand']) != 0:
+        plt.plot(grid_planning_output_json['g_demand'][0:24], color='orange', alpha=1, label=u'热负荷', linewidth=2)
+    if sum(grid_planning_output_json['q_demand']) != 0:
+        plt.plot(grid_planning_output_json['q_demand'][0:24], color='gray', alpha=1, label=u'冷负荷', linewidth=2)
+    plt.xlim(0,24)
+    plt.ylim(0, )
+    # 设置刻度间隔
+    x_major_locator = MultipleLocator(1)
+    ax = plt.gca()
+    ax.xaxis.set_major_locator(x_major_locator)
+    plt.grid(linewidth=0.7, axis='y')
+    plt.title(u"1月1日典型日负荷图", fontsize=14)
+    plt.legend()
+    plt.savefig('.\docx\word\media\image4.png')
+def load_image_7_15():
+    plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
+    plt.rcParams['axes.unicode_minus'] = False
+    plt.figure(figsize=(7.13, 4.43), dpi=100)
+    plt.ylabel(u'负荷(kW·h)', fontsize=10)
+    plt.xticks(fontproperties='Times New Roman', size=10)
+    plt.yticks(fontproperties='Times New Roman', size=10)
+    plt.plot(grid_planning_output_json['ele_load'][4368:4392], color='blue', alpha=1, label=u'电负荷', linewidth=2)
+    if sum(grid_planning_output_json['g_demand']) != 0:
+        plt.plot(grid_planning_output_json['g_demand'][4368:4392], color='orange', alpha=1, label=u'热负荷', linewidth=2)
+    if sum(grid_planning_output_json['q_demand']) != 0:
+        plt.plot(grid_planning_output_json['q_demand'][4368:4392], color='gray', alpha=1, label=u'冷负荷', linewidth=2)
+    plt.xlim(0, 24)
+    plt.ylim(0, )
+    # 设置刻度间隔
+    x_major_locator = MultipleLocator(1)
+    ax = plt.gca()
+    ax.xaxis.set_major_locator(x_major_locator)
+    plt.grid(linewidth=0.7, axis='y')
+    plt.title(u"7月15日典型日负荷图", fontsize=14)
+    plt.legend()
+    plt.savefig('.\docx\word\media\image5.png')

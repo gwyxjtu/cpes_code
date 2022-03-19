@@ -29,7 +29,7 @@ def save_json(j,name):
 if __name__ == '__main__':
     tem_env = 0#环境温度，后续补上
     #print(m_date)#main_input_zxxc_plan_h2devices main_input_zxxc1_new
-    with open("main_input.json",encoding = "utf-8") as load_file:
+    with open("main_input_zxxc1_new.json",encoding = "utf-8") as load_file:
         input_json = json.load(load_file)
 
     #dict_load = get_load()
@@ -39,13 +39,16 @@ if __name__ == '__main__':
     #exit(0)
     #买电，卖电，买氢
 
+
+
+
     res1,grid_planning_output_json,grid_operation_output_json_plan,device_cap1 = planning_problem(dict_load, [0,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['grid']], input_json)
     
     pprint.pprint(device_cap1)
     print(grid_planning_output_json['equipment_cost'],grid_planning_output_json['receive_year'])
-    grid_operation_output_json,flag = operating_problem(dict_load, device_cap1,[0,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['grid']],tem_env,input_json,8760)
+    #grid_operation_output_json,flag = operating_problem(dict_load, device_cap1,[0,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['grid']],tem_env,input_json,8760)
 
-    flag = 0
+    flag = 1
 
     if flag == 1:
         print("grid_g")
