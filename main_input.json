@@ -32,7 +32,7 @@
         "location":[109.734580,38.285200]
     },
     "calc_mode":{
-        "grid_power_pur":0,
+        "grid_power_pur": 0,
         "whether_isloate":0,
 
         "obj":{

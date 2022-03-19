@@ -30,9 +30,9 @@ def replace_word():
         #不离网
         if str(grid_planning_output_json["flag_isloate"])=="0.00":
             if park.loc['园区规范'][1]=='无':
-                replace_text('./输出文档-无离网docx', '园区规范','')
+                replace_text('./输出文档-无离网.docx', '园区规范','')
             else:
-                replace_text('./输出文档-无离网docx', '园区规范','（3）'+park.loc['园区名称'][1]+'管委会提供的基础资料：'+park.loc['园区规范'][1])
+                replace_text('./输出文档-无离网.docx', '园区规范','（3）'+park.loc['园区名称'][1]+'管委会提供的基础资料：'+park.loc['园区规范'][1])
         else:
             if park.loc['园区规范'][1]=='无':
                 replace_text('./输出文档.docx', '园区规范','')

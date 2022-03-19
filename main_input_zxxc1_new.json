@@ -32,8 +32,15 @@
         "location":[126.535800,45.802160]
     },
     "calc_mode":{
-        "grid_power_pur":0,
-        "whether_isloate":0,
+        "grid":{
+            "p_pur_state":0,
+            "p_sol_state":1,
+            "h_pur_state":0
+        },
+        "isloate":{
+            "flag":0,
+            "h_pur_state":0
+        },
         "obj":{
             "capex_sum":1,
             "capex_crf":0,

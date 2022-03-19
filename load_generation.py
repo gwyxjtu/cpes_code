@@ -317,7 +317,7 @@ def get_load(load_dict):
     # exit(0)
 
     dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,'load_sort':load_dict["load_sort"]}
-
+    to_csv(dict_load,"yt.xls")
     return dict_load
 
 def to_csv(res,filename):

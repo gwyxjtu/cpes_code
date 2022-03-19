@@ -1,5 +1,6 @@
 {
     "load":{
+
         "building_area":{
             "apartment":1,
             "hotel":0,
@@ -9,14 +10,7 @@
         "load_area":9932,
         "heat_mounth":[1,2,3,10,11,12],
         "cold_mounth":[],
-        "hydrogen_state":{
-            "grid":0,
-            "isloate":0
-        },
-        "power_sale_state":{
-            "grid":1,
-            "isloate":1
-        },
+
         "power_peak":{
             "flag":1,
             "ele":300,
@@ -31,9 +25,20 @@
         "ele_type":0,
         "location":[92,31]
     },
+
+    
     "calc_mode":{
-        "grid_power_pur":0,
-        "whether_isloate":0,
+
+
+        "grid":{
+            "p_pur_state":1,
+            "p_sol_state":0,
+            "h_pur_state":0
+        },
+        "isloate":{
+            "flag":0,
+            "h_pur_state":0
+        },
         "obj":{
             "capex_sum":0,
             "capex_crf":1,
@@ -75,7 +80,7 @@
         "fc":
             {
                 "power_max":100000,
-                "power_min":0,
+                "power_min":100,
                 "cost":8000,
                 "crf":10,
                 "nominal_lower": 0,
@@ -155,7 +160,7 @@
         "hst":
             {
                 "sto_max":5000000,
-                "sto_min":0,
+                "sto_min":80,
                 "cost":3000,
                 "crf":15,
 
@@ -172,7 +177,7 @@
             {
                 "power_max":5000000,
                 "nm3_max":10000000,
-                "nm3_min":0,
+                "nm3_min":50,
                 "power_min":0,
                 "cost":3360,
                 "crf":7,
@@ -197,7 +202,7 @@
             },
         "sc":
             {
-                "area_max":10000,
+                "area_max":100000,
                 "area_min":0,
                 "cost":800,
                 "crf":20,
@@ -213,7 +218,7 @@
 
         "pv":
             {
-                "area_max":10000,
+                "area_max":100000,
                 "area_min":0,
                 "cost":1000,
                 "crf":20,

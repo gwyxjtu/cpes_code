@@ -1,0 +1,56 @@
+{
+    "load":{
+        "autoload":1,
+        "fileaddress":"E:/论文/生成负载/me/load_input.xls",
+        "province":"" ,
+        "city": "",
+        "building_area":{
+            "apartment":1,
+            "hotel":0,
+            "office":0,
+            "restaurant":0
+        },
+        "load_area":1000,
+        "heat_mounth":"起始于11月15日，结束于3月15日",
+        "cold_mounth":"起始于7月1日，结束于9月1日",
+        "hydrogen_state":{
+            "grid":0,
+            "isloate":0
+        },
+        "power_sale_state":{
+            "grid":1,
+            "isloate":1
+        },
+        "power_peak":{
+            "flag":0,
+            "ele":45,
+            "g":100,
+            "q":150,
+            "flag_shear_g":0,
+            "flag_shear_e":0,
+            "flag_shear_q":0,
+            "shear":6
+        },
+        "power_sum":{
+            "flag":0,
+            "ele":80000,
+            "g":60000,
+            "q":30000
+        },
+        "yearly_power":0,
+        "ele_type":0,
+        "location":[34.2204,109.1115]
+    },
+    "calc_mode":{
+        "obj":{
+            "capex":1,
+            "total_cap":0,
+            "opex":1
+        }
+    },
+    "renewable_energy":{
+        "pv_existst":0,
+        "sc_existst":0,
+        "pv_sc_max":20000000000000
+    }
+}

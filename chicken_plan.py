@@ -17,7 +17,26 @@ import xlrd
 import random
 import time
 import csv
+res_dict = "doc/"
+def to_csv(res,filename):
+    items = list(res.keys())
+    wb = xlwt.Workbook()
+    total = wb.add_sheet('garden')
+    for i in range(len(items)):
+        total.write(0,i,items[i])
+        if type(res[items[i]]) == list:
+            sum = 0
+            print(items[i])
+            for j in range(len(res[items[i]])):
+                total.write(j+2,i,(res[items[i]])[j])
+                # sum += (res[items[i]])[j]
+            # total.write(1,i,sum)
+        else:
+            print(items[i])
+            total.write(1,i,res[items[i]])
 
+    #filename = 'res/chicken_plan_2_load_1' + '.xls'
+    wb.save(res_dict+filename)
 
 def crf(year):
     i = 0.08
@@ -46,7 +65,7 @@ def planning_problem(dict,isloate,input_json):
     m_date = [31,28,31,30,31,30,31,31,30,31,30,31]
     m_date = [sum(m_date[:i])*24 for i in range(12)]
     m_date.append(8760)
-
+    to_csv(dict,"debug_load.xls")
     if input_json["device"]['hyd']['flag'] == 1:
         water = []
         book = xlrd.open_workbook('load/water.xls')
@@ -171,6 +190,8 @@ def planning_problem(dict,isloate,input_json):
     r_solar  = dict['r_solar']
     z_g_demand = [0 for i in range(8760)]
     z_q_demand = [0 for i in range(8760)]
+    print(sum(g_demand),sum(q_demand),sum(ele_load))
+    print("----------------g,q,e_load----------------")
     heat_mounth = input_json['load']['heat_mounth']
     cool_mounth = input_json['load']['cold_mounth']
     for h in heat_mounth:
@@ -182,6 +203,13 @@ def planning_problem(dict,isloate,input_json):
     for cc in cool_mounth:
         z_q_demand[m_date[cc-1]:m_date[cc]] = [1 for _ in range(m_date[cc]-m_date[cc-1])]
 
+    # z_g_demand = dict["z_heat_mounth"]
+    # z_q_demand = dict["z_cold_mounth"]
+
+    # z_g_demand = [1 for i in range(8760)]
+    # z_q_demand = [1 for i in range(8760)]
+
+
     #--------------
     # import matplotlib.pyplot as plt
     # x = [i for i in range(0,24*6)]
@@ -190,7 +218,7 @@ def planning_problem(dict,isloate,input_json):
     # exit(0)
 
 
-    period = len(q_demand)
+    period = 8760
     print(period)
     # Create a new model
     m = gp.Model("mip1")
@@ -634,16 +662,16 @@ def planning_problem(dict,isloate,input_json):
     co2_ele_gas=sum(ele_load)*input_json['carbon']['alpha_e']+sum(gas_sum_ele_gas)*1.535
     #print("------------")
     operation_output_json = {
-            "operation_cost": format(op_sum/10000,'.2f'),  # 年化运行成本/万元
-            "revenue": format(revenue/10000,'.2f'),  # 年化运行成本/万元
-            "cost_save_rate": format((opex_ele_only-op_sum)/opex_ele_only,'.4f'),  #电运行成本节约比例
-            "cost_save_rate_gas": format((opex_ele_gas-op_sum)/opex_ele_gas,'.4f'),  #电气运行成本节约比例
-            "co2":format(ce_h.X/1000,'.2f'),  #总碳排/t
-            "cer_rate":format((co2_ele_only-ce_h.X)/co2_ele_only,'.4f'),  #与电系统相比的碳减排率
-            "cer_gas":format((co2_ele_gas-ce_h.X)/co2_ele_gas,'.4f'), #与电气系统相比的碳减排率
-            "cer_perm2":format((co2_ele_only-ce_h.X)/input_json['load']['load_area']/1000,'.2f'),  #电系统每平米的碳减排量/t
-            "cer_perm2_gas":format((co2_ele_gas-ce_h.X)/input_json['load']['load_area']/1000,'.2f'),  #电气系统每平米的碳减排量/t
-            "cer":format((co2_ele_only-ce_h.X)/1000,'.4f')
+            "operation_cost": format(op_sum/10000,'.1f'),  # 年化运行成本/万元
+            "revenue": format(revenue/10000,'.1f'),  # 年化运行成本/万元
+            "cost_save_rate": format((opex_ele_only-op_sum)/opex_ele_only,'.1f'),  #电运行成本节约比例
+            "cost_save_rate_gas": format((opex_ele_gas-op_sum)/opex_ele_gas,'.1f'),  #电气运行成本节约比例
+            "co2":format(ce_h.X/1000,'.1f'),  #总碳排/t
+            "cer_rate":format((co2_ele_only-ce_h.X)/co2_ele_only,'.1f'),  #与电系统相比的碳减排率
+            "cer_gas":format((co2_ele_gas-ce_h.X)/co2_ele_gas,'.1f'), #与电气系统相比的碳减排率
+            "cer_perm2":format((co2_ele_only-ce_h.X)/input_json['load']['load_area']/1000,'.1f'),  #电系统每平米的碳减排量/t
+            "cer_perm2_gas":format((co2_ele_gas-ce_h.X)/input_json['load']['load_area']/1000,'.1f'),  #电气系统每平米的碳减排量/t
+            "cer":format((co2_ele_only-ce_h.X)/1000,'.1f')
     }
     return {'objective':m.objVal,
             'process time':time.time() - t0,
