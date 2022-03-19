@@ -26,15 +26,17 @@ def save_json(j,name):
     f.write(jj)
     f.close()
     return 0
+
+
 if __name__ == '__main__':
     tem_env = 0#环境温度，后续补上
     #print(m_date)#main_input_zxxc_plan_h2devices main_input_zxxc1_new
-    with open("main_input_zxxc1_new.json",encoding = "utf-8") as load_file:
+    with open("main_input.json",encoding = "utf-8") as load_file:
         input_json = json.load(load_file)
 
     #dict_load = get_load()
     dict_load = get_load_new(input_json["load"])
-    #dict_load = get_load(input_json["load"])
+    dict_load = get_load(input_json["load"])
 
     #exit(0)
     #买电，卖电，买氢
@@ -42,7 +44,7 @@ if __name__ == '__main__':
 
 
 
-    res1,grid_planning_output_json,grid_operation_output_json_plan,device_cap1 = planning_problem(dict_load, [0,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['grid']], input_json)
+    res1,grid_planning_output_json,grid_operation_output_json_plan,device_cap1 = planning_problem(dict_load, [input_json['calc_mode']['grid_power_pur'],input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['grid']], input_json)
     
     pprint.pprint(device_cap1)
     print(grid_planning_output_json['equipment_cost'],grid_planning_output_json['receive_year'])
@@ -111,7 +113,7 @@ if __name__ == '__main__':
         res2,itgrid_planning_output_json,isloate_operation_output_json_plan,device_cap2 = planning_problem(dict_load, [0,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['isloate']], input_json)
         pprint.pprint(device_cap2)
         
-        itgrid_operation_output_json,flag = operating_problem(dict_load, device_cap2,[0,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['isloate']],tem_env,input_json,8760)
+        #itgrid_operation_output_json,flag = operating_problem(dict_load, device_cap2,[0,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['isloate']],tem_env,input_json,8760)
         flag = 1
         if flag == 1:
             print("isloate_g")

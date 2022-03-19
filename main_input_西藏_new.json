@@ -6,9 +6,9 @@
             "office":0,
             "restaurant":0
         },
-        "load_area":100000,
-        "heat_mounth":[1,2,3,11,12],
-        "cold_mounth":[6,7,8],
+        "load_area":9932,
+        "heat_mounth":[1,2,3,10,11,12],
+        "cold_mounth":[],
         "hydrogen_state":{
             "grid":0,
             "isloate":0
@@ -19,9 +19,9 @@
         },
         "power_peak":{
             "flag":1,
-            "ele":1000,
-            "g":3000,
-            "q":2000,
+            "ele":300,
+            "g":600,
+            "q":0,
             "flag_shear_g":0,
             "flag_shear_e":0,
             "flag_shear_q":0,
@@ -29,15 +29,15 @@
         },
         "yearly_power":0,
         "ele_type":0,
-        "location":[126.535800,45.802160]
+        "location":[92,31]
     },
     "calc_mode":{
         "grid_power_pur":0,
         "whether_isloate":0,
         "obj":{
-            "capex_sum":1,
-            "capex_crf":0,
-            "opex":0
+            "capex_sum":0,
+            "capex_crf":1,
+            "opex":1
         }
     },
     "renewable_energy":{
@@ -46,15 +46,16 @@
         "pv_sc_max":20000000000000
     },
     "price":{
-        "TOU_power":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        "power_sale":0.38,
+        "TOU_power":[0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49],
+
+        "power_sale":0.0,
         "gas_price":4.085,
         "heat_price":4.46,
         "cold_price":16,
         "carbon_price": 0.06,
 
         "hydrogen_price":200,
-        "capex_max":[9650000000,2000000000],
+        "capex_max":[965000000000,2000000000],
         "op_max":[1118000000,2000000000]
     },
 
@@ -185,7 +186,7 @@
             },
         "hyd":
             {
-                "flag":1,
+                "flag":0,
                 "supply":0,
                 "power_cost":0,
 
@@ -196,7 +197,7 @@
             },
         "sc":
             {
-                "area_max":0,
+                "area_max":10000,
                 "area_min":0,
                 "cost":800,
                 "crf":20,
@@ -212,7 +213,7 @@
 
         "pv":
             {
-                "area_max":0,
+                "area_max":10000,
                 "area_min":0,
                 "cost":1000,
                 "crf":20,

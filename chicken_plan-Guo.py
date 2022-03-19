@@ -183,6 +183,7 @@ def planning_problem(dict,isloate,input_json):
         z_q_demand[m_date[cc-1]:m_date[cc]] = [1 for _ in range(m_date[cc]-m_date[cc-1])]
 
     #--------------
+
     # import matplotlib.pyplot as plt
     # x = [i for i in range(0,24*6)]
     # plt.plot(x,g_de)
@@ -328,11 +329,9 @@ def planning_problem(dict,isloate,input_json):
         #m.addConstr(t_ht[i*24+24] == t_ht[24*i])
         #m.addConstr(t_ct[i*24+24] == t_ct[24*i])
         #m.addConstr(h_sto[i*24+24] == h_sto[24*i])
-
-
-    #m.addConstr(t_ht[-1] == t_ht[0])
-    #m.addConstr(t_ct[-1] == t_ct[0])
-    #m.addConstr(h_sto[-12] == h_sto[0])
+    m.addConstr(t_ht[-1] == t_ht[0])
+    m.addConstr(t_ct[-1] == t_ct[0])
+    m.addConstr(h_sto[-12] == h_sto[0])
 
 
     m.addConstr(num_gtw<=input_json['device']['gtw']['number_max'])
@@ -345,7 +344,7 @@ def planning_problem(dict,isloate,input_json):
     m.addConstr(p_eb_max<=input_json['device']['eb']['power_max'])
     m.addConstr(p_eb_max>=input_json['device']['eb']['power_min'])
     m.addConstr(p_el_max<=input_json['device']['el']['power_max'])
-    m.addConstr(p_el_max<=50*input_json['device']['el']['nm3_max']/11.2)
+    #m.addConstr(p_el_max<=50*input_json['device']['el']['nm3_min']/11.2)
     m.addConstr(p_el_max>=50*input_json['device']['el']['nm3_min']/11.2)
     m.addConstr(p_el_max>=input_json['device']['el']['power_min'])
     m.addConstr(hst<=input_json['device']['hst']['sto_max'])
@@ -387,23 +386,21 @@ def planning_problem(dict,isloate,input_json):
         #else:
             #m.addConstr(m_ct * (t_ct[i] - t_ct[i+1]) + q_demand[i]/c == m_hpc[i] * (5) +m_ec[i]*(5)  - eta_loss*m_ct*(t_ct[i] - 16))
         m.addConstr(h_sto[i+1] - h_sto[i] == h_pur[i] + h_el[i] - h_fc[i])
-    m.addConstr(g_tube[-1] == g_fc[-1] + g_hp[-1] + g_eb[-1] + g_sc[-1] - g_hpg_gr[-1] - c*m_ht*(t_ht[0] - t_ht[-1])-0.001*c*m_ht*(t_ht[-1] - input_json['device']['ht']['t_supply']))
-
-    m.addConstr(g_demand[-1] == g_tube[-1] + g_hpg[-1])
-    #m.addConstr(c*m_ht * (t_ht[0] - t_ht[-1])   + g_demand[-1] +g_hpg_gr[-1] == g_fc[-1]+g_hp[-1]+g_eb[-1]+ g_hpg[-1]+g_sc[-1])
+        
+    m.addConstr(c*m_ht * (t_ht[0] - t_ht[-1])   + g_demand[-1] +g_hpg_gr[-1] == g_fc[-1]+g_hp[-1]+g_eb[-1]+ g_hpg[-1]+g_sc[-1])
     m.addConstr(c*m_ct * (t_ct[-1] - t_ct[0])   + q_demand[-1] ==  q_hp[-1] +q_hpg[-1])
     m.addConstr(h_sto[0] - h_sto[-1] == h_pur[-1] + h_el[-1] - h_fc[-1])
     #m.addConstr(h_sto[0] - h_sto[-1] + h_ssto[0] - h_ssto[-1] == h_pur[-1] + h_el[-1] - h_fc[-1])
     #m.addConstr(t_ht[0] == 60)
     #m.addConstr(h_ssto[-1] == h_ssto[0])
     m.addConstr(gp.quicksum(q_hpg)+gp.quicksum(p_hpgc)+gp.quicksum(g_hpg_gr) == gp.quicksum(g_hpg)-gp.quicksum(p_hpg))
-    #piecewise price
+    piecewise price
     # m = model_linear_cost(m,300,600000,10,310,439000,p_el_max,capex_el)
     # m = model_linear_cost(m,300,600000,10,310,490000,p_fc_max,capex_fc)
     m.addConstr(capex_fc == cost_fc*p_fc_max)
     m.addConstr(capex_el == cost_el*p_el_max)
     #m.addConstr(s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_hp*p_hp_max+cost_fc*p_fc_max+cost_el*p_el_max + 10*gp.quicksum([p_pur[i]*lambda_ele_in[i] for i in range(period)])-10*gp.quicksum(p_sol)*lambda_ele_out+10*lambda_h*gp.quicksum(h_pur)+954>=0 ) 
-    #m.addConstr(cost_hyd*input_json["device"]['hyd']['flag'] + s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_hp*p_hp_max+cost_fc*p_fc_max+cost_el*p_el_max <= input_json['price']['capex_max'][1-isloate[1]])
+    m.addConstr(cost_hyd*input_json["device"]['hyd']['flag'] + s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_hp*p_hp_max+cost_fc*p_fc_max+cost_el*p_el_max <= input_json['price']['capex_max'][1-isloate[1]])
     for i in range(period):
         #电网
         m.addConstr(p_pur[i] <= 1000000000*(isloate[0]))
@@ -416,7 +413,7 @@ def planning_problem(dict,isloate,input_json):
 
 
         m.addConstr(p_hpgc[i]<= z_q_demand[i] * 1000000000)
-        m.addConstr(p_hpg[i] <=  z_g_demand[i] * 1000000000)
+        m.addConstr(p_hpg[i]<=  z_g_demand[i] * 1000000000)
         # 燃料电池
         m.addConstr(g_fc[i] <= eta_ex*k_fc_g*h_fc[i])#氢燃烧产电
         m.addConstr(10000*z_fc[i]>=g_fc[i])
@@ -432,11 +429,10 @@ def planning_problem(dict,isloate,input_json):
         m.addConstr(p_el[i] <= p_el_max)
         m.addConstr(h_el[i] <= k_el * p_el[i])
         m.addConstr(h_el[i] <= hst)
-
+        if input_json["device"]['hyd']['supply'] == 0:
+            m.addConstr(p_el[i] == p_hyd[i])
         if input_json["device"]['hyd']['flag'] == 1: 
             m.addConstr(p_hyd[i]<=water[i])
-            if input_json["device"]['hyd']['supply'] == 0:
-                m.addConstr(p_el[i] == p_hyd[i])
         else:
             m.addConstr(p_hyd[i] == 0)
 
@@ -468,7 +464,7 @@ def planning_problem(dict,isloate,input_json):
         m.addConstr(h_sto[i]<=hst)
 
         # balance
-        m.addConstr(p_el[i] + p_sol[i] + p_hp[i] +p_hpc[i] + p_hpg[i] + p_hpgc[i] + p_eb[i] + p_co[i]+ ele_load[i] <= p_hyd[i] + p_pur[i] + p_fc[i] + p_pv[i])
+        m.addConstr(p_el[i] + p_sol[i] + p_hp[i] +p_hpc[i] + p_hpg[i] + p_hpgc[i] + p_eb[i] + p_co[i]+ ele_load[i] == p_hyd[i] + p_pur[i] + p_fc[i] + p_pv[i])
 
         # pv
         m.addConstr(p_pv[i] == eta_pv*s_pv*r_solar[i])
@@ -503,7 +499,6 @@ def planning_problem(dict,isloate,input_json):
     # m.optimize()
     #print(m.status)
     m.addConstr(capex_sum == cost_hyd*input_json["device"]['hyd']['flag']+s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_hp*p_hp_max+capex_fc+capex_el+cost_co*p_co_max)
-    m.addConstr(capex_sum <= input_json['price']['capex_max'][1-isloate[0]])
     m.addConstr(ce_h==gp.quicksum(p_pur)*alpha_e)
     try:
         m.optimize()

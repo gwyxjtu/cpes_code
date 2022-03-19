@@ -1,42 +1,44 @@
 {
     "load":{
         "building_area":{
-            "apartment":1,
+            "apartment":0,
             "hotel":0,
-            "office":0,
+            "office":1,
             "restaurant":0
         },
-        "load_area":9932,
-        "heat_mounth":[0],
-        "cold_mounth":[],
+        "load_area":420000,
+        "heat_mounth":[1,2,12],
+        "cold_mounth":[6,7,8,9],
         "hydrogen_state":{
             "grid":0,
             "isloate":0
         },
         "power_sale_state":{
             "grid":1,
-            "isloate":1
+            "isloate":0
         },
         "power_peak":{
-            "flag":1,
+            "flag":0,
             "ele":300,
-            "g":0,
+            "g":600,
             "q":0,
             "flag_shear_g":0,
             "flag_shear_e":0,
             "flag_shear_q":0,
             "shear":6
         },
-        "yearly_power":0,
+        "yearly_power":200000000,
         "ele_type":0,
-        "location":[92,31]
+        "location":[109.734580,38.285200]
     },
     "calc_mode":{
+        "grid_power_pur":0,
         "whether_isloate":0,
+
         "obj":{
-            "capex_sum":1,
-            "capex_crf":0,
-            "opex":0
+            "capex_sum":0,
+            "capex_crf":1,
+            "opex":1
         }
     },
     "renewable_energy":{
@@ -45,16 +47,17 @@
         "pv_sc_max":20000000000000
     },
     "price":{
-        "TOU_power":[0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49],
+        "TOU_power":[0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.4096, 0.7704, 1.1313, 1.1313, 1.1313, 1.1313,0.7704, 0.7704, 0.7704, 0.7704, 0.7704, 0.7704, 1.1313, 1.1313, 1.1313, 1.1313, 1.1313, 0.4096],
 
         "power_sale":0.0,
+        
         "gas_price":4.085,
         "heat_price":4.46,
         "cold_price":16,
         "carbon_price": 0.06,
 
-        "hydrogen_price":200,
-        "capex_max":[9650000000,2000000000],
+        "hydrogen_price":30,
+        "capex_max":[96500000000,965000000000],
         "op_max":[1118000000,2000000000]
     },
 
@@ -64,7 +67,7 @@
         },
         "co":
             {
-                "power_max":1000000,
+                "power_max":10000000,
                 "power_min":0,
                 "cost":1000,
                 "crf":10,
@@ -75,6 +78,7 @@
             {
                 "power_max":100000,
                 "power_min":0,
+
                 "cost":8000,
                 "crf":10,
                 "nominal_lower": 0,
@@ -88,7 +92,7 @@
             },
         "ht":
             {
-                "water_max":80000000,
+                "water_max":8000000000000,
                 "water_min":0,
                 "cost":0.5,
                 "crf":20,
@@ -102,7 +106,7 @@
 
         "eb":
             {
-                "power_max":0,
+                "power_max":1000000,
                 "power_min":0,
                 "cost":500,
                 "crf":10,
@@ -122,7 +126,7 @@
 
         "ghp":
             {
-                "power_max":1000000,
+                "power_max":0,
                 "power_min":0,
                 "cost":4000,
                 "crf":15,
@@ -133,7 +137,7 @@
 
         "gtw":
             {
-                "number_max":100000,
+                "number_max":0,
                 "cost":30000,
                 "crf":30,
 
@@ -141,7 +145,7 @@
             },
         "ct":
             {
-                "water_max":180000000,
+                "water_max":180000000000,
                 "water_min":0,
                 "cost":0.5,
                 "crf":15,
@@ -153,7 +157,7 @@
             },
         "hst":
             {
-                "sto_max":5000000,
+                "sto_max":50000000,
                 "sto_min":0,
                 "cost":3000,
                 "crf":15,
@@ -171,8 +175,10 @@
             {
                 "power_max":5000000,
                 "nm3_max":10000000,
+
                 "nm3_min":0,
                 "power_min":0,
+
                 "cost":3360,
                 "crf":7,
                 "pressure_upper": 3,
@@ -185,7 +191,7 @@
             },
         "hyd":
             {
-                "flag":1,
+                "flag":0,
                 "supply":0,
                 "power_cost":0,
 
@@ -196,7 +202,7 @@
             },
         "sc":
             {
-                "area_max":10000,
+                "area_max":300000,
                 "area_min":0,
                 "cost":800,
                 "crf":20,
@@ -212,7 +218,7 @@
 
         "pv":
             {
-                "area_max":10000,
+                "area_max":300000,
                 "area_min":0,
                 "cost":1000,
                 "crf":20,
