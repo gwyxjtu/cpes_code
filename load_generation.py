@@ -225,8 +225,22 @@ def get_load_new(load_dict):
     print(max(g_demand),max(q_demand),max(ele_load))
     print(sum(g_demand),sum(q_demand),sum(ele_load))
     #exit(0)
-    dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar, 'load_sort':load_dict["load_sort"]}
+    #dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar, 'load_sort':load_dict["load_sort"]}
     #exit(0)
+    z_g_demand = [0 for i in range(8760)]
+    z_q_demand = [0 for i in range(8760)]
+    heat_mounth = load_dict['heat_mounth']
+    cool_mounth = load_dict['cold_mounth']
+    for h in heat_mounth:
+        #print(m_date[h-1],m_date[h])
+        z_g_demand[m_date[h-1]+15*24:min(m_date[h]+15*24,8760)] = [1 for _ in range(m_date[h]-m_date[h-1])]
+    if 12 in heat_mounth:
+        z_g_demand[:15*24] = [1 for _ in range(15*24)]
+        z_g_demand = z_g_demand[:8760]
+    for cc in cool_mounth:
+        z_q_demand[m_date[cc-1]:m_date[cc]] = [1 for _ in range(m_date[cc]-m_date[cc-1])]
+    dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,'load_sort':load_dict["load_sort"],"z_heat_mounth":z_g_demand,"z_cold_mounth":z_q_demand}
+    
     to_csv(dict_load,"test_load.csv")
     return dict_load
 
@@ -315,8 +329,19 @@ def get_load(load_dict):
     print(sum(g_demand),sum(q_demand),sum(ele_load))
     # print(len(r_solar))
     # exit(0)
-
-    dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,'load_sort':load_dict["load_sort"]}
+    z_g_demand = [0 for i in range(8760)]
+    z_q_demand = [0 for i in range(8760)]
+    heat_mounth = load_dict['heat_mounth']
+    cool_mounth = load_dict['cold_mounth']
+    for h in heat_mounth:
+        #print(m_date[h-1],m_date[h])
+        z_g_demand[m_date[h-1]+15*24:min(m_date[h]+15*24,8760)] = [1 for _ in range(m_date[h]-m_date[h-1])]
+    if 12 in heat_mounth:
+        z_g_demand[:15*24] = [1 for _ in range(15*24)]
+        z_g_demand = z_g_demand[:8760]
+    for cc in cool_mounth:
+        z_q_demand[m_date[cc-1]:m_date[cc]] = [1 for _ in range(m_date[cc]-m_date[cc-1])]
+    dict_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,'load_sort':load_dict["load_sort"],"z_heat_mounth":z_g_demand,"z_cold_mounth":z_q_demand}
     to_csv(dict_load,"yt.xls")
     return dict_load
 

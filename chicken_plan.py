@@ -188,23 +188,13 @@ def planning_problem(dict,isloate,input_json):
     g_demand = dict['g_demand']
     q_demand = dict['q_demand']
     r_solar  = dict['r_solar']
-    z_g_demand = [0 for i in range(8760)]
-    z_q_demand = [0 for i in range(8760)]
+
     print(sum(g_demand),sum(q_demand),sum(ele_load))
     print("----------------g,q,e_load----------------")
-    heat_mounth = input_json['load']['heat_mounth']
-    cool_mounth = input_json['load']['cold_mounth']
-    for h in heat_mounth:
-        #print(m_date[h-1],m_date[h])
-        z_g_demand[m_date[h-1]+15*24:min(m_date[h]+15*24,8760)] = [1 for _ in range(m_date[h]-m_date[h-1])]
-    if 12 in heat_mounth:
-        z_g_demand[:15*24] = [1 for _ in range(15*24)]
-        z_g_demand = z_g_demand[:8760]
-    for cc in cool_mounth:
-        z_q_demand[m_date[cc-1]:m_date[cc]] = [1 for _ in range(m_date[cc]-m_date[cc-1])]
 
-    # z_g_demand = dict["z_heat_mounth"]
-    # z_q_demand = dict["z_cold_mounth"]
+
+    z_g_demand = dict["z_heat_mounth"]
+    z_q_demand = dict["z_cold_mounth"]
 
     # z_g_demand = [1 for i in range(8760)]
     # z_q_demand = [1 for i in range(8760)]
@@ -424,7 +414,7 @@ def planning_problem(dict,isloate,input_json):
     #m.addConstr(h_sto[0] - h_sto[-1] + h_ssto[0] - h_ssto[-1] == h_pur[-1] + h_el[-1] - h_fc[-1])
     #m.addConstr(t_ht[0] == 60)
     #m.addConstr(h_ssto[-1] == h_ssto[0])
-    m.addConstr(gp.quicksum(q_hpg)+gp.quicksum(p_hpgc)+gp.quicksum(g_hpg_gr) == gp.quicksum(g_hpg)-gp.quicksum(p_hpg))
+    m.addConstr(gp.quicksum(q_hpg)+gp.quicksum(p_hpgc)+gp.quicksum(g_hpg_gr) >= gp.quicksum(g_hpg)-gp.quicksum(p_hpg))
     #piecewise price
     # m = model_linear_cost(m,300,600000,10,310,439000,p_el_max,capex_el)
     # m = model_linear_cost(m,300,600000,10,310,490000,p_fc_max,capex_fc)

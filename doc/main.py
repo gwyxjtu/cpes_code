@@ -28,7 +28,7 @@ def replace_text(filename,old,new):
 def replace_word():
     if park.loc['是否用氢'][1]=='是':
         #不离网
-        if str(grid_planning_output_json["flag_isloate"])=="0.00":
+        if str(grid_planning_output_json["flag_isloate"])=="0":
             if park.loc['园区规范'][1]=='无':
                 replace_text('./输出文档-无离网.docx', '园区规范','')
             else:
@@ -96,23 +96,11 @@ def replace_word():
 
     replace_text('test.docx','制氢潜力',park.loc['制氢潜力'][1])
 
-    # replace_text('test.docx','（电负荷峰值数据）',str(grid_planning_output_json['ele_load_max']))
-    #
-    # replace_text('test.docx','（热负荷峰值数据）',str(grid_planning_output_json['g_demand_max']))
-    #
-    # replace_text('test.docx','（冷负荷峰值数据）',str(grid_planning_output_json['q_demand_max']))
-    #
-    # replace_text('test.docx','（电负荷总量数据）',str(grid_planning_output_json['ele_load_sum']))
-    #
-    # replace_text('test.docx','（热负荷总量数据）',str(grid_planning_output_json['g_demand_sum']))
-    #
-    # replace_text('test.docx','（冷负荷总量数据）',str(grid_planning_output_json['q_demand_sum']))
-
     replace_text('test.docx',"aaa",grid_planning_output_json['equipment_cost'])
     replace_text('test.docx','bbb',grid_operation_output_json['cer'])
     replace_text('test.docx','ccc',grid_operation_output_json['cer_perm2'])
 
-    replace_text('test.docx','ia',itgrid_planning_output_json['equipment_cost'])
+    replace_text('test.docx','龘',itgrid_planning_output_json['equipment_cost'])
     replace_text('test.docx','薅',itgrid_operation_output_json['cer'])
     replace_text('test.docx','ic',itgrid_operation_output_json['cer_perm2'])
 
@@ -140,12 +128,102 @@ def change_table_air_para(doc):
 
 
 def change_table_equip_para(doc):
+    main_input=main_input_json["device"]
     tables = doc.tables[1]
-
+    para=[]
+    #氢压机
+    if park.loc["是否用氢"][1] == "否" or main_input["co"]["power_max"]==0:
+        para+=["","",""]
+    else:
+        para+=[main_input["co"]["beta_co"],
+               main_input["co"]["cost"],
+               main_input["co"]["crf"]]
+    #燃料电池
+    if main_input["fc"]["power_max"]==0:
+        para+=["","","","",""]
+    else:
+        para+=[main_input["fc"]["eta_fc_p"],
+                main_input["fc"]["eta_ex_g"],
+                main_input["fc"]["theta_ex"],
+                main_input["fc"]["cost"],
+                main_input["fc"]["crf"]]
+    #热水罐
+    if main_input["ht"]["water_max"]==0:
+        para+=["","","",""]
+    else:
+        para+=[main_input["ht"]["t_max"],
+               main_input["ht"]["t_min"],
+               main_input["ht"]["cost"],
+               main_input["ht"]["crf"]]
+    #电锅炉
+    if main_input["eb"]["power_max"]==0:
+        para+=["","",""]
+    else:
+        para+=[main_input["eb"]["beta_eb"],
+               main_input["eb"]["cost"],
+               main_input["eb"]["crf"]]
+    #空气源热泵
+    if main_input["hp"]["power_max"]==0:
+        para+=["","","",""]
+    else:
+        para+=[main_input["hp"]["beta_hpg"],
+               main_input["hp"]["beta_hpq"],
+               main_input["hp"]["cost"],
+               main_input["hp"]["crf"]]
+    #地源热泵
+    if main_input["ghp"]["power_max"]==0:
+        para+=["","","",""]
+    else:
+        para+=[main_input["ghp"]["beta_ghpg"],
+               main_input["ghp"]["beta_ghpq"],
+               main_input["ghp"]["cost"],
+               main_input["ghp"]["crf"]]
+    #浅层地热井
+    if main_input["gtw"]["number_max"]==0:
+        para+=["","",""]
+    else:
+        para+=[main_input["gtw"]["number_max"],
+               main_input["gtw"]["cost"],
+               main_input["gtw"]["crf"]]
+    #冷水罐
+    if main_input["ct"]["water_max"]==0:
+        para+=["","","",""]
+    else:
+        para+=[main_input["ct"]["t_max"],
+               main_input["ct"]["t_min"],
+               main_input["ct"]["cost"],
+               main_input["ct"]["crf"]]
+    #储氢罐
+    if park.loc["是否用氢"][1] == "否" or main_input["hst"]["sto_max"] == 0:
+        para += ["", "", ""]
+    else:
+        para+=[main_input["hst"]["cost"],
+               main_input["hst"]["crf"],
+               main_input["hst"]["sto_max"]]
+    #电解槽
+    if main_input["el"]["power_max"]==0 or main_input["el"]["nm3_max"]==0 :
+        para+=["","",""]
+    else:
+        para+=[int(main_input["el"]["cost"]*50/11.2),
+               main_input["el"]["crf"],
+               main_input["el"]["power_max"]]
+    #光伏板
+    if main_input["pv"]["area_max"]==0:
+        para+=["",""]
+    else:
+        para+=[main_input["pv"]["cost"],
+               main_input["pv"]["crf"]]
+    #太阳能集热器
+    if main_input["sc"]["area_max"]==0:
+        para+=["",""]
+    else:
+        para+=[main_input["sc"]["cost"],
+               main_input["sc"]["crf"]]
+    s=[str(i) for i in para]
     for i in range(1, len(tables.rows)):
-        if str(list(equip['参数值'])[i - 1]) != 'nan':
+        if s[i - 1] != "":
             # 在第该表格i行2列的单元格内输入对应内容”
-            run = tables.cell(i, 2).paragraphs[0].add_run(str(list(equip['参数值'])[i - 1]))
+            run = tables.cell(i, 2).paragraphs[0].add_run(s[i - 1])
             # 设置字体
             run.font.name = 'Times New Roman'
             # 字体大小
@@ -174,19 +252,19 @@ def change_table_equip_allocation(tables, json):
             "area_pv",
             "area_sc",
             "p_co"]
-    replace = list(itemgetter(*keys)(json))
+    replace = [int(float(i)) for i in list(itemgetter(*keys)(json))]
 
     #储热罐、储冷罐kg改成t
-    if float(replace[7])>1000:
-        replace[7]=float(replace[7])//1000
+    if replace[7]>1000:
+        replace[7]=replace[7]//1000
         p = tables.cell(8, 3).paragraphs[0]
         inline = p.runs
         # Loop added to work with runs (strings with same style)
         for i in range(len(inline)):
             text = inline[i].text.replace('kg', 't')
             inline[i].text = text
-    if float(replace[8])>1000:
-        replace[8]=float(replace[8])//1000
+    if replace[8]>1000:
+        replace[8]=replace[8]//1000
         p = tables.cell(9, 3).paragraphs[0]
         inline = p.runs
         # Loop added to work with runs (strings with same style)
@@ -195,7 +273,7 @@ def change_table_equip_allocation(tables, json):
             inline[i].text = text
 
     for i in range(1,len(tables.rows)):
-        if replace[i-1] !=0 and replace[i-1] != '0.00':
+        if replace[i-1] !=0:
             # 在第该表格i行列的单元格内输入对应内容”
             run = tables.cell(i, 2).paragraphs[0].add_run(str(replace[i-1]))
             # 设置字体
@@ -208,13 +286,13 @@ def change_table_equip_allocation(tables, json):
             # 居中
             tables.cell(i, 2).paragraphs[0].alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
-def change_table_eco_analyse(tables, planing_json,opertion_json):
-    replace = [planing_json['equipment_cost'],
-               abs(float(opertion_json['operation_cost'])),
-               opertion_json['cost_save_rate'],
-               planing_json['receive_year'],
-               opertion_json['co2'],
-               opertion_json['cer_rate']]
+def change_table_eco_analyse(tables, planing_json,operation_json):
+    replace = [int(float(planing_json['equipment_cost'])),
+               int(abs(float(operation_json['operation_cost']))),
+               float(operation_json['cost_save_rate']),
+               float(planing_json['receive_year']),
+               int(float(operation_json['co2'])),
+               float(operation_json['cer_rate'])]
     for i in range(1,len(tables.rows)):
         run = tables.cell(i, 1).paragraphs[0].add_run(str(replace[i - 1]))
         # 设置字体
@@ -228,7 +306,7 @@ def change_table_eco_analyse(tables, planing_json,opertion_json):
         tables.cell(i, 1).paragraphs[0].alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
     #收益/成本
-    if float(opertion_json['operation_cost'])<0:
+    if float(operation_json['operation_cost'])<0:
         p=tables.cell(2,0).paragraphs[0]
         inline = p.runs
         # Loop added to work with runs (strings with same style)
@@ -274,7 +352,6 @@ if __name__=='__main__':
     park = pd.read_excel('./配置文档数据.xlsx', sheet_name='园区文字', header=None, index_col=0)
     city = pd.read_excel('./配置文档数据.xlsx', sheet_name='城市文字', header=None, index_col=0)
     gongnuan = pd.read_excel('./配置文档数据.xlsx', sheet_name='供暖规范', header=None, index_col=0)
-    equip = pd.read_excel('./配置文档数据.xlsx', sheet_name='设备参数', index_col=0)
 
     ###更改文字与表格
     replace_word()
@@ -285,24 +362,24 @@ if __name__=='__main__':
 
     table2=doc.tables[2]
     table3 = doc.tables[3]
-    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0.00":
+    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0":
         table4 = doc.tables[4]
         table5 = doc.tables[5]
 
     change_table_equip_allocation(table2,grid_planning_output_json)
-    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0.00":
+    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0":
         change_table_equip_allocation(table4, itgrid_planning_output_json)
     change_table_eco_analyse(table3, grid_planning_output_json, grid_operation_output_json)
-    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0.00":
+    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0":
         change_table_eco_analyse(table5, itgrid_planning_output_json, itgrid_operation_output_json)
     dynamicTable(table2)
-    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0.00":
+    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0":
         dynamicTable(table4)
     doc.save('test.docx')
 
     #更改对应设备文字
     replace_equip_text(table2,'grid-equipment')
-    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0.00":
+    if park.loc['是否用氢'][1] == '是' and str(grid_planning_output_json["flag_isloate"])!="0":
         replace_equip_text(table4, 'off-equipment')
 
 

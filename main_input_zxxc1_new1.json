@@ -1,7 +1,7 @@
 {
     "load":{
-        "autoload":1,
-        "fileaddress":"./doc/test_load.csv",
+        "autoload":0,
+        "fileaddress":"./doc/debug_load.xls",
         "province":"" ,
         "city": "",
         "building_area":{
@@ -16,9 +16,9 @@
 
         "power_peak":{
             "flag":1,
-            "ele":100,
-            "g":300,
-            "q":50,
+            "ele":1000,
+            "g":3000,
+            "q":2000,
             "flag_shear_g":0,
             "flag_shear_e":0,
             "flag_shear_q":0,
@@ -32,7 +32,7 @@
         },
         "yearly_power":0,
         "ele_type":0,
-        "location":[34.2204,109.1115]
+        "location":[45.802160,126.535800]
     },
     "calc_mode":{
         "grid":{
