@@ -29,7 +29,7 @@
         },
         "yearly_power":200000000,
         "ele_type":0,
-        "location":[110,31]
+        "location":[110,32]
     },
     "calc_mode":{
         "grid":{

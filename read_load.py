@@ -1,17 +1,29 @@
 import csv
 import json
-#from location_to_province import location_to_province
 import pypinyin
 import os
 import os.path
 import xlrd
 import xlwt as xlwt
+
+
+#黑龙江 [46.5969,125.1015]
+#广东 [22.2737,113.5721]
+#陕西 [34.2204,109.1115]
+#北京 [39.9062,116.3913]
+#安徽 [31.8228,117.2218]
+#云南 [24.8843,102.8324]
+#西藏 [29.2391,91.7706]
+#武汉 [30.5951,114.2999]
+
+
 rootdir = os.path.dirname(__file__) #文件夹目录
 rootdir = rootdir.replace('\\','/')
 print(rootdir)
 resrootdir = os.path.join(os.path.dirname(__file__) + '/res1124/')#文件夹目录
 resrootdir = resrootdir.replace('\\','/')
 print(resrootdir)
+
 import requests
 import json
 def location_to_province(Longitude,latitude):
@@ -45,7 +57,6 @@ def location_to_province(Longitude,latitude):
         province = 0
         city = 0
         return '0','0'
-
 def fenqu(wei,jing):
     load_sort = 5 if jing > 106 and wei < 25 else 2
     if jing < 106:
@@ -102,19 +113,38 @@ def add_eqpr():
 
 
 
-#黑龙江 [46.5969,125.1015]
-#广东 [22.2737,113.5721]
-#陕西 [34.2204,109.1115]
-#北京 [39.9062,116.3913]
-#安徽 [31.8228,117.2218]
-#云南 [24.8843,102.8324]
+
 theta ={
     "Heilongjiang":[2,0.7],
     "Guangdong":[1,1],
     "Shaanxi":[1.8,0.8],
     "Beijing":[1.8,0.8],
     "Anhui":[1.6,1],
-    "Yunnan":[1.5,0.7]
+    "Yunnan":[1.5,0.7],
+    "Chongqing":[1.5,1],
+    "Fujian":[1.3,1],
+    "Gansu":[1.8,0.7],
+    "Guangxi":[1.4,1],
+    "Hainan":[1.3,1],
+    "Hebei":[1.8,0.8],
+    "Henan":[1.7,1],
+    "Hubei":[1.6,1],
+    "Hunan":[1.5,1],
+    "Jiangsu":[1.8,1],
+    "Jiangxi":[1.4,1],
+    "Jilin":[2,0.7],
+    "Liaoning":[1.8,0.7],
+    "Ningxia":[1.9,0.7],
+    "Qinghai":[1.8,0.7],
+    "Shandong":[1.8,0.9],
+    "Shanghai":[1.5,1],
+    "Shanxi":[1.9,0.8],
+    "Sichuan":[1.5,1],
+    "Tianjin":[1.8,0.8],
+    "Tibet":[1.8,0.5],
+    "Xinjiang":[2,1],
+    "Zhejiang":[1.5,1],
+    "Guizhou":[1.6,0.9]
 }
 
 m_date = [31,28,31,30,31,30,31,31,30,31,30,31]
@@ -138,6 +168,7 @@ def peakbasecorrectload(pinprovince,base_ele_load, base_g_demand, base_q_demand,
     sum_e_cankao = base_e * load_area  / 1000
     sum_g_cankao = base_g * load_area  /1000 *theta[pinprovince][0]
     sum_q_cankao = base_q * load_area  /1000 *theta[pinprovince][1]
+    print("峰值"+str(sum_g_cankao) + "冷" + str(sum_q_cankao))
     base_ele_load, base_g_demand, base_q_demand = peakcorrectload(base_ele_load, base_g_demand, base_q_demand, sum_e_cankao, sum_g_cankao, sum_q_cankao)
     return base_ele_load, base_g_demand, base_q_demand
 
@@ -180,6 +211,10 @@ def gqmonthcorrectload(g_demand, q_demand,heat_mounth,cold_mounth):
         qn_demand[start_c_index:8760] = q_demand[start_c_index:8760]
         z_cold_month[0:end_c_index] = [1 for i in range(end_c_index)]
         z_cold_month[start_c_index:8760] = [1 for i in range(8760 - end_c_index)]
+    print(len(z_cold_month))
+    print(len(z_heat_mounth))
+    print(start_h_index)
+    print(end_h_index)
     return gn_demand, qn_demand,  z_heat_mounth, z_cold_month
 
 
@@ -312,22 +347,25 @@ def all_load(dict_load):
     add_eqpr()
     location = dict_load['location']
     load_sort = fenqu(location[0], location[1])
+    heat_mounth = dict_load['heat_mounth']
+    cold_mounth = dict_load['cold_mounth']
     #如果不自动生成文档，直接从路径读取
     if dict_load["autoload"]==0:
         ele_load, g_demand, q_demand, r_solar = file_to_list(dict_load["fileaddress"])
         aimfilename = 'addressload_result.xls'
         wb = xlwt.Workbook()
         total = wb.add_sheet('egqr')
-        for i in range(8760):
-            total.write(i + 1, 0, ele_load[i])
-            total.write(i + 1, 1, g_demand[i])
-            total.write(i + 1, 2, q_demand[i])
-            total.write(i + 1, 3, r_solar[i])
-        wb.save(aimfilename)
+
+        g_demand, q_demand, z_heat_mounth, z_cold_month = gqmonthcorrectload(g_demand, q_demand,
+                                                                                       heat_mounth, cold_mounth)
+        # return ele_load, g_demand, q_demand, r_solar, z_heat_mounth, z_cold_month, load_sort
+        return_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,
+                       'load_sort': load_sort, 'z_cold_mounth': z_cold_month, 'z_heat_mounth': z_heat_mounth}
+        return return_load
     # 如果自动生成文档，读参数开始输入
     else:
         #如果有给定的城市名称
-        if dict_load['city']!="":
+        if dict_load['province']!="":
             province, city = dict_load['province'],dict_load['city']
         #如果只有经纬度
         else:
@@ -340,60 +378,82 @@ def all_load(dict_load):
                 i=i+1
             if city == '0' and i >19:
                 return "网络异常，请修改配置文件增加city"
-            else:
-                pinprovince = pinyin(province)[0:-5]
-                pincity = pinyin(city)[0:-3]
-                pinprovince = pinprovince.capitalize()
-                pincity = pincity.capitalize()
-                if province == "陕西省":
-                    pinprovince = "Shaanxi"
-                elif province == "北京市":
-                    pinprovince = "Beijing"
-                building_area = dict_load['building_area']
-                load_area = dict_load['load_area']
-                print(pinprovince)
-                print(pincity)
-                #基础负荷
-                base_ele_load, base_g_demand, base_q_demand, r_solar = baseautoload(pinprovince,pincity,building_area,load_area)
-                power_peak = dict_load['power_peak']
-                peak_flag = power_peak['flag']
-                peak_ele = power_peak['ele']
-                peak_g = power_peak['g']
-                peak_q = power_peak['q']
-                power_sum = dict_load['power_sum']
-                sum_flag = power_sum['flag']
-                sum_ele = power_sum['ele']
-                sum_g = power_sum['g']
-                sum_q = power_sum['q']
-                # 供热、供冷矫正
-                heat_mounth = dict_load['heat_mounth']
-                cold_mounth = dict_load['cold_mounth']
-                base_g_demand, base_q_demand, z_heat_mounth, z_cold_month = gqmonthcorrectload(base_g_demand, base_q_demand, heat_mounth, cold_mounth)
-                base_ele_load, base_g_demand, base_q_demand = peakbasecorrectload(pinprovince,base_ele_load, base_g_demand, base_q_demand,building_area,load_area)
-                #峰值矫正
-                if peak_flag == 1 and sum_flag ==0:
-                    ele_load, g_demand, q_demand = peakcorrectload(base_ele_load, base_g_demand, base_q_demand,peak_ele,peak_g,peak_q)
-                #总量矫正
-                elif peak_flag == 0 and sum_flag == 1:
-                    ele_load, g_demand, q_demand = sumcorrectload(base_ele_load, base_g_demand, base_q_demand,sum_ele,sum_g,sum_q)
-                #不矫正
-                elif peak_flag == 0 and sum_flag == 0:
-                    ele_load, g_demand, q_demand = base_ele_load, base_g_demand, base_q_demand
-                #有峰值有总量，优先峰值
-                else:
-                    ele_load, g_demand, q_demand = peakcorrectload(base_ele_load, base_g_demand, base_q_demand,peak_ele,peak_g,peak_q)
-                return_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar, 'load_sort':load_sort,'z_cold_mounth':z_cold_month,'z_heat_mounth':z_heat_mounth}
-                #return ele_load, g_demand, q_demand, r_solar, z_heat_mounth, z_cold_month, load_sort
-                return return_load
+        pinprovince = pinyin(province)[0:-5]
+        pincity = pinyin(city)[0:-3]
+        pinprovince = pinprovince.capitalize()
+        pincity = pincity.capitalize()
+        if province == "陕西省":
+            pinprovince = "Shaanxi"
+        elif province == "北京市":
+            pinprovince = "Beijing"
+        elif province == "重庆市":
+            pinprovince = "Chongqing"
+        elif province == "天津市":
+            pinprovince = "Tianjin"
+        elif province == "西藏自治区":
+            pinprovince = "Tibet"
+        elif province == "广西壮族自治区":
+            pinprovince = "Guangxi"
+        elif province == "新疆维吾尔自治区":
+            pinprovince = "Xinjiang"
+        elif province == "宁夏回族自治区":
+            pinprovince = "Ningxia"
+        elif province == "内蒙古自治区":
+            pinprovince = "Nei.Mongol"
+        elif province == "新疆维吾尔自治区":
+            pinprovince = "Xinjiang"
+        elif province == "上海市":
+            pinprovince = "Shanghai"
+        building_area = dict_load['building_area']
+        load_area = dict_load['load_area']
+        print(pinprovince)
+        print(pincity)
+        #基础负荷
+        base_ele_load, base_g_demand, base_q_demand, r_solar = baseautoload(pinprovince,pincity,building_area,load_area)
+        power_peak = dict_load['power_peak']
+        peak_flag = power_peak['flag']
+        peak_ele = power_peak['ele']
+        peak_g = power_peak['g']
+        peak_q = power_peak['q']
+        power_sum = dict_load['power_sum']
+        sum_flag = power_sum['flag']
+        sum_ele = power_sum['ele']
+        sum_g = power_sum['g']
+        sum_q = power_sum['q']
+        # 供热、供冷矫正
+        base_g_demand, base_q_demand, z_heat_mounth, z_cold_month = gqmonthcorrectload(base_g_demand, base_q_demand, heat_mounth, cold_mounth)
+        base_ele_load, base_g_demand, base_q_demand = peakbasecorrectload(pinprovince,base_ele_load, base_g_demand, base_q_demand,building_area,load_area)
+        #峰值矫正
+        if peak_flag == 1 and sum_flag ==0:
+            ele_load, g_demand, q_demand = peakcorrectload(base_ele_load, base_g_demand, base_q_demand,peak_ele,peak_g,peak_q)
+        #总量矫正
+        elif peak_flag == 0 and sum_flag == 1:
+            ele_load, g_demand, q_demand = sumcorrectload(base_ele_load, base_g_demand, base_q_demand,sum_ele,sum_g,sum_q)
+        #不矫正
+        elif peak_flag == 0 and sum_flag == 0:
+            ele_load, g_demand, q_demand = base_ele_load, base_g_demand, base_q_demand
+        #有峰值有总量，优先峰值
+        else:
+            ele_load, g_demand, q_demand = peakcorrectload(base_ele_load, base_g_demand, base_q_demand,peak_ele,peak_g,peak_q)
+        # return ele_load, g_demand, q_demand, r_solar, z_heat_mounth, z_cold_month, load_sort
+        return_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,
+                   'load_sort': load_sort, 'z_cold_mounth': z_cold_month, 'z_heat_mounth': z_heat_mounth}
+        return return_load
 
 if __name__ == '__main__':
     # 读输入文件
-    with open("main_input_zxxc1_new.json", encoding="utf-8") as load_file:
+    with open("main_input.json", encoding="utf-8") as load_file:
         input_json = json.load(load_file)
     dict_load = input_json["load"]
-    ele_load, g_demand, q_demand, r_solar, z_heat_mounth, z_cold_month, load_sort = all_load(dict_load)
-    #print(z_heat_mounth)
-    print("111")
+    return_load = all_load(dict_load)
+    ele_load = return_load["ele_load"]
+    g_demand = return_load["g_demand"]
+    q_demand = return_load["q_demand"]
+    r_solar = return_load["r_solar"]
+    z_heat_mounth = return_load["z_heat_mounth"]
+    z_cold_mounth = return_load["z_cold_mounth"]
+    load_sort = return_load["load_sort"]
+    # ele_load, g_demand, q_demand, r_solar, z_heat_mounth, z_cold_month, load_sort = all_load(dict_load)
     aimfilename = 'autoload_result.xls'
     wb = xlwt.Workbook()
     total = wb.add_sheet('egqr')
@@ -403,7 +463,7 @@ if __name__ == '__main__':
         total.write(i+1,2,q_demand[i])
         total.write(i+1,3,r_solar[i])
         total.write(i+1,4,z_heat_mounth[i])
-        total.write(i+1,5,z_cold_month[i])
+        total.write(i+1,5,z_cold_mounth[i])
     total.write(1, 6, load_sort)
     total.write(0, 0, "电负荷/kwh")
     total.write(0, 1, "热负荷/kwh")
@@ -412,5 +472,4 @@ if __name__ == '__main__':
     total.write(0, 4, "z_heat_month")
     total.write(0, 5, "z_cold_month")
     total.write(0, 6, "load_sort")
-
     wb.save(aimfilename)

@@ -1,0 +1,242 @@
+{
+    "load":{
+        "autoload":1,
+        "fileaddress":"./doc/debug_load.xls",
+        "province":"" ,
+        "city": "",
+        "building_area":{
+            "apartment":1,
+            "hotel":0,
+            "office":0,
+            "restaurant":0
+        },
+        "load_area":100000,
+        "heat_mounth":"起始于11月15日，结束于4月15日",
+        "cold_mounth":"起始于6月1日，结束于9月1日",
+
+        "power_peak":{
+            "flag":1,
+            "ele":1000,
+            "g":3000,
+            "q":2000,
+            "flag_shear_g":0,
+            "flag_shear_e":0,
+            "flag_shear_q":0,
+            "shear":6
+        },
+        "power_sum":{
+            "flag":0,
+            "ele":80000,
+            "g":60000,
+            "q":1000
+        },
+        "yearly_power":0,
+        "ele_type":0,
+        "location":[27.802160,102.2800]
+    },
+    "calc_mode":{
+        "grid":{
+            "p_pur_state":0,
+            "p_sol_state":1,
+            "h_pur_state":0
+        },
+        "isloate":{
+            "flag":0,
+            "h_pur_state":0
+        },
+        "obj":{
+            "capex_sum":1,
+            "capex_crf":0,
+            "opex":0
+        }
+    },
+    "renewable_energy":{
+        "pv_existst":0,
+        "sc_existst":0,
+        "pv_sc_max":20000000000000
+    },
+    "price":{
+        "TOU_power":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "power_sale":0.38,
+        "gas_price":4.085,
+        "heat_price":4.46,
+        "cold_price":16,
+        "carbon_price": 0.06,
+
+        "hydrogen_price":200,
+        "capex_max":[9650000000,2000000000],
+        "op_max":[1118000000,2000000000]
+    },
+
+    "device":{
+        "grid": {
+          "transformer": 100000
+        },
+        "co":
+            {
+                "power_max":1000000,
+                "power_min":0,
+                "cost":1000,
+                "crf":10,
+
+                "beta_co":1.399
+            },
+        "fc":
+            {
+                "power_max":100000,
+                "power_min":0,
+                "cost":8000,
+                "crf":10,
+                "nominal_lower": 0,
+
+                "eta_fc_p":15,
+                "eta_ex_g":16.6,
+                "theta_ex":0.95,
+
+                "V_c": 10,
+                "t_fc": 85
+            },
+        "ht":
+            {
+                "water_max":80000000,
+                "water_min":0,
+                "cost":0.5,
+                "crf":20,
+
+
+                "t_max":90,
+                "t_min":4,
+                "t_supply":55,
+                "miu_loss":0.02
+            },
+
+        "eb":
+            {
+                "power_max":0,
+                "power_min":0,
+                "cost":500,
+                "crf":10,
+
+                "beta_eb":0.9
+            },
+        "hp":
+            {
+                "power_max":0,
+                "power_min":0,
+                "cost":3000,
+                "crf":15,
+
+                "beta_hpg":3,
+                "beta_hpq":4
+            },
+
+        "ghp":
+            {
+                "power_max":1000000000,
+                "power_min":0,
+                "cost":4000,
+                "crf":15,
+
+                "beta_ghpg":3.54,
+                "beta_ghpq":4
+            },
+
+        "gtw":
+            {
+                "number_max":10000000,
+                "cost":30000,
+                "crf":30,
+
+                "beta_gtw":7
+            },
+        "ct":
+            {
+                "water_max":180000000,
+                "water_min":0,
+                "cost":0.5,
+                "crf":15,
+
+                "t_max":13,
+                "t_min":4,
+                "t_supply":7,
+                "miu_loss":0.9
+            },
+        "hst":
+            {
+                "sto_max":5000000,
+                "sto_min":0,
+                "cost":3000,
+                "crf":15,
+
+                "pressure_upper": 35,
+                "pressure_lower": 0.5,
+
+
+                "inout_max":5000,
+                "U_max":350,
+                "U_min":5
+            },
+
+        "el":
+            {
+                "power_max":5000000,
+                "nm3_max":10000000,
+                "nm3_min":0,
+                "power_min":0,
+                "cost":3360,
+                "crf":7,
+                "pressure_upper": 3,
+                "pressure_lower": 0.1,
+                "beta_el":0.0182,
+
+                "500RtV":0,
+                "U_max":200,
+                "U_min":20
+            },
+        "hyd":
+            {
+                "flag":1,
+                "supply":0,
+                "power_cost":0,
+
+                "peak":-1,
+
+                "cost":0,
+                "crf":20
+            },
+        "sc":
+            {
+                "area_max":10000000,
+                "area_min":0,
+                "cost":800,
+                "crf":20,
+
+                "beta_sc":0.72,
+                "theta_ex":0.9,
+                "a_stc":100,
+                "miu_loss":0.0064,
+
+                "V_stc": 50,
+                "V_stc_ex": 5
+            },
+
+        "pv":
+            {
+                "area_max":1000000000,
+                "area_min":0,
+                "cost":1000,
+                "crf":20,
+
+                "beta_pv":0.21
+            }
+
+
+    },
+
+    "carbon":{
+        "alpha_h2":1.74,
+        "alpha_e":0.5839,
+        "alpha_EO":0.8922,
+        "alpha_gas":1.535
+    }
+}
