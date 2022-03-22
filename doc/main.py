@@ -245,7 +245,7 @@ def change_table_equip_allocation(tables, json):
             "p_hpg_max",
             "p_hp_max",
             "p_eb_max",
-            "p_el_max",
+            "nm3_el_max",
             "hst",
             "m_ht",
             "m_ct",

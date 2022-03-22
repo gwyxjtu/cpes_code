@@ -5,13 +5,13 @@
 # 使用方法
 
 ## 修改配置文件
-通过`main_input.json`进行配置，主要是负荷和可再生能源和价格部分。
+通过`main_input_newload.json`进行配置，主要是负荷和可再生能源和价格部分。
 
 ## 运行主计算程序
-运行`main_calc.py`进行计算,计算结果被输出到doc子目录下。
+运行`main_calc_newload.py`进行计算,计算结果被输出到doc子目录下。
 
 ## 修改文档相关文字
-修改doc文件夹下的xlsx文件
+修改doc文件夹下的`配置文档数据.xlsx`文件
 
 ## 运行文档生成程序
 运行doc下的`main.py`输出`out.docx`，为最终输出的文档。
@@ -25,32 +25,43 @@
 
 ### 负荷部分
 
-输入,`building_area`为各个类型房屋的比例；`heat_mounth,cold_mounth`为供热和供冷的月份，`power_peak`为峰值电负荷，缺省为0;`yearly_power`为年用电总量;`load_area`为总用能面积，非常关键;`ele_type`如果为1，代表冷热负荷与总电量无关，只与面积有关，如果为0代表冷热负荷与总电量有关。  `location`为坐标经纬度，第一个为经度，第二个为纬度。用于获取当地光照水平以及供暖条件；`power_peak`是负荷峰值，flag1表示启用，0表示不启用；`shear`表示负荷削减程度越大说明总负荷越低。`hydrogen_state`表示是否允许买氢，0表示不允许，1表示允许。
+
+负荷部分输入，`autoload` 代表是否使用自动生成负荷，1则代表自动生成，0则代表从 `fileaddress`中读取电热冷负荷，具体格式参见 `debug_load.xls`，`building_area`代表不同建筑类型比例，如果每个建筑比例3:2:1则分别在每个类型的建筑后面输入3，2，1即可，`load_area` 代表供热区域面积。`heat_mounth` 和 `cold_mounth` 分别表示供暖和供冷月份，如果是全年供热则填入 `全年`即可。`power_peak`为峰值电负荷，缺省为0，flagshear为debug参数，可以忽略，默认填0即可。`power_sum`是总电量的参数，flag表示是否使用这一类参数，下面的ele g q 分别代表电热冷的负荷总量。location 代表坐标经纬度。
 ```
     "load":{
+        "autoload":1,
+        "fileaddress":"./doc/debug_load.xls",
+        "province":"" ,
+        "city": "",
         "building_area":{
             "apartment":1,
             "hotel":0,
             "office":0,
             "restaurant":0
         },
-        "load_area":9936,
-        "heat_mounth":[1,2,3,4,11,12],
-        "cold_mounth":[],
-        "hydrogen_state":{
-            "grid":0,
-            "isloate":0
-        },
+        "load_area":100000,
+        "heat_mounth":"起始于1月1日，结束于12月31日",
+        "cold_mounth":"起始于6月1日，结束于9月1日",
+
         "power_peak":{
             "flag":1,
-            "ele":400,
-            "g":800,
-            "q":0,
-            "shear":4
+            "ele":1000,
+            "g":3000,
+            "q":2000,
+            "flag_shear_g":0,
+            "flag_shear_e":0,
+            "flag_shear_q":0,
+            "shear":6
+        },
+        "power_sum":{
+            "flag":0,
+            "ele":80000,
+            "g":60000,
+            "q":1000
         },
         "yearly_power":0,
         "ele_type":0,
-        "location":[92,31]
+        "location":[27.802160,102.2800]
     },
 ```
 ### 计算模式部分
@@ -97,6 +108,7 @@
         "gas_price":1.2,
         "heat_price":12,
         "cold_price":16,
+        "carbon_price": 0.06,
 
 
         "hydrogen_price":30,

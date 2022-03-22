@@ -182,45 +182,58 @@ def gqmonthcorrectload(g_demand, q_demand,heat_mounth,cold_mounth):
     qn_demand = [0 for i in range(8760)]
     z_heat_mounth = [0 for i in range(8760)]
     z_cold_month = [0 for i in range(8760)]
-    start_h_m = int(heat_mounth.split('于')[1].split('月')[0])
-    start_h_d = int(heat_mounth.split('于')[1].split('月')[1].split('日')[0])
-    end_h_m = int(heat_mounth.split('于')[2].split('月')[0])
-    end_h_d = int(heat_mounth.split('于')[2].split('月')[1].split('日')[0])
-    start_c_m = int(cold_mounth.split('于')[1].split('月')[0])
-    start_c_d = int(cold_mounth.split('于')[1].split('月')[1].split('日')[0])
-    end_c_m = int(cold_mounth.split('于')[2].split('月')[0])
-    end_c_d = int(cold_mounth.split('于')[2].split('月')[1].split('日')[0])
-    start_h_index = m_date[start_h_m-1] + 24 * (start_h_d-1)
-    end_h_index = m_date[end_h_m-1] + 24 * (end_h_d-1)
-    start_c_index = m_date[start_c_m-1] + 24 * (start_c_d - 1)
-    end_c_index = m_date[end_c_m-1] + 24 * (end_c_d - 1)
-    print(start_h_index,end_h_index,start_c_index,end_c_index)
-    if end_h_index >= start_h_index:
-        gn_demand[start_h_index:end_h_index] = g_demand[start_h_index:end_h_index]
-        z_heat_mounth[start_h_index:end_h_index] = [1 for i in range(end_h_index - start_h_index)]
+    if heat_mounth =="全年":
+        z_heat_mounth = [1 for i in range(8760)]
+        gn_demand[0:8760] = g_demand[0:8760]
+    elif cold_mounth == "全年":
+        z_cold_mounth = [1 for i in range(8760)]
+        qn_demand[0:8760] = q_demand[0:8760]
     else:
-        gn_demand[0:end_h_index] = g_demand[0:end_h_index]
-        gn_demand[start_h_index:8760] = g_demand[start_h_index:8760]
-        z_heat_mounth[0:end_h_index] = [1 for i in range(end_h_index)]
-        z_heat_mounth[start_h_index:8760] = [1 for i in range(8760 - start_h_index)]
-    if end_c_index >= start_c_index:
-        qn_demand[start_c_index:end_c_index] = q_demand[start_c_index:end_c_index]
-        z_cold_month[start_c_index:end_c_index] = [1 for i in range(end_c_index - start_c_index)]
-    else:
-        qn_demand[0:end_c_index] = q_demand[0:end_c_index]
-        qn_demand[start_c_index:8760] = q_demand[start_c_index:8760]
-        z_cold_month[0:end_c_index] = [1 for i in range(end_c_index)]
-        z_cold_month[start_c_index:8760] = [1 for i in range(8760 - end_c_index)]
-    print(len(z_cold_month))
-    print(len(z_heat_mounth))
-    print(start_h_index)
-    print(end_h_index)
+        start_h_m = int(heat_mounth.split('于')[1].split('月')[0])
+        start_h_d = int(heat_mounth.split('于')[1].split('月')[1].split('日')[0])
+        end_h_m = int(heat_mounth.split('于')[2].split('月')[0])
+        end_h_d = int(heat_mounth.split('于')[2].split('月')[1].split('日')[0])
+        start_c_m = int(cold_mounth.split('于')[1].split('月')[0])
+        start_c_d = int(cold_mounth.split('于')[1].split('月')[1].split('日')[0])
+        end_c_m = int(cold_mounth.split('于')[2].split('月')[0])
+        end_c_d = int(cold_mounth.split('于')[2].split('月')[1].split('日')[0])
+        start_h_index = m_date[start_h_m-1] + 24 * (start_h_d-1)
+        end_h_index = m_date[end_h_m-1] + 24 * (end_h_d-1)
+        start_c_index = m_date[start_c_m-1] + 24 * (start_c_d - 1)
+        end_c_index = m_date[end_c_m-1] + 24 * (end_c_d - 1)
+        print(start_h_index,end_h_index,start_c_index,end_c_index)
+        if end_h_index >= start_h_index:
+            gn_demand[start_h_index:end_h_index] = g_demand[start_h_index:end_h_index]
+            z_heat_mounth[start_h_index:end_h_index] = [1 for i in range(end_h_index - start_h_index)]
+        else:
+            gn_demand[0:end_h_index] = g_demand[0:end_h_index]
+            gn_demand[start_h_index:8760] = g_demand[start_h_index:8760]
+            z_heat_mounth[0:end_h_index] = [1 for i in range(end_h_index)]
+            z_heat_mounth[start_h_index:8760] = [1 for i in range(8760 - start_h_index)]
+        if end_c_index >= start_c_index:
+            qn_demand[start_c_index:end_c_index] = q_demand[start_c_index:end_c_index]
+            z_cold_month[start_c_index:end_c_index] = [1 for i in range(end_c_index - start_c_index)]
+        else:
+            qn_demand[0:end_c_index] = q_demand[0:end_c_index]
+            qn_demand[start_c_index:8760] = q_demand[start_c_index:8760]
+            z_cold_month[0:end_c_index] = [1 for i in range(end_c_index)]
+            z_cold_month[start_c_index:8760] = [1 for i in range(8760 - end_c_index)]
+        print(len(z_cold_month))
+        print(len(z_heat_mounth))
+        print(start_h_index)
+        print(end_h_index)
     return gn_demand, qn_demand,  z_heat_mounth, z_cold_month
 
 
 
 def peakcorrectload(base_ele_load, base_g_demand, base_q_demand,peak_ele,peak_g,peak_q):
-    ele_max , max_g , max_q = max(base_ele_load) , max(base_g_demand), max(base_q_demand)
+    #ele_max , max_g , max_q = max(base_ele_load) , max(base_g_demand), max(base_q_demand)
+    ordered_base_ele_load = sorted(base_ele_load)
+    ordered_base_g_demand = sorted(base_g_demand)
+    ordered_base_q_demand = sorted(base_q_demand)
+    ele_max = ordered_base_ele_load[8000]
+    max_g = ordered_base_g_demand[8000]
+    max_q = ordered_base_q_demand[8000]
     ele_load = [0 for i in range(8760)]
     g_demand = [0 for i in range(8760)]
     q_demand = [0 for i in range(8760)]

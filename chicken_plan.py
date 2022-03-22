@@ -659,8 +659,8 @@ def planning_problem(dict,isloate,input_json):
             "co2":format(ce_h.X/1000,'.1f'),  #总碳排/t
             "cer_rate":format((co2_ele_only-ce_h.X)/co2_ele_only,'.1f'),  #与电系统相比的碳减排率
             "cer_gas":format((co2_ele_gas-ce_h.X)/co2_ele_gas,'.1f'), #与电气系统相比的碳减排率
-            "cer_perm2":format((co2_ele_only-ce_h.X)/input_json['load']['load_area']/1000,'.1f'),  #电系统每平米的碳减排量/t
-            "cer_perm2_gas":format((co2_ele_gas-ce_h.X)/input_json['load']['load_area']/1000,'.1f'),  #电气系统每平米的碳减排量/t
+            "cer_perm2":format((co2_ele_only-ce_h.X)/input_json['load']['load_area'],'.1f'),  #电系统每平米的碳减排量/kg
+            "cer_perm2_gas":format((co2_ele_gas-ce_h.X)/input_json['load']['load_area'],'.1f'),  #电气系统每平米的碳减排量/kg
             "cer":format((co2_ele_only-ce_h.X)/1000,'.1f')
     }
     return {'objective':m.objVal,

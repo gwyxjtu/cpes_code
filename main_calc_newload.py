@@ -52,7 +52,7 @@ def save_json(j,name):
 if __name__ == '__main__':
     tem_env = 0#环境温度，后续补上
     #print(m_date)#main_input_zxxc_plan_h2devices main_input_zxxc1_new main_input_newload
-    with open("main_input_newload.json",encoding = "utf-8") as load_file:
+    with open("main_input_西藏_new1.json",encoding = "utf-8") as load_file:
         input_json = json.load(load_file)
 
     #dict_load = get_load()
@@ -150,8 +150,7 @@ if __name__ == '__main__':
     if input_json['calc_mode']['isloate']['flag'] == 1:
         pprint.pprint(device_cap2)
         print(itgrid_planning_output_json['equipment_cost'],itgrid_planning_output_json['receive_year'])
-        pprint.pprint(grid_operation_output_json)
-        pprint.pprint(grid_operation_output_json_plan)
+
     if input_json['calc_mode']['isloate']['flag'] == 1:
         print("isloate")
         pprint.pprint(itgrid_operation_output_json)
@@ -163,9 +162,13 @@ if __name__ == '__main__':
 
     #output_json = operating_problem(dict_load, device_cap, 0, tmp_env, input_json)
 
-    
+    pprint.pprint(grid_operation_output_json)
+    pprint.pprint(grid_operation_output_json_plan)
 
-
+    if input_json['calc_mode']['isloate']['flag'] == 1:
+        
+        pprint.pprint(itgrid_operation_output_json)
+        pprint.pprint(isloate_operation_output_json_plan)
     save_json(grid_planning_output_json,"grid_planning_output_json")
     save_json(grid_operation_output_json,"grid_operation_output_json")
 
