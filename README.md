@@ -1,6 +1,5 @@
 # cpes_code
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/FRESNA/netallocation/master?filepath=examples)
-[![Python application](https://github.com/FRESNA/netallocation/workflows/Python%20application/badge.svg)](https://github.com/FRESNA/netallocation/actions/)
+
 ![Python Version](https://img.shields.io/badge/python-3.5%20%7C%203.6%20%7C%203.7-blue)
 
 本项目为半自动计算综合能源系统测算报告的测算部分代码。
