@@ -1,0 +1,274 @@
+{
+    "load":{
+        "autoload":0,
+        "fileaddress":"./doc/qcyload.xls",
+        "province":"" ,
+        "city": "",
+        "building_area":{
+            "apartment":1,
+            "hotel":0,
+            "office":0,
+            "restaurant":0
+        },
+        "load_area":623000,
+        "heat_mounth":"起始于11月15日，结束于3月15日",
+        "cold_mounth":"起始于5月15日，结束于9月15日",
+
+        "power_peak":{
+            "flag":1,
+            "ele":1000,
+            "g":3000,
+            "q":2000,
+            "flag_shear_g":0,
+            "flag_shear_e":0,
+            "flag_shear_q":0,
+            "shear":6
+        },
+        "power_sum":{
+            "flag":0,
+            "ele":80000,
+            "g":60000,
+            "q":1000
+        },
+        "yearly_power":0,
+        "ele_type":0,
+        "location":[27.802160,102.2800]
+    },
+    "calc_mode":{
+        "grid":{
+            "p_pur_state":1,
+            "p_sol_state":1,
+            "h_pur_state":1
+        },
+        "isloate":{
+            "flag":0,
+            "h_pur_state":0
+        },
+        "obj":{
+            "capex_sum":0,
+            "capex_crf":1,
+            "opex":1
+        }
+    },
+    "renewable_energy":{
+        "pv_existst":0,
+        "sc_existst":0,
+        "pv_sc_max":20000000000000
+    },
+    "price":{
+        "TOU_power":[0.325, 0.325, 0.325, 0.325, 0.325, 0.325, 0.325, 0.6037, 0.8824, 0.8824, 0.8824, 0.8824, 0.6037, 0.6037, 0.6037, 0.6037, 0.6037, 0.6037, 0.6037, 0.8824, 0.8824, 0.8824, 0.8824, 0.325],
+        "power_sale":0.00,
+        "gas_price":4.085,
+        "heat_price":5.8,
+        "cold_price":16,
+        "carbon_price": 0.06,
+
+        "hydrogen_price":30,
+        "capex_max":[9650000000000,2000000000000],
+        "op_max":[1118000000,2000000000]
+    },
+
+    "device":{
+        "grid": {
+          "transformer": 100000
+        },
+        "co":
+            {
+                "power_max":1000000,
+                "power_min":0,
+                "cost":1000,
+                "crf":10,
+
+                "beta_co":1.399
+            },
+        "fc":
+            {
+                "power_max":100000,
+                "power_min":1200,
+                "cost":8000,
+                "crf":10,
+                "nominal_lower": 0,
+
+                "eta_fc_p":15,
+                "eta_ex_g":16.6,
+                "theta_ex":0.95,
+
+                "V_c": 10,
+                "t_fc": 85
+            },
+        "ht":
+            {
+                "water_max":8705000,
+                "water_min":0,
+                "cost":0.5,
+                "crf":20,
+
+
+                "t_max":90,
+                "t_min":4,
+                "t_supply":55,
+                "miu_loss":0.02
+            },
+
+        "eb":
+            {
+                "power_max":6200,
+                "power_min":6200,
+                "cost":1000,
+                "crf":10,
+
+                "beta_eb":0.9
+            },
+        "ac":
+            {
+                "power_max":3740,
+                "power_min":3740,
+                "cost":1667,
+                "crf":15,
+
+                "commit":"电制冷",
+                "beta_ac":3.53
+            },
+        "hp":
+            {
+                "power_max":0,
+                "power_min":0,
+                "cost":5000,
+                "crf":20,
+
+                "comment":"initial value 724",
+                "beta_hpg":3,
+                "beta_hpq":2.75
+            },
+        "hp1":
+            {
+                "power_max":2275,
+                "power_min":1500,
+                "cost":28500,
+                "crf":20,
+
+                "commit":"中深层",
+                "beta_hpg":4,
+                "beta_hpq":3.6
+            },
+        "hp2":
+            {
+                "power_max":1334,
+                "power_min":1334,
+                "cost":15000,
+                "crf":20,
+
+                "commit":"污水源",
+                "beta_hpg":3,
+                "beta_hpq":2.7
+            },
+        "ghp":
+            {
+                "power_max":850,
+                "power_min":400,
+                "cost":4000,
+                "crf":20,
+
+                "beta_ghpg":3.54,
+                "beta_ghpq":3.18
+            },
+
+        "gtw":
+            {
+                "number_max":10000000,
+                "cost":30000,
+                "crf":30,
+
+                "beta_gtw":5
+            },
+        "ct":
+            {
+                "water_max":180000000,
+                "water_min":0,
+                "cost":0.5,
+                "crf":15,
+
+                "t_max":13,
+                "t_min":4,
+                "t_supply":7,
+                "miu_loss":0.9
+            },
+        "hst":
+            {
+                "sto_max":5000000,
+                "sto_min":500,
+                "cost":3000,
+                "crf":20,
+
+                "pressure_upper": 35,
+                "pressure_lower": 0.5,
+
+
+                "inout_max":5000,
+                "U_max":350,
+                "U_min":5
+            },
+
+        "el":
+            {
+                "power_max":5000000,
+                "nm3_max":10000000,
+                "nm3_min":1000,
+                "power_min":0,
+                "cost":2240,
+                "crf":10,
+                "pressure_upper": 3,
+                "pressure_lower": 0.1,
+                "beta_el":0.0182,
+
+                "500RtV":0,
+                "U_max":200,
+                "U_min":20
+            },
+        "hyd":
+            {
+                "flag":0,
+                "supply":0,
+                "power_cost":0,
+
+                "peak":-1,
+
+                "cost":0,
+                "crf":20
+            },
+        "sc":
+            {
+                "area_max":0,
+                "area_min":0,
+                "cost":800,
+                "crf":20,
+
+                "beta_sc":0.72,
+                "theta_ex":0.9,
+                "a_stc":100,
+                "miu_loss":0.0064,
+
+                "V_stc": 50,
+                "V_stc_ex": 5
+            },
+
+        "pv":
+            {
+                "area_max":40000,
+                "area_min":0,
+                "cost":1000,
+                "crf":20,
+
+                "beta_pv":0.21
+            }
+
+
+    },
+
+    "carbon":{
+        "alpha_h2":1.74,
+        "alpha_e":0.5839,
+        "alpha_EO":0.8922,
+        "alpha_gas":1.535
+    }
+}

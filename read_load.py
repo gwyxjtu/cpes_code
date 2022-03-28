@@ -369,7 +369,7 @@ def all_load(dict_load):
         wb = xlwt.Workbook()
         total = wb.add_sheet('egqr')
 
-        g_demand, q_demand, z_heat_mounth, z_cold_month = gqmonthcorrectload(g_demand, q_demand,
+        g_demand, _, z_heat_mounth, z_cold_month = gqmonthcorrectload(g_demand, q_demand,
                                                                                        heat_mounth, cold_mounth)
         # return ele_load, g_demand, q_demand, r_solar, z_heat_mounth, z_cold_month, load_sort
         return_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,
