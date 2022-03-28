@@ -238,7 +238,7 @@
 
     "carbon":{
         "alpha_h2":1.74,
-        "alpha_e":0.5839,
+        "alpha_e":0.5810,
         "alpha_EO":0.8922,
         "alpha_gas":1.535
     }

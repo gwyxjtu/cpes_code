@@ -118,13 +118,19 @@ def planning_problem(dict,isloate,input_json):
     crf_sc =    crf(input_json['device']['sc']['crf'])
     #crf_pump =  crf(input_jso['device']n['']['crf'])
     crf_eb =    crf(input_json['device']['eb']['crf'])
+    crf_ac =    crf(input_json['device']['ac']['crf'])
     crf_hp =    crf(input_json['device']['hp']['crf'])
+    crf_hp1 =    crf(input_json['device']['hp1']['crf'])
+    crf_hp2 =    crf(input_json['device']['hp2']['crf'])
     crf_hpg =   crf(input_json['device']['ghp']['crf'])
     crf_gtw =   crf(input_json['device']['gtw']['crf'])
     crf_co =    crf(input_json['device']['co']['crf'])
     crf_hyd=    crf(input_json['device']['hyd']['crf'])
 
     cost_hp = input_json['device']['hp']['cost']
+    cost_ac = input_json['device']['ac']['cost']
+    cost_hp1 = input_json['device']['hp1']['cost']
+    cost_hp2 = input_json['device']['hp2']['cost']
     cost_hpg = input_json['device']['ghp']['cost']
     cost_eb = input_json['device']['eb']['cost']
     #cost_ec = 3326.613
@@ -173,11 +179,16 @@ def planning_problem(dict,isloate,input_json):
     k_fc_g = input_json['device']['fc']['eta_ex_g']
     k_el = input_json['device']['el']['beta_el']
 
-    k_hp_g = input_json['device']['hp']['beta_hpg']#-dict['load_sort']*0.3
+    k_hp_g = input_json['device']['hp']['beta_hpg']#
     k_hp_q = input_json['device']['hp']['beta_hpq']
-    k_hpg_g = input_json['device']['ghp']['beta_ghpg']
+    k_hp1_g = input_json['device']['hp1']['beta_hpg']
+    k_hp1_q = input_json['device']['hp1']['beta_hpq']
+    k_hp2_g = input_json['device']['hp2']['beta_hpg']
+    k_hp2_q = input_json['device']['hp2']['beta_hpq']
+    k_hpg_g = input_json['device']['ghp']['beta_ghpg']-dict['load_sort']*0.3
     k_hpg_q = input_json['device']['ghp']['beta_ghpq']
     k_eb = input_json['device']['eb']['beta_eb']
+    k_ac = input_json['device']['ac']['beta_ac']
     k_sc = input_json['device']['sc']['beta_sc']
     theta_ex = input_json['device']['sc']['theta_ex']
     p_gtw = input_json['device']['gtw']['beta_gtw']
@@ -236,6 +247,7 @@ def planning_problem(dict,isloate,input_json):
     s_pv = m.addVar(vtype=GRB.CONTINUOUS, lb=0,  name=f"s_pv")#ub=13340,
     s_sc = m.addVar(vtype=GRB.CONTINUOUS, lb=0,  name=f"s_sc")
     capex_sum = m.addVar(vtype=GRB.CONTINUOUS, lb=0,  name=f"capex_sum")
+    capex_crf = m.addVar(vtype=GRB.CONTINUOUS, lb=0,  name=f"capex_crf")
     capex = m.addVar(vtype=GRB.CONTINUOUS, lb=0,  name=f"capex")
     capex_fc = m.addVar(vtype=GRB.CONTINUOUS, lb=0,  name=f"capex_fc")
     capex_el = m.addVar(vtype=GRB.CONTINUOUS, lb=0,  name=f"capex_el")
@@ -248,16 +260,27 @@ def planning_problem(dict,isloate,input_json):
     #m_ht = m.addVar(vtype=GRB.CONTINUOUS, lb=10, name="m_ht") # capacity of hot water tank
 
     g_hp = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"g_hp{t}") for t in range(period)]# 热泵产热
+    g_hp1 = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"g_hp1{t}") for t in range(period)]
+    g_hp2 = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"g_hp2{t}") for t in range(period)]
     g_hpg = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"g_hpg{t}") for t in range(period)]# 热泵产热
     g_hpg_gr = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"g_hpg_gr{t}") for t in range(period)]# 热泵灌热
     q_hp = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"q_hp{t}") for t in range(period)]# 热泵产热
+    q_hp1 = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"q_hp1{t}") for t in range(period)]
+    q_hp2 = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"q_hp2{t}") for t in range(period)]
     q_hpg = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"q_hpg{t}") for t in range(period)]# 热泵产热
 
 
     p_hp = [m.addVar(vtype=GRB.CONTINUOUS, lb=0,name=f"p_hp{t}") for t in range(period)]#热泵产热耗电 ub = 268,
+    p_hp1 = [m.addVar(vtype=GRB.CONTINUOUS, lb=0,name=f"p_hp1{t}") for t in range(period)]
+    p_hp2 = [m.addVar(vtype=GRB.CONTINUOUS, lb=0,name=f"p_hp2{t}") for t in range(period)]
     p_hp_max = m.addVar(vtype=GRB.CONTINUOUS, lb=0,ub = input_json["device"]["hp"]["power_max"], name=f"p_hp_max")
+    p_hp1_max = m.addVar(vtype=GRB.CONTINUOUS, lb=0,ub = input_json["device"]["hp1"]["power_max"], name=f"p_hp1_max")
+    p_hp2_max = m.addVar(vtype=GRB.CONTINUOUS, lb=0,ub = input_json["device"]["hp2"]["power_max"], name=f"p_hp2_max")
 
     p_hpc = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"p_hpc{t}") for t in range(period)]#热泵产冷的耗电,ub = 202
+    p_hpc1 = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"p_hpc1{t}") for t in range(period)]
+    p_hpc2 = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"p_hpc2{t}") for t in range(period)]
+
     p_hpc_max = m.addVar(vtype=GRB.CONTINUOUS, lb=0,ub = input_json["device"]["hp"]["power_max"],  name=f"p_hpc_max")
 
     p_hpg = [m.addVar(vtype=GRB.CONTINUOUS, lb=0,name=f"p_hpg{t}") for t in range(period)]#热泵产热耗电 ub = 268,
@@ -273,8 +296,12 @@ def planning_problem(dict,isloate,input_json):
     m_eb = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"m_eb{t}") for t in range(period)]#电锅炉换水量
 
     p_eb = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"p_eb{t}") for t in range(period)]#电锅炉耗电
+    p_ac = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"p_ac{t}") for t in range(period)]
 
     p_eb_max = m.addVar(vtype=GRB.CONTINUOUS, lb=0,ub = input_json["device"]["eb"]["power_max"], name=f"p_eb_max")
+    p_ac_max = m.addVar(vtype=GRB.CONTINUOUS, lb=0,ub = input_json["device"]["ac"]["power_max"], name=f"p_ac_max")
+
+    q_ac = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"q_ac{t}") for t in range(period)]
 
     g_eb = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"g_eb{t}") for t in range(period)]#电锅炉产热
     g_tube = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"g_tube{t}") for t in range(period)]
@@ -370,6 +397,14 @@ def planning_problem(dict,isloate,input_json):
     m.addConstr(p_hpg_max>=input_json['device']['ghp']['power_min'])
     m.addConstr(p_hp_max<=input_json['device']['hp']['power_max'])
     m.addConstr(p_hp_max>=input_json['device']['hp']['power_min'])
+    m.addConstr(p_hp1_max<=input_json['device']['hp1']['power_max'])
+    m.addConstr(p_hp1_max>=input_json['device']['hp1']['power_min'])
+    m.addConstr(p_hp2_max<=input_json['device']['hp2']['power_max'])
+    m.addConstr(p_hp2_max>=input_json['device']['hp2']['power_min'])
+
+    m.addConstr(p_ac_max<=input_json['device']['ac']['power_max'])
+    m.addConstr(p_ac_max>=input_json['device']['ac']['power_min'])
+
     m.addConstr(p_eb_max<=input_json['device']['eb']['power_max'])
     m.addConstr(p_eb_max>=input_json['device']['eb']['power_min'])
     m.addConstr(p_el_max<=input_json['device']['el']['power_max'])
@@ -404,22 +439,22 @@ def planning_problem(dict,isloate,input_json):
         # hot water tank and heat supply
         # m.addConstr(c*m_ht*(t_ht[i + 1] - t_ht[i])+0.001*c*m_ht*(t_ht[i] - input_json['device']['ht']['t_supply']) + g_demand[i] +g_hpg_gr[i] == 
         #     g_fc[i] + g_hp[i] + g_eb[i] + g_hpg[i] + g_sc[i])
-        m.addConstr(g_tube[i] == g_fc[i] + g_hp[i] + g_eb[i] + g_sc[i] - g_hpg_gr[i] - c*m_ht*(t_ht[i + 1] - t_ht[i])-0.001*c*m_ht*(t_ht[i] - input_json['device']['ht']['t_supply']))
+        m.addConstr(g_tube[i] == g_fc[i] + g_hp[i] + g_hp1[i] + g_hp2[i] + g_eb[i] + g_sc[i] - g_hpg_gr[i] - c*m_ht*(t_ht[i + 1] - t_ht[i])-0.001*c*m_ht*(t_ht[i] - input_json['device']['ht']['t_supply']))
         m.addConstr(g_demand[i] == g_tube[i] + g_hpg[i])
 
 
         # cold water tank and cold supply
-        m.addConstr(c*m_ct * (t_ct[i] - t_ct[i+1])+0.001*c*m_ct*(input_json['device']['ct']['t_max'] - t_ct[i]) + q_demand[i] == q_hp[i] +q_hpg[i])
+        m.addConstr(c*m_ct * (t_ct[i] - t_ct[i+1])+0.001*c*m_ct*(input_json['device']['ct']['t_max'] - t_ct[i]) + q_demand[i] == q_hp[i] +q_hp1[i]+q_hp2[i]+q_ac[i]+q_hpg[i])
 
 
         #else:
             #m.addConstr(m_ct * (t_ct[i] - t_ct[i+1]) + q_demand[i]/c == m_hpc[i] * (5) +m_ec[i]*(5)  - eta_loss*m_ct*(t_ct[i] - 16))
         m.addConstr(h_sto[i+1] - h_sto[i] == h_pur[i] + h_el[i] - h_fc[i])
-    m.addConstr(g_tube[-1] == g_fc[-1] + g_hp[-1] + g_eb[-1] + g_sc[-1] - g_hpg_gr[-1] - c*m_ht*(t_ht[0] - t_ht[-1])-0.001*c*m_ht*(t_ht[-1] - input_json['device']['ht']['t_supply']))
+    m.addConstr(g_tube[-1] == g_fc[-1] + g_hp[-1]+g_hp1[-1]+g_hp2[-1] + g_eb[-1] + g_sc[-1] - g_hpg_gr[-1] - c*m_ht*(t_ht[0] - t_ht[-1])-0.001*c*m_ht*(t_ht[-1] - input_json['device']['ht']['t_supply']))
 
     m.addConstr(g_demand[-1] == g_tube[-1] + g_hpg[-1])
     #m.addConstr(c*m_ht * (t_ht[0] - t_ht[-1])   + g_demand[-1] +g_hpg_gr[-1] == g_fc[-1]+g_hp[-1]+g_eb[-1]+ g_hpg[-1]+g_sc[-1])
-    m.addConstr(c*m_ct * (t_ct[-1] - t_ct[0])   + q_demand[-1] ==  q_hp[-1] +q_hpg[-1])
+    m.addConstr(c*m_ct * (t_ct[-1] - t_ct[0])   + q_demand[-1] ==  q_hp[-1] +q_hp1[-1]+q_hp2[-1]+q_ac[-1]+q_hpg[-1])
     m.addConstr(h_sto[0] - h_sto[-1] == h_pur[-1] + h_el[-1] - h_fc[-1])
     #m.addConstr(h_sto[0] - h_sto[-1] + h_ssto[0] - h_ssto[-1] == h_pur[-1] + h_el[-1] - h_fc[-1])
     #m.addConstr(t_ht[0] == 60)
@@ -475,6 +510,20 @@ def planning_problem(dict,isloate,input_json):
         m.addConstr(p_hpc[i]*k_hp_q == q_hp[i])
         m.addConstr(p_hpc[i] <= p_hp_max)
 
+
+        m.addConstr(p_hp1[i]*k_hp1_g == g_hp1[i])
+        m.addConstr(p_hp1[i] <= p_hp1_max)
+
+        m.addConstr(p_hpc1[i]*k_hp1_q == q_hp1[i])
+        m.addConstr(p_hpc1[i] <= p_hp1_max)
+
+
+        m.addConstr(p_hp2[i]*k_hp2_g == g_hp2[i])
+        m.addConstr(p_hp2[i] <= p_hp2_max)
+
+        m.addConstr(p_hpc2[i]*k_hp2_q == q_hp2[i])
+        m.addConstr(p_hpc2[i] <= p_hp2_max)
+
         # hpg
         m.addConstr(p_hpg[i]*k_hpg_g == g_hpg[i])
         m.addConstr(p_hpg[i] <= p_hpg_max)
@@ -490,13 +539,15 @@ def planning_problem(dict,isloate,input_json):
         m.addConstr(k_eb*p_eb[i] == g_eb[i])
         m.addConstr(p_eb[i] <= p_eb_max)
 
-
+        # air conditioner
+        m.addConstr(q_ac[i] == k_ac * p_ac[i])
+        m.addConstr(p_ac[i]<=p_ac_max)
 
         # hydrogen sto
         m.addConstr(h_sto[i]<=hst)
 
         # balance
-        m.addConstr(p_el[i] + p_sol[i] + p_hp[i] +p_hpc[i] + p_hpg[i] + p_hpgc[i] + p_eb[i] + p_co[i]+ ele_load[i] <= p_hyd[i] + p_pur[i] + p_fc[i] + p_pv[i])
+        m.addConstr(p_el[i] + p_sol[i] + p_hp[i] +p_hp1[i] +p_hp2[i] +p_hpc[i] +p_hpc1[i] +p_hpc2[i] + p_hpg[i] + p_hpgc[i] + p_eb[i] + p_ac[i] + p_co[i]+ ele_load[i] <= p_hyd[i] + p_pur[i] + p_fc[i] + p_pv[i])
 
         # pv
         m.addConstr(p_pv[i] == eta_pv*s_pv*r_solar[i])
@@ -520,8 +571,7 @@ def planning_problem(dict,isloate,input_json):
     m.addConstr(cost_c_heat == sum([g_demand[i]/0.95*lambda_ele_in[i] for i in range(period)]))#/(3.41))
     m.addConstr(cost_c_cool == sum([q_demand[i]/4*lambda_ele_in[i] for i in range(period)]))#/3.8)
     m.addConstr(cost_c == cost_c_cool+cost_c_heat+cost_c_ele)
-    m.setObjective(input_json['calc_mode']['obj']['capex_sum']*capex_sum+input_json['calc_mode']['obj']['capex_crf']*(cost_hyd*input_json["device"]['hyd']['flag']*crf_hyd+ crf_pv*s_pv*cost_pv +crf_sc*s_sc*cost_sc + crf_hst*hst*cost_hst + crf_water*cost_ht*(m_ht+m_ct) + crf_hp*cost_hp*p_hp_max  + crf_hpg*cost_hpg*p_hpg_max + crf_gtw*cost_gtw*num_gtw
-           + crf_eb*cost_eb*p_eb_max  + crf_fc*capex_fc + crf_el*capex_el+crf_co*p_co_max*cost_co)
+    m.setObjective(input_json['calc_mode']['obj']['capex_sum']*capex_sum+input_json['calc_mode']['obj']['capex_crf']*capex_crf
        + input_json['calc_mode']['obj']['opex']*op_sum,GRB.MINIMIZE)
     #m.setObjective()
     #-gp.quicksum(p_sol)*lambda_ele_out
@@ -530,7 +580,10 @@ def planning_problem(dict,isloate,input_json):
     m.params.MIPGap = 0.01
     # m.optimize()
     #print(m.status)
-    m.addConstr(capex_sum == cost_hyd*input_json["device"]['hyd']['flag']+s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_hp*p_hp_max+capex_fc+capex_el+cost_co*p_co_max)
+    m.addConstr(capex_crf == cost_hyd*input_json["device"]['hyd']['flag']*crf_hyd+ crf_pv*s_pv*cost_pv +crf_sc*s_sc*cost_sc + crf_hst*hst*cost_hst + crf_water*cost_ht*(m_ht+m_ct) + crf_hp*cost_hp*p_hp_max + crf_hp1*cost_hp1*p_hp1_max  + crf_hp2*cost_hp2*p_hp2_max + crf_hpg*cost_hpg*p_hpg_max + crf_gtw*cost_gtw*num_gtw
+           + crf_eb*cost_eb*p_eb_max+ crf_ac*cost_ac*p_ac_max  + crf_fc*capex_fc + crf_el*capex_el+crf_co*p_co_max*cost_co)
+    m.addConstr(capex_sum == cost_hyd*input_json["device"]['hyd']['flag']+s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_ac*p_ac_max+ cost_hp*p_hp_max+ cost_hp1*p_hp1_max+ cost_hp2*p_hp2_max+ capex_fc+capex_el+cost_co*p_co_max)
+
     m.addConstr(capex_sum <= input_json['price']['capex_max'][1-isloate[0]])
     m.addConstr(ce_h==gp.quicksum(p_pur)*alpha_e)
     try:
@@ -601,6 +654,9 @@ def planning_problem(dict,isloate,input_json):
             'p_fc_max':  format(p_fc_max.X,'.1f'),  # 燃料电池容量/kw
             'p_hpg_max': format(p_hpg_max.X,'.1f'),  # 地源热泵功率/kw
             'p_hp_max':  format(p_hp_max.X,'.1f'),  # 空气源热泵功率/kw
+            'p_hp1_max':  format(p_hp1_max.X,'.1f'),
+            'p_hp2_max':  format(p_hp2_max.X,'.1f'),
+            'p_ac_max':  format(p_ac_max.X,'.1f'),
             'p_eb_max':  format(p_eb_max.X,'.1f'),  # 电热锅炉功率/kw
             'p_el_max':  format(p_el_max.X,'.1f'),  # 电解槽功率/kw
             'nm3_el_max': format(11.2*p_el_max.X/50,'.1f'),  # 电解槽nm3/nm3
@@ -623,6 +679,9 @@ def planning_problem(dict,isloate,input_json):
             'p_fc_max': p_fc_max.X,  # 燃料电池容量/kw
             'p_hpg_max': p_hpg_max.X,  # 地源热泵功率/kw
             'p_hp_max': p_hp_max.X,  # 空气源热泵功率/kw
+            'p_hp1_max':p_hp1_max.X,
+            'p_hp2_max':p_hp2_max.X,
+            'p_ac_max': p_eb_max.X,
             'p_eb_max': p_eb_max.X,  # 电热锅炉功率/kw
             'p_el_max': p_el_max.X,  # 电解槽功率/kw
             'hst': hst.X,  # 储氢罐容量/kg
@@ -695,6 +754,8 @@ def planning_problem(dict,isloate,input_json):
             'p_fc_max':p_fc_max.X,
             'p_hpg_max':p_hpg_max.X,
             'p_hp_max':p_hp_max.X,
+            'p_hp1_max':p_hp1_max.X,
+            'p_hp2_max':p_hp2_max.X,
             'p_eb_max':p_eb_max.X,
             #'p_ec_max':p_ec_max.X,
             'p_el_max':p_el_max.X,

@@ -76,11 +76,11 @@ def planning_problem(dict,isloate,input_json):
             max_water = max(water)
             water = [water[i]*input_json["device"]['hyd']['peak']/max_water for i in range(len(water))]
     t0 = time.time()
-    alpha_e = 0.5839#电网排放因子kg/kWh
-    alpha_gas = 1.535#天然气排放因子kg/Nm3
+    alpha_e =input_json['carbon']['alpha_e']#电网排放因子kg/kWh
+    alpha_gas = input_json['carbon']['alpha_gas']#天然气排放因子kg/Nm3
     #alpha_heat = 0.351
-    alpha_H2=1.74#氢排放因子
-    alpha_eo=0.8922#减排项目基准排放因子
+    alpha_H2=input_json['carbon']['alpha_h2']#氢排放因子
+    alpha_eo=input_json['carbon']['alpha_EO']#减排项目基准排放因子
     gas_price = 1.2
 
     #lambda_ele_in = [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.7, 1, 1, 1, 1,

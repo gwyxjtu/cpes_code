@@ -119,9 +119,18 @@
 
                 "beta_eb":0.9
             },
+        "ac":
+            {
+                "power_max":100000,
+                "power_min":0,
+                "cost":50,
+                "crf":10,
+
+                "beta_ac":7.9
+            },
         "hp":
             {
-                "power_max":0,
+                "power_max":10,
                 "power_min":0,
                 "cost":3000,
                 "crf":15,
@@ -129,7 +138,26 @@
                 "beta_hpg":3,
                 "beta_hpq":4
             },
+        "hp1":
+            {
+                "power_max":10,
+                "power_min":0,
+                "cost":3000,
+                "crf":15,
 
+                "beta_hpg":3,
+                "beta_hpq":4
+            },
+        "hp2":
+            {
+                "power_max":10,
+                "power_min":0,
+                "cost":3000,
+                "crf":15,
+
+                "beta_hpg":3,
+                "beta_hpq":4
+            },
         "ghp":
             {
                 "power_max":1000000000,
