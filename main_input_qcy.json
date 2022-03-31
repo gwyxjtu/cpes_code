@@ -44,6 +44,7 @@
             "flag":0,
             "h_pur_state":0
         },
+        "cer":0.5,
         "obj":{
             "capex_sum":0,
             "capex_crf":1,

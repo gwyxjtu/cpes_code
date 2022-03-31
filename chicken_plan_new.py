@@ -99,7 +99,7 @@ def planning_problem(dict,isloate,input_json):
 
     lambda_ele_out = input_json['price']['power_sale']
     lambda_h = input_json['price']['hydrogen_price']
-    cer=1
+    cer=input_json['calc_mode']['cer']
     #lambda_carbon = 0.06
     #p_transformer = 10000
     #lambda_fc = 15000
@@ -213,12 +213,21 @@ def planning_problem(dict,isloate,input_json):
     # for cc in cool_mounth:
     #     z_q_demand[m_date[cc-1]:m_date[cc]] = [1 for _ in range(m_date[cc]-m_date[cc-1])]
 
-    # # z_g_demand = dict["z_heat_mounth"]
-    # # z_q_demand = dict["z_cold_mounth"]
+    z_g_demand = dict["z_heat_mounth"]
+    z_q_demand = dict["z_cold_mounth"]
 
-    z_g_demand = [1 for i in range(8760)]
-    z_q_demand = [1 for i in range(8760)]
+    # z_g_demand = [1 for i in range(8760)]
+    # z_q_demand = [1 for i in range(8760)]
+    # ele_day = [356.06,332.77,321.13,315.31,359.52,472.41,643.9,754.74,728.19,647.6,556.43,562.26,556.43,538.97,533.15,564.49,769.55,990.85,1023.2,954.17,930.89,809.94,630.78,471.32]
+
+    # ele_load = ele_day*365
+    # kkk = 10000/max(ele_day)
+    # ele_load = [kkk*ele_load[i] for i in range(8760)]
+
+
+
     print(sum(g_demand),sum(q_demand),sum(ele_load))
+    print(max(g_demand),max(q_demand),max(ele_load))
     print("----------------g,q,e_load----------------")
     
     #--------------
@@ -566,7 +575,7 @@ def planning_problem(dict,isloate,input_json):
     # m.setObjective( crf_pv * cost_pv*area_pv+ crf_el*cost_el*el_max
     #     +crf_hst * hst*cost_hst +crf_water* cost_water_hot*m_ht + crf_fc *cost_fc * fc_max + lambda_h*gp.quicksum(h_pur)*365+ 
     #     365*gp.quicksum([p_pur[i]*lambda_ele_in[i] for i in range(24)])-365*gp.quicksum(p_sol)*lambda_ele_out , GRB.MINIMIZE)
-    #m.addConstr(gp.quicksum(p_pur)<=cer*(sum(ele_load)+sum(g_demand)+sum(q_demand)))
+    m.addConstr(gp.quicksum(p_pur)<=cer*(sum(ele_load)+sum(g_demand)/k_hp_g+sum(q_demand)/k_hp_q))
     m.addConstr(cost_c_ele == sum([ele_load[i]*lambda_ele_in[i] for i in range(period)]))
     m.addConstr(cost_c_heat == sum([g_demand[i]/0.95*lambda_ele_in[i] for i in range(period)]))#/(3.41))
     m.addConstr(cost_c_cool == sum([q_demand[i]/4*lambda_ele_in[i] for i in range(period)]))#/3.8)
@@ -586,6 +595,7 @@ def planning_problem(dict,isloate,input_json):
 
     m.addConstr(capex_sum <= input_json['price']['capex_max'][1-isloate[0]])
     m.addConstr(ce_h==gp.quicksum(p_pur)*alpha_e)
+
     try:
         m.optimize()
     except gp.GurobiError:
@@ -604,7 +614,12 @@ def planning_problem(dict,isloate,input_json):
     op_sum =sum([p_hyd[i].x for i in range(period)])*input_json["device"]["hyd"]["power_cost"]+ sum([p_pur[i].X*lambda_ele_in[i] for i in range(period)])-sum([p_sol[i].X for i in range(period)])*lambda_ele_out+lambda_h*sum([h_pur[i].X for i in range(period)])
     #op_sum = op_sum.x
     revenue = sum([ele_load[i]*lambda_ele_in[i] for i in range(period)]) + input_json['load']['load_area']*(input_json['price']['heat_price']*len(input_json['load']['heat_mounth'])+input_json['price']['cold_price']*len(input_json['load']['cold_mounth']))
-    print(revenue)
+    print("revenue_ele")
+    revenue_ele = sum([ele_load[i]*lambda_ele_in[i] for i in range(period)])
+    #revenue_heat = sum([g_demand[i]/0.95*lambda_ele_in[i] for i in range(period)])
+    #revenue_cold = sum([q_demand[i]/4*lambda_ele_in[i] for i in range(period)])
+    print(revenue_ele)
+    
     #exit(0)
     #s_heat_sto = [q_hp[i].X - g_hp[i].X for i in range(period)]
     # for i in range(period-1):
@@ -778,9 +793,9 @@ def planning_problem(dict,isloate,input_json):
 
             'cer':sum([p_pur[i].X for i in range(period)])/(sum(ele_load)+sum(g_demand)+sum(q_demand)),
             'cer_self':sum([p_sol[i].X for i in range(period)])/(sum(ele_load)+sum(g_demand)+sum(q_demand)),
-            'ele_load':dict['ele_load'],
-            'g_demand':dict['g_demand'],
-            'q_demand':dict['q_demand'],
+            'ele_load':ele_load,
+            'g_demand':g_demand,
+            'q_demand':q_demand,
             #'m_demand':dict['m_demand'],
             'p_pur' : [p_pur[i].X for i in range(period)],
             'p_sol' : [p_sol[i].X for i in range(period)],
