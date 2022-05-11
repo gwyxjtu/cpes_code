@@ -23,9 +23,120 @@ print(rootdir)
 resrootdir = os.path.join(os.path.dirname(__file__) + '/res1124/')#文件夹目录
 resrootdir = resrootdir.replace('\\','/')
 print(resrootdir)
-
+industrial_rootdir = os.path.join(os.path.dirname(__file__) + '/industrial/')#文件夹目录
+industrial_rootdir = industrial_rootdir.replace('\\','/')
+print(industrial_rootdir)
 import requests
 import json
+
+def industrial(ele_load,industrial_mode):
+    ele_load_industrial = []
+    if industrial_mode['单峰'][0]==1:
+        book = xlrd.open_workbook(industrial_rootdir+"单峰.xlsx")
+        data = book.sheet_by_index(0)
+        for l in range(1, data.nrows):
+            ele_load_industrial.append(data.cell(l, 0).value)
+        ele_load_industrial = ele_load_industrial * 8
+        ele_load_industrial = ele_load_industrial[0: 8760]
+        ordered_ele_load_industrial = sorted(ele_load_industrial)
+        ele_max = ordered_ele_load_industrial[8000]
+        for i in range(8760):
+            ele_load_industrial[i] = ele_load[i]+ele_load_industrial[i] * industrial_mode['单峰'][1] / ele_max
+    elif industrial_mode['单峰'][0]==2:
+        book = xlrd.open_workbook(industrial_rootdir+"单峰.xlsx")
+        data = book.sheet_by_index(0)
+        for l in range(1, data.nrows):
+            ele_load_industrial.append(data.cell(l, 0).value)
+        ele_load_industrial = ele_load_industrial * 8
+        ele_load_industrial = ele_load_industrial[0: 8760]
+        all_ele = sum(ele_load_industrial)
+        for i in range(8760):
+            ele_load_industrial[i] = ele_load[i]+ele_load_industrial[i] * industrial_mode['单峰'][1] / all_ele
+    elif industrial_mode['双峰'][0]==1:
+        book = xlrd.open_workbook(industrial_rootdir+"双峰.xlsx")
+        data = book.sheet_by_index(0)
+        for l in range(1, data.nrows):
+            ele_load_industrial.append(data.cell(l, 0).value)
+        ele_load_industrial = ele_load_industrial * 8
+        ele_load_industrial = ele_load_industrial[0: 8760]
+        ordered_ele_load_industrial = sorted(ele_load_industrial)
+        ele_max = ordered_ele_load_industrial[8000]
+        for i in range(8760):
+            ele_load_industrial[i] = ele_load[i]+ele_load_industrial[i] * industrial_mode['双峰'][1] / ele_max
+    elif industrial_mode['双峰'][0]==2:
+        book = xlrd.open_workbook(industrial_rootdir+"双峰.xlsx")
+        data = book.sheet_by_index(0)
+        for l in range(1, data.nrows):
+            ele_load_industrial.append(data.cell(l, 0).value)
+        ele_load_industrial = ele_load_industrial * 8
+        ele_load_industrial = ele_load_industrial[0: 8760]
+        all_ele = sum(ele_load_industrial)
+        for i in range(8760):
+            ele_load_industrial[i] = ele_load[i]+ele_load_industrial[i] * industrial_mode['双峰'][1] / all_ele
+    elif industrial_mode['午间低谷'][0]==1:
+        book = xlrd.open_workbook(industrial_rootdir+"午间低谷.xlsx")
+        data = book.sheet_by_index(0)
+        for l in range(1, data.nrows):
+            ele_load_industrial.append(data.cell(l, 0).value)
+        ele_load_industrial = ele_load_industrial * 8
+        ele_load_industrial = ele_load_industrial[0: 8760]
+        ordered_ele_load_industrial = sorted(ele_load_industrial)
+        ele_max = ordered_ele_load_industrial[8000]
+        for i in range(8760):
+            ele_load_industrial[i] = ele_load[i]+ele_load_industrial[i] * industrial_mode['午间低谷'][1] / ele_max
+    elif industrial_mode['午间低谷'][0]==2:
+        book = xlrd.open_workbook(industrial_rootdir+"午间低谷.xlsx")
+        data = book.sheet_by_index(0)
+        for l in range(1, data.nrows):
+            ele_load_industrial.append(data.cell(l, 0).value)
+        ele_load_industrial = ele_load_industrial * 8
+        ele_load_industrial = ele_load_industrial[0: 8760]
+        all_ele = sum(ele_load_industrial)
+        for i in range(8760):
+            ele_load_industrial[i] = ele_load[i]+ele_load_industrial[i] * industrial_mode['午间低谷'][1] / all_ele
+    elif industrial_mode['相对均匀'][0]==1:
+        book = xlrd.open_workbook(industrial_rootdir+"相对均匀.xlsx")
+        data = book.sheet_by_index(0)
+        for l in range(1, data.nrows):
+            ele_load_industrial.append(data.cell(l, 0).value)
+        ele_load_industrial = ele_load_industrial * 8
+        ele_load_industrial = ele_load_industrial[0: 8760]
+        ordered_ele_load_industrial = sorted(ele_load_industrial)
+        ele_max = ordered_ele_load_industrial[8000]
+        for i in range(8760):
+            ele_load_industrial[i] = ele_load[i]+ele_load_industrial[i] * industrial_mode['相对均匀'][1] / ele_max
+    elif industrial_mode['相对均匀'][0]==2:
+        book = xlrd.open_workbook(industrial_rootdir+"相对均匀.xlsx")
+        data = book.sheet_by_index(0)
+        for l in range(1, data.nrows):
+            ele_load_industrial.append(data.cell(l, 0).value)
+        ele_load_industrial = ele_load_industrial * 8
+        ele_load_industrial = ele_load_industrial[0: 8760]
+        all_ele = sum(ele_load_industrial)
+        for i in range(8760):
+            ele_load_industrial[i] = ele_load[i]+ele_load_industrial[i] * industrial_mode['相对均匀'][1] / all_ele
+    elif industrial_mode['夜间用能'][0]==1:
+        book = xlrd.open_workbook(industrial_rootdir+"夜间用能.xlsx")
+        data = book.sheet_by_index(0)
+        for l in range(1, data.nrows):
+            ele_load_industrial.append(data.cell(l, 0).value)
+        ele_load_industrial = ele_load_industrial * 8
+        ele_load_industrial = ele_load_industrial[0: 8760]
+        ordered_ele_load_industrial = sorted(ele_load_industrial)
+        ele_max = ordered_ele_load_industrial[8000]
+        for i in range(8760):
+            ele_load_industrial[i] = ele_load[i]+ele_load_industrial[i] * industrial_mode['夜间用能'][1] / ele_max
+    elif industrial_mode['夜间用能'][0]==2:
+        book = xlrd.open_workbook(industrial_rootdir+"夜间用能.xlsx")
+        data = book.sheet_by_index(0)
+        for l in range(1, data.nrows):
+            ele_load_industrial.append(data.cell(l, 0).value)
+        ele_load_industrial = ele_load_industrial * 8
+        ele_load_industrial = ele_load_industrial[0: 8760]
+        all_ele = sum(ele_load_industrial)
+        for i in range(8760):
+            ele_load_industrial[i] = ele_load[i]+ele_load_industrial[i] * industrial_mode['夜间用能'][1] / all_ele
+    return ele_load_industrial
 def location_to_province(Longitude,latitude):
     key = 'GjG3XAdmywz7CyETWqHwIuEC6ZExY6QT'
     location = str(Longitude)+','+str(latitude)
@@ -65,7 +176,6 @@ def fenqu(wei,jing):
         load_sort = 3
     if wei >= 40 or (jing < 101 and wei > 28):
         load_sort = 1
-    print (load_sort)
     return load_sort
 
 def data_remode(resrootdir):
@@ -82,8 +192,12 @@ def data_remode(resrootdir):
             type = data[1]
             location = data[4]
             data1 = location.split('.')
-            province0 = data1[0]
-            city0 = data1[1]
+            if data1[0] == 'Nei':
+                province0 = data1[0] + '.' + data1[1]
+                city0 = data1[2]
+            else:
+                province0 = data1[0]
+                city0 = data1[1]
             if city.count(city0) == 0:
                 province.append(province0)
                 city.append(city0)
@@ -144,7 +258,8 @@ theta ={
     "Tibet":[1.8,0.5],
     "Xinjiang":[2,1],
     "Zhejiang":[1.5,1],
-    "Guizhou":[1.6,0.9]
+    "Guizhou":[1.6,0.9],
+    "Nei.Mongol":[2,0.7],
 }
 
 m_date = [31,28,31,30,31,30,31,31,30,31,30,31]
@@ -154,6 +269,7 @@ base_apartment = [40,60,150]#W/m2
 base_hotel = [55,60,150]#W/m2
 base_office = [50,60,180]#W/m2
 base_restaurant = [60,60,350]#W/m2
+
 
 def peakbasecorrectload(pinprovince,base_ele_load, base_g_demand, base_q_demand,building_area,load_area):
     s_all = float(building_area['apartment']) + float(building_area['hotel']) + float(building_area['office']) + float(
@@ -168,13 +284,9 @@ def peakbasecorrectload(pinprovince,base_ele_load, base_g_demand, base_q_demand,
     sum_e_cankao = base_e * load_area  / 1000
     sum_g_cankao = base_g * load_area  /1000 *theta[pinprovince][0]
     sum_q_cankao = base_q * load_area  /1000 *theta[pinprovince][1]
-    print("峰值"+str(sum_g_cankao) + "冷" + str(sum_q_cankao))
+    print("热峰值"+str(sum_g_cankao) + "冷峰值" + str(sum_q_cankao))
     base_ele_load, base_g_demand, base_q_demand = peakcorrectload(base_ele_load, base_g_demand, base_q_demand, sum_e_cankao, sum_g_cankao, sum_q_cankao)
     return base_ele_load, base_g_demand, base_q_demand
-
-
-
-
 
 
 def gqmonthcorrectload(g_demand, q_demand,heat_mounth,cold_mounth):
@@ -185,23 +297,13 @@ def gqmonthcorrectload(g_demand, q_demand,heat_mounth,cold_mounth):
     if heat_mounth =="全年":
         z_heat_mounth = [1 for i in range(8760)]
         gn_demand[0:8760] = g_demand[0:8760]
-    elif cold_mounth == "全年":
-        z_cold_mounth = [1 for i in range(8760)]
-        qn_demand[0:8760] = q_demand[0:8760]
     else:
         start_h_m = int(heat_mounth.split('于')[1].split('月')[0])
         start_h_d = int(heat_mounth.split('于')[1].split('月')[1].split('日')[0])
         end_h_m = int(heat_mounth.split('于')[2].split('月')[0])
         end_h_d = int(heat_mounth.split('于')[2].split('月')[1].split('日')[0])
-        start_c_m = int(cold_mounth.split('于')[1].split('月')[0])
-        start_c_d = int(cold_mounth.split('于')[1].split('月')[1].split('日')[0])
-        end_c_m = int(cold_mounth.split('于')[2].split('月')[0])
-        end_c_d = int(cold_mounth.split('于')[2].split('月')[1].split('日')[0])
-        start_h_index = m_date[start_h_m-1] + 24 * (start_h_d-1)
-        end_h_index = m_date[end_h_m-1] + 24 * (end_h_d-1)
-        start_c_index = m_date[start_c_m-1] + 24 * (start_c_d - 1)
-        end_c_index = m_date[end_c_m-1] + 24 * (end_c_d - 1)
-        print(start_h_index,end_h_index,start_c_index,end_c_index)
+        start_h_index = m_date[start_h_m - 1] + 24 * (start_h_d - 1)
+        end_h_index = m_date[end_h_m - 1] + 24 * (end_h_d - 1)
         if end_h_index >= start_h_index:
             gn_demand[start_h_index:end_h_index] = g_demand[start_h_index:end_h_index]
             z_heat_mounth[start_h_index:end_h_index] = [1 for i in range(end_h_index - start_h_index)]
@@ -210,6 +312,16 @@ def gqmonthcorrectload(g_demand, q_demand,heat_mounth,cold_mounth):
             gn_demand[start_h_index:8760] = g_demand[start_h_index:8760]
             z_heat_mounth[0:end_h_index] = [1 for i in range(end_h_index)]
             z_heat_mounth[start_h_index:8760] = [1 for i in range(8760 - start_h_index)]
+    if cold_mounth == "全年":
+        z_cold_mounth = [1 for i in range(8760)]
+        qn_demand[0:8760] = q_demand[0:8760]
+    else:
+        start_c_m = int(cold_mounth.split('于')[1].split('月')[0])
+        start_c_d = int(cold_mounth.split('于')[1].split('月')[1].split('日')[0])
+        end_c_m = int(cold_mounth.split('于')[2].split('月')[0])
+        end_c_d = int(cold_mounth.split('于')[2].split('月')[1].split('日')[0])
+        start_c_index = m_date[start_c_m-1] + 24 * (start_c_d - 1)
+        end_c_index = m_date[end_c_m-1] + 24 * (end_c_d - 1)
         if end_c_index >= start_c_index:
             qn_demand[start_c_index:end_c_index] = q_demand[start_c_index:end_c_index]
             z_cold_month[start_c_index:end_c_index] = [1 for i in range(end_c_index - start_c_index)]
@@ -218,22 +330,20 @@ def gqmonthcorrectload(g_demand, q_demand,heat_mounth,cold_mounth):
             qn_demand[start_c_index:8760] = q_demand[start_c_index:8760]
             z_cold_month[0:end_c_index] = [1 for i in range(end_c_index)]
             z_cold_month[start_c_index:8760] = [1 for i in range(8760 - end_c_index)]
-        print(len(z_cold_month))
-        print(len(z_heat_mounth))
-        print(start_h_index)
-        print(end_h_index)
     return gn_demand, qn_demand,  z_heat_mounth, z_cold_month
 
 
 
 def peakcorrectload(base_ele_load, base_g_demand, base_q_demand,peak_ele,peak_g,peak_q):
-    #ele_max , max_g , max_q = max(base_ele_load) , max(base_g_demand), max(base_q_demand)
+    # ele_max , max_g , max_q = max(base_ele_load) , max(base_g_demand), max(base_q_demand)
+    print(peak_g)
+    print("kjkkkkkkkkkkkkkk")
     ordered_base_ele_load = sorted(base_ele_load)
     ordered_base_g_demand = sorted(base_g_demand)
     ordered_base_q_demand = sorted(base_q_demand)
-    ele_max = ordered_base_ele_load[8000]
-    max_g = ordered_base_g_demand[8000]
-    max_q = ordered_base_q_demand[8000]
+    ele_max = ordered_base_ele_load[8500]
+    max_g = ordered_base_g_demand[8500]
+    max_q = ordered_base_q_demand[8500]
     ele_load = [0 for i in range(8760)]
     g_demand = [0 for i in range(8760)]
     q_demand = [0 for i in range(8760)]
@@ -243,10 +353,18 @@ def peakcorrectload(base_ele_load, base_g_demand, base_q_demand,peak_ele,peak_g,
             g_demand[i] = 0
         else:
             g_demand[i] = base_g_demand[i] * peak_g / max_g
+            # if g_demand[i] > 15000:
+            #     g_demand[i] = 15000
+            # if g_demand[i] < peak_g*0.7:
+            #     g_demand[i] = g_demand[i] * 1.42
         if max_q == 0:
             q_demand[i] = 0
         else:
             q_demand[i] = base_q_demand[i] * peak_q / max_q
+            # if q_demand[i] > peak_q:
+            #     q_demand[i] = peak_q
+            # if q_demand[i] < peak_q*0.5:
+            #     q_demand[i] = q_demand[i] * 1.2
     return ele_load, g_demand, q_demand
 
 def sumcorrectload(base_ele_load, base_g_demand, base_q_demand,sum_ele,sum_g,sum_q):
@@ -262,7 +380,7 @@ def sumcorrectload(base_ele_load, base_g_demand, base_q_demand,sum_ele,sum_g,sum
     return ele_load, g_demand, q_demand
 
 
-def baseautoload(pinprovince,pincity,building_area,load_area):
+def baseautoload(province,pinprovince,pincity,building_area,load_area):
     ele_load = [0 for i in range(8760)]
     g_demand = [0 for i in range(8760)]
     q_demand = [0 for i in range(8760)]
@@ -270,7 +388,7 @@ def baseautoload(pinprovince,pincity,building_area,load_area):
     r_g_demand,o_g_demand,h_g_demand,a_g_demand= [0 for i in range(8760)],[0 for i in range(8760)],[0 for i in range(8760)],[0 for i in range(8760)]
     r_q_demand,o_q_demand,h_q_demand,a_q_demand= [0 for i in range(8760)],[0 for i in range(8760)],[0 for i in range(8760)],[0 for i in range(8760)]
     r_solar = [0 for i in range(8760)]
-    r_r_solar,o_r_solar,h_r_solar,a_r_solar= [0 for i in range(8760)],[0 for i in range(8760)],[0 for i in range(8760)],[0 for i in range(8760)]
+    # r_r_solar,o_r_solar,h_r_solar,a_r_solar= [0 for i in range(8760)],[0 for i in range(8760)],[0 for i in range(8760)],[0 for i in range(8760)]
     s_all = float(building_area['apartment'])+float(building_area['hotel'])+float(building_area['office'])+float(building_area['restaurant'])
     s_apartment = float(building_area['apartment'])/s_all
     s_hotel = float(building_area['hotel'])/s_all
@@ -284,7 +402,7 @@ def baseautoload(pinprovince,pincity,building_area,load_area):
             r_ele_load[i] = float(row["Electricity Load [kwh]"])
             r_g_demand[i] = float(row["Heating Load [kwh]"])
             r_q_demand[i] = float(row["Cooling Load [kwh]"])
-            r_r_solar[i] = float(row["Environment:Site Direct Solar Radiation Rate per Area [W/m2](Hourly)"])
+            # r_r_solar[i] = float(row["Environment:Site Direct Solar Radiation Rate per Area [W/m2](Hourly)"])
             i += 1
     with open(resrootdir + officefilename) as officecsv:
         office = csv.DictReader(officecsv)
@@ -293,7 +411,7 @@ def baseautoload(pinprovince,pincity,building_area,load_area):
             o_ele_load[i] = float(row1["Electricity Load [kwh]"])
             o_g_demand[i] = float(row1["Heating Load [kwh]"])
             o_q_demand[i] = float(row1["Cooling Load [kwh]"])
-            o_r_solar[i] = float(row1["Environment:Site Direct Solar Radiation Rate per Area [W/m2](Hourly)"])
+            # o_r_solar[i] = float(row1["Environment:Site Direct Solar Radiation Rate per Area [W/m2](Hourly)"])
             i += 1
     with open(resrootdir + hotelfilename) as hotelcsv:
         hotel = csv.DictReader(hotelcsv)
@@ -302,7 +420,7 @@ def baseautoload(pinprovince,pincity,building_area,load_area):
             h_ele_load[i] = float(row2["Electricity Load [kwh]"])
             h_g_demand[i] = float(row2["Heating Load [kwh]"])
             h_q_demand[i] = float(row2["Cooling Load [kwh]"])
-            h_r_solar[i] = float(row2["Environment:Site Direct Solar Radiation Rate per Area [W/m2](Hourly)"])
+            # h_r_solar[i] = float(row2["Environment:Site Direct Solar Radiation Rate per Area [W/m2](Hourly)"])
             i += 1
     with open(resrootdir + apartmentfilename) as apartmentcsv:
         apartment = csv.DictReader(apartmentcsv)
@@ -311,14 +429,28 @@ def baseautoload(pinprovince,pincity,building_area,load_area):
             a_ele_load[i] = float(row3["Electricity Load [kwh]"])
             a_g_demand[i] = float(row3["Heating Load [kwh]"])
             a_q_demand[i] = float(row3["Cooling Load [kwh]"])
-            a_r_solar[i] = float(row3["Environment:Site Direct Solar Radiation Rate per Area [W/m2](Hourly)"])
+            # a_r_solar[i] = float(row3["Environment:Site Direct Solar Radiation Rate per Area [W/m2](Hourly)"])
             i += 1
     for i in range(0,8760):
         ele_load[i] = (a_ele_load[i] * s_apartment + h_ele_load[i] * s_hotel + o_ele_load[i] * s_office + r_ele_load[i] * s_restaurant)*load_area
         g_demand[i] = (a_g_demand[i] * s_apartment + h_g_demand[i] * s_hotel + o_g_demand[i] * s_office + r_g_demand[i] * s_restaurant)*load_area
         q_demand[i] = (a_q_demand[i] * s_apartment + h_q_demand[i] * s_hotel + o_q_demand[i] * s_office + r_q_demand[i] * s_restaurant)*load_area
-        r_solar[i] = a_r_solar[i] * s_apartment + h_r_solar[i] * s_hotel + o_r_solar[i] * s_office + r_r_solar[i] * s_restaurant
+        # r_solar[i] = a_r_solar[i] * s_apartment + h_r_solar[i] * s_hotel + o_r_solar[i] * s_office + r_r_solar[i] * s_restaurant
 
+    r_solar_rootdir = 'solar/'  # 文件夹目录
+    book_r_solar = xlrd.open_workbook('r_solar.xls')
+    data = book_r_solar.sheet_by_index(0)
+    sheng = data.col_values(2, start_rowx=0, end_rowx=None)
+    shi = data.col_values(3, start_rowx=0, end_rowx=None)
+    suoyin = sheng.index(province)
+    r_solar_filename = data.cell_value(suoyin,4)
+    r_solar_dir = r_solar_rootdir+r_solar_filename
+    with open(r_solar_dir) as tempreture_file:
+        reader = csv.reader(tempreture_file)
+        column = [row for row in reader]
+    for i in range(8760):
+        r_solar[i]=float(column[i+4][2])
+    print(r_solar)
     return ele_load, g_demand, q_demand, r_solar
 
 
@@ -369,7 +501,7 @@ def all_load(dict_load):
         wb = xlwt.Workbook()
         total = wb.add_sheet('egqr')
 
-        g_demand, _, z_heat_mounth, z_cold_month = gqmonthcorrectload(g_demand, q_demand,
+        g_demand, q_demand, z_heat_mounth, z_cold_month = gqmonthcorrectload(g_demand, q_demand,
                                                                                        heat_mounth, cold_mounth)
         # return ele_load, g_demand, q_demand, r_solar, z_heat_mounth, z_cold_month, load_sort
         return_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,
@@ -422,7 +554,7 @@ def all_load(dict_load):
         print(pinprovince)
         print(pincity)
         #基础负荷
-        base_ele_load, base_g_demand, base_q_demand, r_solar = baseautoload(pinprovince,pincity,building_area,load_area)
+        base_ele_load, base_g_demand, base_q_demand, r_solar = baseautoload(province,pinprovince,pincity,building_area,load_area)
         power_peak = dict_load['power_peak']
         peak_flag = power_peak['flag']
         peak_ele = power_peak['ele']
@@ -449,6 +581,8 @@ def all_load(dict_load):
         else:
             ele_load, g_demand, q_demand = peakcorrectload(base_ele_load, base_g_demand, base_q_demand,peak_ele,peak_g,peak_q)
         # return ele_load, g_demand, q_demand, r_solar, z_heat_mounth, z_cold_month, load_sort
+        if dict_load['industrial_input_mode']==1:
+            ele_load = industrial(ele_load,dict_load['industrial_mode'])
         return_load = {'ele_load': ele_load, 'g_demand': g_demand, 'q_demand': q_demand, 'r_solar': r_solar,
                    'load_sort': load_sort, 'z_cold_mounth': z_cold_month, 'z_heat_mounth': z_heat_mounth}
         return return_load

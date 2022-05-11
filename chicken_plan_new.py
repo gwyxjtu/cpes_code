@@ -377,7 +377,6 @@ def planning_problem(dict,isloate,input_json):
 
     cost_c_cool = m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"cost_c_cool")
 
-    cost_c_m = m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"cost_c_m")
 
     cost_c = m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"cost_c")
     #p_pump = [m.addVar(vtype=GRB.CONTINUOUS, lb=0, name=f"p_pump{t}") for t in range(period)] 
@@ -613,7 +612,7 @@ def planning_problem(dict,isloate,input_json):
     cap_sum = capex_sum.x
     op_sum =sum([p_hyd[i].x for i in range(period)])*input_json["device"]["hyd"]["power_cost"]+ sum([p_pur[i].X*lambda_ele_in[i] for i in range(period)])-sum([p_sol[i].X for i in range(period)])*lambda_ele_out+lambda_h*sum([h_pur[i].X for i in range(period)])
     #op_sum = op_sum.x
-    revenue = sum([ele_load[i]*lambda_ele_in[i] for i in range(period)]) + input_json['load']['load_area']*(input_json['price']['heat_price']*len(input_json['load']['heat_mounth'])+input_json['price']['cold_price']*len(input_json['load']['cold_mounth']))
+    revenue = sum([ele_load[i]*lambda_ele_in[i] for i in range(period)]) + input_json['load']['load_area']*(input_json['price']['heat_price']*(sum(z_g_demand)/30/24)+input_json['price']['cold_price']*(sum(z_q_demand)/30/24))
     print("revenue_ele")
     revenue_ele = sum([ele_load[i]*lambda_ele_in[i] for i in range(period)])
     #revenue_heat = sum([g_demand[i]/0.95*lambda_ele_in[i] for i in range(period)])
@@ -752,7 +751,6 @@ def planning_problem(dict,isloate,input_json):
             'cost_c_ele':cost_c_ele.X,
             'cost_c_heat':cost_c_heat.X,
             'cost_c_cool':cost_c_cool.X,
-            'cost_c_m':cost_c_m.X,
             'cost_c':cost_c.X,
             'cap_fc':capex_fc.X,
             'cap_hp':cost_hp*p_hp_max.X,
