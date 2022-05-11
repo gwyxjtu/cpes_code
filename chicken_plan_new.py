@@ -556,10 +556,10 @@ def planning_problem(dict,isloate,input_json):
         m.addConstr(h_sto[i]<=hst)
 
         # balance
-        m.addConstr(p_el[i] + p_sol[i] + p_hp[i] +p_hp1[i] +p_hp2[i] +p_hpc[i] +p_hpc1[i] +p_hpc2[i] + p_hpg[i] + p_hpgc[i] + p_eb[i] + p_ac[i] + p_co[i]+ ele_load[i] <= p_hyd[i] + p_pur[i] + p_fc[i] + p_pv[i])
+        m.addConstr(p_el[i] + p_sol[i] + p_hp[i] +p_hp1[i] +p_hp2[i] +p_hpc[i] +p_hpc1[i] +p_hpc2[i] + p_hpg[i] + p_hpgc[i] + p_eb[i] + p_ac[i] + p_co[i]+ ele_load[i] == p_hyd[i] + p_pur[i] + p_fc[i] + p_pv[i])
 
         # pv
-        m.addConstr(p_pv[i] == eta_pv*s_pv*r_solar[i])
+        m.addConstr(p_pv[i] <= eta_pv*s_pv*r_solar[i])
         # sc
         m.addConstr(g_sc[i] <= k_sc*theta_ex*s_sc*r_solar[i])
 
@@ -696,7 +696,7 @@ def planning_problem(dict,isloate,input_json):
             'p_hp_max': p_hp_max.X,  # 空气源热泵功率/kw
             'p_hp1_max':p_hp1_max.X,
             'p_hp2_max':p_hp2_max.X,
-            'p_ac_max': p_eb_max.X,
+            'p_ac_max': p_ac_max.X,
             'p_eb_max': p_eb_max.X,  # 电热锅炉功率/kw
             'p_el_max': p_el_max.X,  # 电解槽功率/kw
             'hst': hst.X,  # 储氢罐容量/kg

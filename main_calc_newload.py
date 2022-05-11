@@ -73,6 +73,8 @@ if __name__ == '__main__':
     print(grid_planning_output_json['equipment_cost'],grid_planning_output_json['receive_year'])
     #grid_operation_output_json,flag = operating_problem(dict_load, device_cap1,[0,input_json["load"]['power_sale_state']['grid'],input_json["load"]['hydrogen_state']['grid']],tem_env,input_json,8760)
 
+
+
     flag = 1
 
     if flag == 1:
