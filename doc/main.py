@@ -204,7 +204,7 @@ def change_table_equip_para(doc):
     if main_input["el"]["power_max"]==0 or main_input["el"]["nm3_max"]==0 :
         para+=["","",""]
     else:
-        para+=[int(main_input["el"]["cost"]*50/11.2),
+        para+=[main_input["el"]["cost"]*50/11.2,
                main_input["el"]["crf"],
                main_input["el"]["power_max"]]
     #光伏板
@@ -245,7 +245,7 @@ def change_table_equip_allocation(tables, json):
             "p_hpg_max",
             "p_hp_max",
             "p_eb_max",
-            "nm3_el_max",
+            "p_el_max",
             "hst",
             "m_ht",
             "m_ct",
@@ -292,7 +292,8 @@ def change_table_eco_analyse(tables, planing_json,operation_json):
                float(operation_json['cost_save_rate']),
                float(planing_json['receive_year']),
                int(float(operation_json['co2'])),
-               float(operation_json['cer_rate'])]
+               float(operation_json['cer_rate']),
+               float(operation_json['revenue'])]
     for i in range(1,len(tables.rows)):
         run = tables.cell(i, 1).paragraphs[0].add_run(str(replace[i - 1]))
         # 设置字体

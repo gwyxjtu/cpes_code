@@ -9,6 +9,7 @@
 #              x * z + y * z = 1  (bilinear equality)
 #              x, y, z non-negative (x integral in second version)
 
+from tkinter import E
 import gurobipy as gp
 from gurobipy import GRB
 import numpy as np
@@ -95,7 +96,7 @@ def planning_problem(dict,isloate,input_json):
 
 
     lambda_ele_in = input_json['price']['TOU_power']*365
-
+    discount = input_json['price']['discount']
 
     lambda_ele_out = input_json['price']['power_sale']
     lambda_h = input_json['price']['hydrogen_price']
@@ -224,8 +225,9 @@ def planning_problem(dict,isloate,input_json):
     # kkk = 10000/max(ele_day)
     # ele_load = [kkk*ele_load[i] for i in range(8760)]
 
-
-
+    # q_demand = [q_demand[i]*2 for i in range(len(q_demand))]
+    # g_demand = [g_demand[i]*2 for i in range(len(g_demand))]
+    # ele_load = [ele_load[i]*2 for i in range(len(ele_load))]
     print(sum(g_demand),sum(q_demand),sum(ele_load))
     print(max(g_demand),max(q_demand),max(ele_load))
     print("----------------g,q,e_load----------------")
@@ -612,9 +614,9 @@ def planning_problem(dict,isloate,input_json):
     cap_sum = capex_sum.x
     op_sum =sum([p_hyd[i].x for i in range(period)])*input_json["device"]["hyd"]["power_cost"]+ sum([p_pur[i].X*lambda_ele_in[i] for i in range(period)])-sum([p_sol[i].X for i in range(period)])*lambda_ele_out+lambda_h*sum([h_pur[i].X for i in range(period)])
     #op_sum = op_sum.x
-    revenue = sum([ele_load[i]*lambda_ele_in[i] for i in range(period)]) + input_json['load']['load_area']*(input_json['price']['heat_price']*(sum(z_g_demand)/30/24)+input_json['price']['cold_price']*(sum(z_q_demand)/30/24))
+    revenue = sum([ele_load[i]*lambda_ele_in[i] for i in range(period)])*input_json['price']['discount'] + input_json['load']['load_area']*(input_json['price']['heat_price']*(sum(z_g_demand)/30/24)+input_json['price']['cold_price']*(sum(z_q_demand)/30/24))
     print("revenue_ele")
-    revenue_ele = sum([ele_load[i]*lambda_ele_in[i] for i in range(period)])
+    revenue_ele = sum([ele_load[i]*lambda_ele_in[i]*input_json['price']['discount'] for i in range(period)])
     #revenue_heat = sum([g_demand[i]/0.95*lambda_ele_in[i] for i in range(period)])
     #revenue_cold = sum([q_demand[i]/4*lambda_ele_in[i] for i in range(period)])
     print(revenue_ele)
@@ -735,7 +737,8 @@ def planning_problem(dict,isloate,input_json):
     co2_ele_gas=sum(ele_load)*input_json['carbon']['alpha_e']+sum(gas_sum_ele_gas)*1.535
     #print("------------")
     operation_output_json = {
-            "operation_cost": format(op_sum/10000,'.1f'),  # 年化运行成本/万元
+            "operation_cost": format((op_sum+revenue)/10000,'.1f'),  # 年化运行总收益/万元
+            "operation_cost_old": format(op_sum/10000,'.1f'),  # 年化运行总收益/万元
             "revenue": format(revenue/10000,'.1f'),  # 年化运行成本/万元
             "cost_save_rate": format((opex_ele_only-op_sum)/opex_ele_only,'.1f'),  #电运行成本节约比例
             "cost_save_rate_gas": format((opex_ele_gas-op_sum)/opex_ele_gas,'.1f'),  #电气运行成本节约比例
@@ -748,10 +751,6 @@ def planning_problem(dict,isloate,input_json):
     }
     return {'objective':m.objVal,
             'process time':time.time() - t0,
-            'cost_c_ele':cost_c_ele.X,
-            'cost_c_heat':cost_c_heat.X,
-            'cost_c_cool':cost_c_cool.X,
-            'cost_c':cost_c.X,
             'cap_fc':capex_fc.X,
             'cap_hp':cost_hp*p_hp_max.X,
             #'cap_hpc':cost_hpc*p_hpc_max.X,

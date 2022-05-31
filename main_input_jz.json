@@ -1,7 +1,7 @@
 {
     "load":{
-        "autoload":1,
-        "fileaddress":"./doc/debug_load.xls",
+        "autoload":0,
+        "fileaddress":"./load/jinzhai.xls",
         "province":"" ,
         "city": "",
         "building_area":{
@@ -10,15 +10,15 @@
             "office":0,
             "restaurant":0
         },
-        "load_area":9932,
-        "heat_mounth":"起始于11月15日，结束于4月15日",
-        "cold_mounth":"起始于6月1日，结束于6月1日",
+        "load_area":50000,
+        "heat_mounth":"起始于11月15日，结束于3月15日",
+        "cold_mounth":"起始于6月15日，结束于9月15日",
 
         "power_peak":{
             "flag":1,
-            "ele":300,
-            "g":600,
-            "q":0,
+            "ele":1000,
+            "g":3000,
+            "q":2000,
             "flag_shear_g":0,
             "flag_shear_e":0,
             "flag_shear_q":0,
@@ -32,21 +32,19 @@
         },
         "yearly_power":0,
         "ele_type":0,
-        "location":[31,92]
+        "location":[27.802160,102.2800]
     },
-    
     "calc_mode":{
-
-
         "grid":{
             "p_pur_state":1,
-            "p_sol_state":0,
+            "p_sol_state":1,
             "h_pur_state":0
         },
         "isloate":{
             "flag":0,
             "h_pur_state":0
         },
+        "cer":1,
         "obj":{
             "capex_sum":0,
             "capex_crf":1,
@@ -59,16 +57,15 @@
         "pv_sc_max":20000000000000
     },
     "price":{
-        "TOU_power":[0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49, 0.49],
-
-        "power_sale":0.0,
-        "gas_price":4.085,
+        "TOU_power":[0.3942, 0.3942, 0.3942, 0.3942, 0.3942, 0.3942, 0.3942, 0.3942, 0.6342,0.9444, 0.9444, 0.9444, 0.6342,0.6342, 0.6342, 0.6342, 0.6342, 0.9444, 0.9444, 0.9444, 0.9444, 0.9444, 0.6342,0.3942],
+        "power_sale":0.3844,
+        "gas_price":3.5,
         "heat_price":4.46,
-        "cold_price":16,
+        "cold_price":12,
         "carbon_price": 0.06,
 
         "hydrogen_price":200,
-        "capex_max":[965000000000,2000000000],
+        "capex_max":[150000000,200000000000],
         "op_max":[1118000000,2000000000]
     },
 
@@ -88,7 +85,7 @@
         "fc":
             {
                 "power_max":100000,
-                "power_min":100,
+                "power_min":0,
                 "cost":8000,
                 "crf":10,
                 "nominal_lower": 0,
@@ -123,6 +120,15 @@
 
                 "beta_eb":0.9
             },
+        "ac":
+            {
+                "power_max":0,
+                "power_min":0,
+                "cost":50,
+                "crf":10,
+
+                "beta_ac":7.9
+            },
         "hp":
             {
                 "power_max":0,
@@ -133,10 +139,29 @@
                 "beta_hpg":3,
                 "beta_hpq":4
             },
+        "hp1":
+            {
+                "power_max":0,
+                "power_min":0,
+                "cost":3000,
+                "crf":15,
 
+                "beta_hpg":3,
+                "beta_hpq":4
+            },
+        "hp2":
+            {
+                "power_max":0,
+                "power_min":0,
+                "cost":3000,
+                "crf":15,
+
+                "beta_hpg":3,
+                "beta_hpq":4
+            },
         "ghp":
             {
-                "power_max":1000000,
+                "power_max":1000000000,
                 "power_min":0,
                 "cost":4000,
                 "crf":15,
@@ -147,7 +172,7 @@
 
         "gtw":
             {
-                "number_max":100000,
+                "number_max":10000000,
                 "cost":30000,
                 "crf":30,
 
@@ -168,7 +193,7 @@
         "hst":
             {
                 "sto_max":5000000,
-                "sto_min":80,
+                "sto_min":0,
                 "cost":3000,
                 "crf":15,
 
@@ -185,7 +210,7 @@
             {
                 "power_max":5000000,
                 "nm3_max":10000000,
-                "nm3_min":50,
+                "nm3_min":0,
                 "power_min":0,
                 "cost":3360,
                 "crf":7,
@@ -210,7 +235,7 @@
             },
         "sc":
             {
-                "area_max":100000,
+                "area_max":0,
                 "area_min":0,
                 "cost":800,
                 "crf":20,
@@ -226,7 +251,7 @@
 
         "pv":
             {
-                "area_max":100000,
+                "area_max":80000,
                 "area_min":0,
                 "cost":1000,
                 "crf":20,

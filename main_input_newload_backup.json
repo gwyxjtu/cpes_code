@@ -1,7 +1,7 @@
 {
     "load":{
-        "autoload":0,
-        "fileaddress":"./doc/qcyload.xls",
+        "autoload":1,
+        "fileaddress":"./doc/debug_load.xls",
         "province":"" ,
         "city": "",
         "building_area":{
@@ -10,9 +10,9 @@
             "office":0,
             "restaurant":0
         },
-        "load_area":623000,
-        "heat_mounth":"起始于11月15日，结束于3月15日",
-        "cold_mounth":"起始于5月15日，结束于9月15日",
+        "load_area":100000,
+        "heat_mounth":"起始于1月1日，结束于12月31日",
+        "cold_mounth":"起始于6月1日，结束于9月1日",
 
         "power_peak":{
             "flag":1,
@@ -37,21 +37,20 @@
     "calc_mode":{
         "grid":{
             "solar_analys":1,
-            "p_pur_state":1,
-            "p_sol_state":0,
+            "p_pur_state":0,
+            "p_sol_state":1,
             "h_pur_state":0
         },
         "isloate":{
             "solar_analys":1,
-            "flag":1,
+            "flag":0,
             "h_pur_state":0
         },
-        
-        "cer":0.5,
+        "cer":1,
         "obj":{
-            "capex_sum":0,
-            "capex_crf":1,
-            "opex":1
+            "capex_sum":1,
+            "capex_crf":0,
+            "opex":0
         }
     },
     "renewable_energy":{
@@ -60,16 +59,16 @@
         "pv_sc_max":20000000000000
     },
     "price":{
-        "TOU_power":[0.325, 0.325, 0.325, 0.325, 0.325, 0.325, 0.325, 0.6037, 0.8824, 0.8824, 0.8824, 0.8824, 0.6037, 0.6037, 0.6037, 0.6037, 0.6037, 0.6037, 0.6037, 0.8824, 0.8824, 0.8824, 0.8824, 0.325],
-        "power_sale":0.00,
+        "TOU_power":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "power_sale":0.38,
         "gas_price":4.085,
-        "heat_price":5.8,
+        "heat_price":4.46,
         "cold_price":16,
         "carbon_price": 0.06,
         "discount":0.9,
 
-        "hydrogen_price":30,
-        "capex_max":[9650000000000,2000000000000],
+        "hydrogen_price":200,
+        "capex_max":[9650000000,2000000000],
         "op_max":[1118000000,2000000000]
     },
 
@@ -88,8 +87,8 @@
             },
         "fc":
             {
-                "power_max":10000000000,
-                "power_min":1000,
+                "power_max":100000,
+                "power_min":0,
                 "cost":8000,
                 "crf":10,
                 "nominal_lower": 0,
@@ -103,7 +102,7 @@
             },
         "ht":
             {
-                "water_max":870500,
+                "water_max":80000000,
                 "water_min":0,
                 "cost":0.5,
                 "crf":20,
@@ -119,62 +118,58 @@
             {
                 "power_max":0,
                 "power_min":0,
-                "cost":1000,
+                "cost":500,
                 "crf":10,
 
                 "beta_eb":0.9
             },
         "ac":
             {
-                "power_max":1000,
-                "power_min":500,
-                "cost":1667,
-                "crf":15,
+                "power_max":100000,
+                "power_min":0,
+                "cost":50,
+                "crf":10,
 
-                "commit":"电制冷",
-                "beta_ac":3.5
+                "beta_ac":7.9
             },
         "hp":
             {
-                "power_max":0,
+                "power_max":10,
                 "power_min":0,
-                "cost":5000,
-                "crf":20,
+                "cost":3000,
+                "crf":15,
 
-                "comment":"initial value 724",
                 "beta_hpg":3,
-                "beta_hpq":2.75
+                "beta_hpq":4
             },
         "hp1":
             {
-                "power_max":0,
+                "power_max":10,
                 "power_min":0,
-                "cost":28500,
-                "crf":20,
+                "cost":3000,
+                "crf":15,
 
-                "commit":"中深层",
-                "beta_hpg":4,
-                "beta_hpq":3.6
+                "beta_hpg":3,
+                "beta_hpq":4
             },
         "hp2":
             {
-                "power_max":1334,
-                "power_min":700,
-                "cost":15000,
-                "crf":20,
+                "power_max":10,
+                "power_min":0,
+                "cost":3000,
+                "crf":15,
 
-                "commit":"污水源",
                 "beta_hpg":3,
-                "beta_hpq":4.5
+                "beta_hpq":4
             },
         "ghp":
             {
-                "power_max":500,
-                "power_min":300,
+                "power_max":1000000000,
+                "power_min":0,
                 "cost":4000,
-                "crf":20,
+                "crf":15,
 
-                "beta_ghpg":4,
+                "beta_ghpg":3.54,
                 "beta_ghpq":4
             },
 
@@ -184,7 +179,7 @@
                 "cost":30000,
                 "crf":30,
 
-                "beta_gtw":5
+                "beta_gtw":7
             },
         "ct":
             {
@@ -200,10 +195,10 @@
             },
         "hst":
             {
-                "sto_max":10000,
-                "sto_min":300,
+                "sto_max":5000000,
+                "sto_min":0,
                 "cost":3000,
-                "crf":20,
+                "crf":15,
 
                 "pressure_upper": 35,
                 "pressure_lower": 0.5,
@@ -218,10 +213,10 @@
             {
                 "power_max":5000000,
                 "nm3_max":10000000,
-                "nm3_min":500,
+                "nm3_min":0,
                 "power_min":0,
-                "cost":2240,
-                "crf":10,
+                "cost":3360,
+                "crf":7,
                 "pressure_upper": 3,
                 "pressure_lower": 0.1,
                 "beta_el":0.0182,
@@ -232,7 +227,7 @@
             },
         "hyd":
             {
-                "flag":0,
+                "flag":1,
                 "supply":0,
                 "power_cost":0,
 
@@ -243,7 +238,7 @@
             },
         "sc":
             {
-                "area_max":0,
+                "area_max":10000000,
                 "area_min":0,
                 "cost":800,
                 "crf":20,
@@ -259,12 +254,12 @@
 
         "pv":
             {
-                "area_max":86036,
+                "area_max":1000000000,
                 "area_min":0,
                 "cost":1000,
                 "crf":20,
-                "backup_qcy":33591,
-                "beta_pv":0.2
+
+                "beta_pv":0.21
             }
 
 
