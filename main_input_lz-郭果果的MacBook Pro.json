@@ -8,7 +8,7 @@
             "office":30,
             "restaurant":0
         },
-        "load_area":100000,
+        "load_area":300000,
         "heat_mounth":"起始于12月15日，结束于3月15日",
         "cold_mounth":"起始于6月1日，结束于10月1日",
         "hydrogen_state":{
@@ -42,7 +42,7 @@
     "calc_mode":{
 
         "grid":{
-            "solar_analys":0,
+            "solar_analys":1,
             "p_pur_state":1,
             "p_sol_state":0,
             "h_pur_state":0

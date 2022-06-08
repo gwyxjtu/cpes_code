@@ -683,7 +683,6 @@ def planning_problem(dict,isloate,input_json):
             'area_sc': format(s_sc.X,'.1f'),  # 集热器面积/m2
             'p_co': format(p_co_max.X,'.1f'),  #氢压机功率/kw
 
-
             "equipment_cost": format(cap_sum/10000,'.2f'),  #设备总投资/万元
             "receive_year": format(cap_sum/(revenue-op_sum+0.01),'.2f'),  # 投资回报年限/年
     }
@@ -711,9 +710,7 @@ def planning_problem(dict,isloate,input_json):
             #'g_hpg_gr':[-sum(g_hpg_gr[m_date[2]:m_date[5]])*7/(m_date[2] - m_date[5]), -sum(g_hpg_gr[m_date[5]:m_date[8]])*7/(m_date[5] - m_date[8]),- sum(g_hpg_gr[m_date[8]:m_date[11]])*7/(m_date[8] - m_date[11]), sum(g_hpg_gr[m_date[11]:m_date[12]]+g_hpg_gr[m_date[0]:m_date[2]])*7/(90)],
             #'g_hpg':[-sum(g_hpg[m_date[2]:m_date[5]])*7/(m_date[2] - m_date[5]), -sum(g_hpg[m_date[5]:m_date[8]])*7/(m_date[5] - m_date[8]), -sum(g_hpg[m_date[8]:m_date[11]])*7/(m_date[8] - m_date[11]), sum(g_hpg[m_date[11]:m_date[12]]+g_hpg[m_date[0]:m_date[2]])*7/90],
             #'q_hpg':[-sum(q_hpg[m_date[2]:m_date[5]])*7/(m_date[2] - m_date[5]), -sum(q_hpg[m_date[5]:m_date[8]])*7/(m_date[5] - m_date[8]),- sum(q_hpg[m_date[8]:m_date[11]])*7/(m_date[8] - m_date[11]), sum(q_hpg[m_date[11]:m_date[12]]+q_hpg[m_date[0]:m_date[2]])*7/90]
-            "revenue_ele":sum([ele_load[i]*lambda_ele_in[i]*input_json['price']['discount'] for i in range(period)]),
-            "revenue_heat":input_json['load']['load_area']*input_json['price']['heat_price']*sum(z_g_demand)/30/24,
-            "revenue_cold":input_json['load']['load_area']*input_json['price']['cold_price']*sum(z_q_demand)/30/24,
+    
             'g_hpg_gr':[sum(g_hpg_gr[3288:3288+7*24]), sum(g_hpg_gr[5448:5448+7*24]), sum(g_hpg_gr[7656:7656+7*24]), sum(g_hpg_gr[360:360+7*24])],
             'g_hpg':[sum(g_hpg[3288:3288+7*24]), sum(g_hpg[5448:5448+7*24]), sum(g_hpg[7656:7656+7*24]), sum(g_hpg[360:360+7*24])],
             'q_hpg':[sum(q_hpg[3288:3288+7*24]), sum(q_hpg[5448:5448+7*24]),sum(q_hpg[7656:7656+7*24]), sum(q_hpg[360:360+7*24])]
@@ -740,8 +737,8 @@ def planning_problem(dict,isloate,input_json):
     co2_ele_gas=sum(ele_load)*input_json['carbon']['alpha_e']+sum(gas_sum_ele_gas)*1.535
     #print("------------")
     operation_output_json = {
-            "operation_cost_net": format((revenue-op_sum)/10000,'.1f'),  # 年化运行净收益/万元
-            "operation_cost": format(op_sum/10000,'.1f'),  # 年化运行总成本/万元
+            "operation_cost": format((op_sum+revenue)/10000,'.1f'),  # 年化运行总收益/万元
+            "operation_cost_old": format(op_sum/10000,'.1f'),  # 年化运行总收益/万元
             "revenue": format(revenue/10000,'.1f'),  # 年化运行成本/万元
             "cost_save_rate": format((opex_ele_only-op_sum)/opex_ele_only,'.1f'),  #电运行成本节约比例
             "cost_save_rate_gas": format((opex_ele_gas-op_sum)/opex_ele_gas,'.1f'),  #电气运行成本节约比例
@@ -789,9 +786,7 @@ def planning_problem(dict,isloate,input_json):
             'p_sol_earn':-sum([p_sol[i].X for i in range(period)])*lambda_ele_out,
             'opex':sum([p_pur[i].X*lambda_ele_in[i] for i in range(period)])-sum([p_sol[i].X for i in range(period)])*lambda_ele_out+lambda_h*sum([h_pur[i].X for i in range(period)]),
             'hyd_pur_cost':sum([p_hyd[i].X for i in range(period)])*input_json["device"]["hyd"]["power_cost"],
-            'cap_sum': capex_sum.x,
-            "operation_cost": format(op_sum/10000,'.1f'),  # 年化运行总成本/万元
-            "revenue": format(revenue/10000,'.1f'),  # 年化运行成本/万元
+            'cap_sum': capex.x,
 
             'cer':sum([p_pur[i].X for i in range(period)])/(sum(ele_load)+sum(g_demand)+sum(q_demand)),
             'cer_self':sum([p_sol[i].X for i in range(period)])/(sum(ele_load)+sum(g_demand)+sum(q_demand)),
