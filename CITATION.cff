@@ -1,0 +1,11 @@
+---
+cff-version: "1.1.0"
+message: "If you use this software, please cite it using these metadata."
+title: Optimization document Generator
+abstract: "Tools to automatic generation of energy station operation planning schemes."
+authors:
+  - affiliation: "Xi’an Jiaotong University"
+    family-names: Guo
+    given-names: Wangyi
+    orcid: ""
+repository-code: "https://github.com/gwyxjtu/cpes_code/"
