@@ -6,6 +6,6 @@ abstract: "Tools to automatic generation of energy station operation planning sc
 authors:
   - affiliation: "Xi’an Jiaotong University"
     family-names: Guo
-    given-names: Wang Yi
+    given-names: WangYi
     orcid: ""
 repository-code: "https://github.com/gwyxjtu/cpes_code/"
