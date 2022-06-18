@@ -1,0 +1,62 @@
+
+Gurobi 9.5.1 (mac64[arm]) logging started Sat Jun 18 15:10:32 2022
+
+Set parameter LogFile to value "log/mip.log"
+Set parameter MIPGap to value 0.01
+Gurobi Optimizer version 9.5.1 build v9.5.1rc2 (mac64[arm])
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+Optimize a model with 385487 rows, 377073 columns and 959263 nonzeros
+Model fingerprint: 0xd0f568d1
+Model has 17520 quadratic constraints
+Variable types: 342032 continuous, 35041 integer (35040 binary)
+Coefficient statistics:
+  Matrix range     [3e-04, 3e+04]
+  QMatrix range    [1e-03, 1e-03]
+  QLMatrix range   [2e-05, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+10]
+  RHS range        [6e-01, 8e+12]
+  QRHS range       [2e+02, 1e+04]
+Warning: Model contains large rhs
+Warning: Model contains large bounds
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+Presolve removed 292252 rows and 298608 columns
+Presolve time: 0.66s
+Presolved: 180835 rows, 95985 columns, 488678 nonzeros
+Presolved model has 17520 bilinear constraint(s)
+Variable types: 95984 continuous, 1 integer (0 binary)
+
+Deterministic concurrent LP optimizer: primal and dual simplex (primal and dual model)
+Showing first log only...
+
+Root relaxation presolved: 180835 rows, 95985 columns, 488678 nonzeros
+
+
+Root simplex log...
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+   35796    1.4147691e+07   0.000000e+00   9.799473e+05      5s
+   43728    1.3664719e+07   0.000000e+00   4.935470e+05     10s
+   54508    1.3360722e+07   0.000000e+00   4.899972e+03     15s
+   57638    1.2827507e+07   0.000000e+00   5.991489e+05     20s
+   60961    1.2691659e+07   0.000000e+00   7.700134e+04     25s
+   64544    1.2626981e+07   0.000000e+00   3.222403e+06     30s
+   68744    1.2545509e+07   0.000000e+00   2.009378e+06     35s
+   72857    1.2416116e+07   0.000000e+00   2.230245e+05     40s
+   74441    1.2337912e+07   0.000000e+00   1.294394e+05     45s
+   77741    1.2184900e+07   0.000000e+00   2.111526e+06     50s
+Concurrent spin time: 2.78s
+
+Solved with primal simplex (dual model)
+
+Root relaxation: objective 1.078592e+07, 317200 iterations, 53.59 seconds (139.70 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 1.0786e+07    0 17397          - 1.0786e+07      -     -   55s
+     0     0 1.0786e+07    0 17396          - 1.0786e+07      -     -   80s
+     0     0 1.0786e+07    0 17396          - 1.0786e+07      -     -  104s
+     0     2 1.0786e+07    0 17396          - 1.0786e+07      -     -  122s
+     1     4 1.0786e+07    1 17396          - 1.0786e+07      -   0.0  159s

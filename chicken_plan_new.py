@@ -587,6 +587,7 @@ def planning_problem(dict,isloate,input_json):
     #-gp.quicksum(p_sol)*lambda_ele_out
     # First optimize() call will fail - need to set NonConvex to 2
     m.params.NonConvex = 2
+    m.Params.LogFile = "log/mip.log"
     m.params.MIPGap = 0.01
     # m.optimize()
     #print(m.status)
@@ -835,15 +836,7 @@ def planning_problem(dict,isloate,input_json):
             'g_sc':[g_sc[i].X for i in range(period)],
             #'m_eb':[m_eb[i].X for i in range(period)],
             'g_hpg_gr':g_hpg_gr,
-            #'m_fc':[m_fc[i].X for i in range(period)],
-            #'m_ec':[m_ec[i].X for i in range(period)],
-            #'m_hp':[m_hp[i].X for i in range(period)],
-            #'h_ssto':[h_ssto[i].X for i in range(365)],
-            #'h_loss' : [eta_loss*m_ht*(t_ht[i].X - t_env_indoor[i]) for i in range(period)],
-            #'t_eb':[t_eb[i].X for i in range(period)],
-            #'t_return':[pulp.value(t_return[i]) for i in range(period)],
-            #'t_ac':[pulp.value(t_ac[i]) for i in range(period)],
-            #'t_cr':[pulp.value(t_cr[i]) for i in range(period)],
+
             't_ct':[t_ct[i].X for i in range(period)]
             #'q_ac':[pulp.value(c*m_ac*(t_cr[i] - t_ac[i])) for i in range(period)],
             #'g_fc':[eta_ex*mu_fc_g*h_fc[i].X for i in range(period)],
