@@ -18,6 +18,8 @@ import xlrd
 import random
 import time
 import csv
+# from branch_and_bound_class import *
+
 res_dict = "doc/"
 def to_csv(res,filename):
     items = list(res.keys())
@@ -213,10 +215,18 @@ def planning_problem(dict,isloate,input_json):
     #     z_g_demand = z_g_demand[:8760]
     # for cc in cool_mounth:
     #     z_q_demand[m_date[cc-1]:m_date[cc]] = [1 for _ in range(m_date[cc]-m_date[cc-1])]
+    
 
     z_g_demand = dict["z_heat_mounth"]
     z_q_demand = dict["z_cold_mounth"]
-
+    # 增加洗煤厂热负荷
+    # for i in range(8760):
+    #     # 9-11点增加热负1
+    #     if i%24 >= 7 and i%24 <= 23 and z_g_demand[i] == 1:
+    #         g_demand[i] += 167
+            
+    #print(sum(z_g_demand))
+    #exit(0)
     # z_g_demand = [1 for i in range(8760)]
     # z_q_demand = [1 for i in range(8760)]
     # ele_day = [356.06,332.77,321.13,315.31,359.52,472.41,643.9,754.74,728.19,647.6,556.43,562.26,556.43,538.97,533.15,564.49,769.55,990.85,1023.2,954.17,930.89,809.94,630.78,471.32]
@@ -469,7 +479,7 @@ def planning_problem(dict,isloate,input_json):
     #m.addConstr(h_sto[0] - h_sto[-1] + h_ssto[0] - h_ssto[-1] == h_pur[-1] + h_el[-1] - h_fc[-1])
     #m.addConstr(t_ht[0] == 60)
     #m.addConstr(h_ssto[-1] == h_ssto[0])
-    m.addConstr(gp.quicksum(q_hpg)+gp.quicksum(p_hpgc)+gp.quicksum(g_hpg_gr) >= gp.quicksum(g_hpg)-gp.quicksum(p_hpg))
+    # m.addConstr(gp.quicksum(q_hpg)+gp.quicksum(p_hpgc)+gp.quicksum(g_hpg_gr) >= gp.quicksum(g_hpg)-gp.quicksum(p_hpg))
     #piecewise price
     # m = model_linear_cost(m,300,600000,10,310,439000,p_el_max,capex_el)
     # m = model_linear_cost(m,300,600000,10,310,490000,p_fc_max,capex_fc)
@@ -596,7 +606,8 @@ def planning_problem(dict,isloate,input_json):
     m.addConstr(capex_sum == cost_hyd*input_json["device"]['hyd']['flag']+s_pv*cost_pv +s_sc*cost_sc +p_hpg_max*cost_hpg +cost_gtw*num_gtw +cost_ht*m_ht+cost_ht*m_ct+cost_hst*hst+cost_eb*p_eb_max+cost_ac*p_ac_max+ cost_hp*p_hp_max+ cost_hp1*p_hp1_max+ cost_hp2*p_hp2_max+ capex_fc+capex_el+cost_co*p_co_max)
 
     m.addConstr(capex_sum <= input_json['price']['capex_max'][1-isloate[0]])
-    m.addConstr(ce_h==gp.quicksum(p_pur)*alpha_e)
+    m.addConstr(ce_h==gp.quicksum(p_pur)*alpha_e) #-gp.quicksum(p_sol)*alpha_e
+
 
     try:
         m.optimize()

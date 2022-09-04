@@ -52,7 +52,7 @@ def save_json(j,name):
 if __name__ == '__main__':
     tem_env = 0#环境温度，后续补上
     #print(m_date)#main_input_zxxc_plan_h2devices main_input_zxxc1_new main_input_newload
-    with open("main_input_lz.json",encoding = "utf-8") as load_file:
+    with open("main_input_newload.json",encoding = "utf-8") as load_file:
         input_json = json.load(load_file)
 
 

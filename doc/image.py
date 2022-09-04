@@ -50,11 +50,11 @@ def load_image_1_01():
     plt.ylabel(u'负荷(kW·h)', fontsize=10)
     plt.xticks(fontproperties='Times New Roman', size=10)
     plt.yticks(fontproperties='Times New Roman', size=10)
-    plt.plot(grid_planning_output_json['ele_load'][0:24], color='blue', alpha=1, label=u'电负荷', linewidth=2)
+    plt.plot(grid_planning_output_json['ele_load'][24:48], color='blue', alpha=1, label=u'电负荷', linewidth=2)
     if sum(grid_planning_output_json['g_demand']) != 0:
-        plt.plot(grid_planning_output_json['g_demand'][0:24], color='orange', alpha=1, label=u'热负荷', linewidth=2)
+        plt.plot(grid_planning_output_json['g_demand'][24:48], color='orange', alpha=1, label=u'热负荷', linewidth=2)
     if sum(grid_planning_output_json['q_demand']) != 0:
-        plt.plot(grid_planning_output_json['q_demand'][0:24], color='gray', alpha=1, label=u'冷负荷', linewidth=2)
+        plt.plot(grid_planning_output_json['q_demand'][24:48], color='gray', alpha=1, label=u'冷负荷', linewidth=2)
     plt.xlim(0,24)
     plt.ylim(0, )
     # 设置刻度间隔
@@ -62,7 +62,7 @@ def load_image_1_01():
     ax = plt.gca()
     ax.xaxis.set_major_locator(x_major_locator)
     plt.grid(linewidth=0.7, axis='y')
-    plt.title(u"1月1日典型日负荷图", fontsize=14)
+    plt.title(u"1月2日典型日负荷图", fontsize=14)
     plt.legend()
     plt.savefig('.\docx\word\media\image4.png')
 def load_image_7_15():

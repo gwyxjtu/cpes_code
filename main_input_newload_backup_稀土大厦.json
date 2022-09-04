@@ -1,17 +1,17 @@
 {
     "load":{
-        "autoload":0,
-        "fileaddress":"load/hengshan.xls",
-        "province":"内蒙古自治区",
+        "autoload":1,
+        "fileaddress":"load/湖北省1500000autoload_result.xls",
+        "province":"内蒙古自治区" ,
         "city": "",
         "building_area":{
-            "apartment":1,
+            "apartment":0,
             "hotel":0,
             "office":1,
             "restaurant":0
         },
-        "load_area":138000,
-        "heat_mounth":"起始于11月1日，结束于4月1日",
+        "load_area":49136,
+        "heat_mounth":"起始于10月15日，结束于4月15日",
         "cold_mounth":"起始于6月15日，结束于9月15日",
 
         "power_peak":{
@@ -25,10 +25,10 @@
             "shear":6
         },
         "power_sum":{
-            "flag":0,
-            "ele":8500000,
-            "g":2000000,
-            "q":0
+            "flag":1,
+            "ele":2800000,
+            "g":600040,
+            "q":1200000
         },
         "yearly_power":0,
         "ele_type":0,
@@ -49,12 +49,12 @@
             "solar_analys":0,
             "p_pur_state":1,
             "p_sol_state":0,
-            "h_pur_state":1
+            "h_pur_state":0
         },
         "isloate":{
             "solar_analys":0,
-            "flag":1,
-            "h_pur_state":1
+            "flag":0,
+            "h_pur_state":0
         },
         "cer":100,
         "obj":{
@@ -69,18 +69,20 @@
         "pv_sc_max":10000000
     },
     "price":{
-        "TOU_power":[0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49,0.49],
+        "TOU_power":[0.6713,0.6713,0.6713,0.6713,0.6713,0.9935,0.9935,0.6713,0.6713,0.6713,0.3155,0.3155,0.3155,0.3155,0.3155,0.6713,0.6713,0.9935,0.9935,0.9935,0.9935,0.6713,0.6713,0.6713],
 
-        "power_sale":0.38,
-        "discount":0.9,
+        "power_sale":1.99,
+        "discount":1,
         "gas_price":4.085,
-        "heat_price":4.6,
-        "cold_price":16,
+        "heat_price":4,
+        "cold_price":6,
+        "heat_kw":0.61,
+        "cold_kw":0.38,
         "carbon_price": 0.06,
 
-        "hydrogen_price":13.44,
-        "capex_max":[3000000000,25000000000],
-        "op_max":[111800000000,200000000000]
+        "hydrogen_price":30,
+        "capex_max":[30000000000,150000000],
+        "op_max":[1118000000,2000000000]
     },
 
     "device":{
@@ -128,7 +130,7 @@
 
         "eb":
             {
-                "power_max":10000,
+                "power_max":0,
                 "power_min":0,
                 "cost":500,
                 "crf":10,
@@ -208,7 +210,7 @@
         "hst":
             {
                 "sto_max":50000000,
-                "sto_min":0,
+                "sto_min":20,
                 "cost":3000,
                 "crf":15,
 
@@ -226,7 +228,7 @@
                 "power_max":5000000,
                 "nm3_max":10000000,
 
-                "nm3_min":0,
+                "nm3_min":50,
                 "power_min":0,
 
                 "cost":3360,
@@ -268,7 +270,7 @@
 
         "pv":
             {
-                "area_max":90000,
+                "area_max":110000000,
                 "area_min":0,
                 "cost":1000,
                 "crf":20,
